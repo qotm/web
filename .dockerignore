@@ -1,0 +1,16 @@
+# Keep the build context small and the image reproducible.
+node_modules
+dist
+dev-dist
+
+# Env files are NOT copied into the image — the URLs are passed as build args.
+# Copying them would bake whichever environment happened to be checked out.
+.env
+.env.*
+!.env.example
+
+.git
+.github
+.forgejo
+*.log
+.DS_Store

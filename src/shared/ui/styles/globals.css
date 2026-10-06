@@ -1,0 +1,285 @@
+/**
+ * @/shared/ui global stylesheet — the single CSS entry every app imports:
+ *   import '@/shared/ui/styles/globals.css';
+ *
+ * Layers: self-hosted font -> Tailwind v4 -> brand tokens (theme.css) ->
+ * shadcn semantic tokens (light/dark) mapped for utilities. Design language =
+ * Wise: flat surfaces, no shadows, 1px ink hairlines, 24px radii, green CTA only.
+ */
+@import 'tailwindcss';
+@import './theme.css';
+
+/**
+ * Inter, self-hosted. This was a `@import url(fonts.googleapis.com/...)` on the
+ * first line of this file, which is the slowest possible way to load a font: a
+ * CSS @import is only discovered after this stylesheet has been parsed, so it
+ * cost three SERIALIZED round trips across two extra origins (googleapis ->
+ * gstatic -> woff2) before text could paint. Worse for the installed PWA — the
+ * service worker cannot precache a cross-origin URL, so fonts hit the network on
+ * every cold start and failed outright offline, despite the shell being cached.
+ *
+ * One variable file replaces the six static weights that were being requested.
+ * 47 KB covers the whole 100-900 axis, and all six weights are in use
+ * (400/500/600/700/800/900). Latin only, and upright only — there is no italic
+ * anywhere in the codebase. Add `wght-italic` here if that ever changes.
+ *
+ * Declared by hand rather than `@import '@fontsource-variable/inter/wght.css'`
+ * because that pulls in all seven subsets (cyrillic, greek, vietnamese, ...).
+ * Vite would emit every one into dist, and `woff2` is in the PWA precache glob.
+ *
+ * Named `Inter` so the `--font-sans` / `--font-display` stacks need no change; an
+ * @font-face shadows a same-named system font, so this file always wins.
+ */
+@font-face {
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2');
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+		U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Scan workspace component packages for utility classes (they live under
+   node_modules in consumers, which Tailwind skips by default). The consuming
+   app's own src is auto-detected by Tailwind. Add a line here for any new
+   component package. */
+@source '../**/*.{ts,tsx}';
+@source '../../../layouts/src/**/*.{ts,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--radius: 0.75rem; /* 12px base (inputs); cards/buttons use explicit 24px */
+
+	--background: #eceee9;
+	--foreground: #0e0f0c;
+	--card: #ffffff;
+	--card-foreground: #0e0f0c;
+	--popover: #ffffff;
+	--popover-foreground: #0e0f0c;
+	--primary: #9fe870;
+	--primary-foreground: #0e0f0c;
+	--secondary: #f2f4ef;
+	--secondary-foreground: #0e0f0c;
+	--muted: #f2f4ef;
+	--muted-foreground: #7d7f7a;
+	--accent: #e2f6d5;
+	--accent-foreground: #163300;
+	--destructive: #c0242b;
+	--destructive-foreground: #ffffff;
+	--border: rgba(14, 15, 12, 0.09);
+	--input: rgba(14, 15, 12, 0.28);
+	--ring: rgba(159, 232, 112, 0.55);
+	--brand-panel: #e8ebe6;
+
+	/*
+	 * Secondary text + link colours. These start life as fixed brand tokens in
+	 * theme.css, which means they never changed with the theme — #454745
+	 * body text sits at ~2:1 on a dark card, and the #163300 link is effectively
+	 * invisible. Redeclared here (light values identical to the brand ones, so
+	 * light mode is unchanged) and overridden in .dark below.
+	 * Dark values are the design's own palette from `Client App.dc.html`.
+	 */
+	--body: #454745;
+	--mute: #868685;
+	--link: #163300;
+
+	/*
+	 * Status colours, same problem: the brand hexes are tuned for a white card and
+	 * are muddy on a dark one. Light values match the brand tokens exactly; the
+	 * dark ones are the design's own `--gain`/`--loss` (plus a lifted warning).
+	 * These feed both the `text-*` and the translucent `bg-*` tint utilities.
+	 */
+	--positive: #2ead4b;
+	--negative: #d03238;
+	--warning: #ffd11a;
+
+	/*
+	 * Foreground for the `bg-warning/20` pill. The fixed brand `--color-warning-deep`
+	 * (#b86700) was being used here, which is the classic pairing bug: the tint
+	 * follows the theme, the text does not. On a dark card it measured 2.43:1 —
+	 * unreadable. These are the design's own warning-pill foregrounds
+	 * (`--pill-warn-fg`), and they measure 8.8–10:1 light / 6.5–8.6:1 dark.
+	 */
+	--warning-content: #4a3b1c;
+
+	/*
+	 * Active-tab underline (admin console tab bars). The design uses a literal
+	 * #579b2e in both themes, which measures 2.93:1 on the light page background —
+	 * under the 3:1 WCAG 1.4.11 needs for a non-text indicator. Darkened along the
+	 * same hue (97.4°) to 3.55:1; the dark value is the same hue lifted for an ink
+	 * canvas. Deliberately NOT `--primary`: Wise Green is the CTA accent, and an
+	 * active tab is a state, not a call to action.
+	 */
+	--tab-active: #4e8b29;
+
+	/*
+	 * Categorical chart palette — for encoding *identity* (which holding is which),
+	 * never magnitude. Six slots because a donut stops being readable past ~6
+	 * slices, and because the hue budget is genuinely that small: excluding the
+	 * gain (~144°) and loss (~30°) hue neighbourhoods removes ~100° of the wheel,
+	 * and what's left can't hold 8 mutually distinguishable hues that also stay
+	 * clear of those two colours in both themes. Verified min pairwise ΔE 40 (light)
+	 * / 36 (dark) against Tableau10's 30 as the benchmark, every slot ≥32 ΔE from
+	 * `--positive`/`--negative`/`--primary` so no slice reads as a gain, a loss or
+	 * a CTA, and hue drift ≤3° between themes so a slice keeps its identity on
+	 * toggle. Lightness is deliberately held in a narrow band per theme so no slice
+	 * outweighs another.
+	 *
+	 * `--chart-other` is the "and the rest" bucket: neutral on purpose, so it
+	 * recedes instead of reading as another holding. Adding a 7th hue here will
+	 * break the guarantees above — collapse into Other instead.
+	 */
+	/*
+	 * Single magnitude hue for bar charts. Bar rows are ONE series — identity comes
+	 * from the row label, so every bar is the same colour; colouring them by value
+	 * would double-encode the length. Separate from `--chart-1` despite sharing the
+	 * light value: that slot is tuned for small donut slices, and its dark value
+	 * (#55bca4, OKLCH L 0.727) sits outside the 0.48–0.67 lightness band a dark-mode
+	 * bar fill needs. Both values pass the dataviz validator on all five checks.
+	 */
+	--chart-bar: #009e84;
+
+	--chart-1: #009e84;
+	--chart-2: #0096c7;
+	--chart-3: #6767c7;
+	--chart-4: #ac7e9a;
+	--chart-5: #c27c2d;
+	--chart-6: #737548;
+	--chart-other: #8f958e;
+
+	/*
+	 * Modal / drawer backdrop. Needs to be darker on a dark page to still read as
+	 * a separation layer — the design specifies exactly this pair.
+	 */
+	--scrim: rgba(14, 15, 12, 0.45);
+}
+
+.dark {
+	--background: #0e0f0c;
+	--foreground: #f4f6f1;
+	--card: #191b16;
+	--card-foreground: #f4f6f1;
+	--popover: #191b16;
+	--popover-foreground: #f4f6f1;
+	--primary: #9fe870;
+	--primary-foreground: #0e0f0c;
+	--secondary: #23261f;
+	--secondary-foreground: #f4f6f1;
+	--muted: #23261f;
+	--muted-foreground: #8b8d88;
+	--accent: rgba(159, 232, 112, 0.15);
+	--accent-foreground: #9fe870;
+	--destructive: #ff8085;
+	--destructive-foreground: #0e0f0c;
+	--border: rgba(232, 235, 230, 0.11);
+	--input: rgba(232, 235, 230, 0.3);
+	--ring: rgba(159, 232, 112, 0.4);
+	--brand-panel: #14160f;
+
+	--body: #c4c7c0;
+	--mute: #8b8d88;
+	/* Links become the brand green on dark — ink-deep is unreadable there. */
+	--link: #9fe870;
+
+	--positive: #6fdd8b;
+	--negative: #ff8085;
+	--warning: #ffd95e;
+	/* On a dark tint the deep olive inverts to the warning colour itself. */
+	--warning-content: #ffd95e;
+
+	/* Same 97.4° hue as light, lifted for the ink canvas (9.1:1 on --background). */
+	--tab-active: #74c742;
+
+	/* Same hue as light, stepped into the dark band (see the light block for why). */
+	--chart-bar: #35a68d;
+
+	/* Same hues as light, lifted for the dark card (see the light block for why). */
+	--chart-1: #55bca4;
+	--chart-2: #43c8ff;
+	--chart-3: #a7a1fc;
+	--chart-4: #eab8d6;
+	--chart-5: #e29d56;
+	--chart-6: #c9c998;
+	--chart-other: #7f857e;
+
+	--scrim: rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-brand-panel: var(--brand-panel);
+
+	/*
+	 * Re-point the secondary-text utilities (`text-body`, `text-mute`,
+	 * `text-ink-deep`) at the theme-aware vars above. theme.css defines these
+	 * as fixed brand hexes, and this layer wins — so `text-body` finally responds
+	 * to the theme instead of staying #454745 on a dark card.
+	 */
+	--color-body: var(--body);
+	--color-mute: var(--mute);
+	--color-ink-deep: var(--link);
+	--color-positive: var(--positive);
+	--color-negative: var(--negative);
+	--color-warning: var(--warning);
+	/* Pair `bg-warning/20` with `text-warning-content`, never `text-warning-deep`. */
+	--color-warning-content: var(--warning-content);
+	/*
+	 * `bg-chart-bar` for CSS bar fills. The `--chart-1..6` donut slots are
+	 * deliberately NOT mapped to utilities — the donut reads them through
+	 * `readVar()` in JS — so this is the only chart colour with a class.
+	 */
+	--color-chart-bar: var(--chart-bar);
+	/* Enables `border-tab-active` on the selected tab's 2px underline. */
+	--color-tab-active: var(--tab-active);
+	/* Enables `bg-scrim` — already carries its own alpha, so no /45 modifier. */
+	--color-scrim: var(--scrim);
+}
+
+@layer base {
+	* {
+		border-color: var(--color-border);
+	}
+
+	/*
+	 * Tells the browser which palette its own UI should use — native scrollbars,
+	 * form controls, autofill backgrounds and the text caret. Without it these
+	 * stay light-styled over a dark page. The theme provider also sets this
+	 * inline on <html> so it flips instantly with the class.
+	 */
+	:root {
+		color-scheme: light;
+	}
+
+	.dark {
+		color-scheme: dark;
+	}
+
+	body {
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+	}
+}

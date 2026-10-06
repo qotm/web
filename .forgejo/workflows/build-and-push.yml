@@ -1,0 +1,58 @@
+# Builds and pushes the app image.
+#
+# Vite compiles the VITE_* URLs into the bundle at build time, so this image is
+# specific to one environment — see the note at the top of the Dockerfile.
+
+name: Build and Push
+
+on:
+  push:
+    branches:
+      - main
+  # Day-to-day work happens on `development`; this lets a build be cut without
+  # merging to main first.
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate image tag
+        id: tag
+        run: |
+          DATE=$(date +'%y_%m_%d')
+          RAND=$(printf '%05d' "$((RANDOM % 100000))")
+          echo "TAG=${DATE}_${RAND}" >> "$GITHUB_OUTPUT"
+          echo "OWNER=$(echo '${{ github.repository }}' | cut -d/ -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.DK_USER }}
+          password: ${{ secrets.DK_ACCESS_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: .
+          build-args: |
+            VITE_APP_API_URL=${{ secrets.VITE_APP_API_URL }}
+            VITE_APP_SITE_URL=${{ secrets.VITE_APP_SITE_URL }}
+            VITE_APP_SUPPORT_EMAIL=${{ secrets.VITE_APP_SUPPORT_EMAIL }}
+            VITE_OPENOBSERVE_URL=${{ secrets.VITE_OPENOBSERVE_URL }}
+            VITE_OPENOBSERVE_ORG=${{ secrets.VITE_OPENOBSERVE_ORG }}
+            VITE_OPENOBSERVE_CLIENT_TOKEN=${{ secrets.VITE_OPENOBSERVE_CLIENT_TOKEN }}
+          tags: |
+            ${{ secrets.REGISTRY }}/${{ steps.tag.outputs.OWNER }}/web:latest
+            ${{ secrets.REGISTRY }}/${{ steps.tag.outputs.OWNER }}/web:${{ steps.tag.outputs.TAG }}
+
+      - name: Summary
+        run: echo "Pushed web:${{ steps.tag.outputs.TAG }}" >> "$GITHUB_STEP_SUMMARY"

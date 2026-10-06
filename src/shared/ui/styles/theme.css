@@ -1,0 +1,48 @@
+/**
+ * Qotm Web — shared Tailwind v4 brand tokens (Wise-derived design system).
+ * Source of truth: Claude Design "Qotm Web Design System" (colors_and_type.css).
+ *
+ * Consume in an app's main CSS entry (via @/shared/ui/styles/globals.css):
+ *   @import 'tailwindcss';
+ *   @import './theme.css';
+ *
+ * These are the BRAND tokens (palette shades, ink, semantic, fonts). The shadcn
+ * semantic layer (--background/--foreground/--primary/...) is layered on top by
+ * @/shared/ui/styles/globals.css, which owns light/dark theming.
+ *
+ * Brand rule: Wise Green (#9fe870) is the CTA accent ONLY — never a success color.
+ */
+@theme {
+	/* Brand green shades (primary itself is owned by the shadcn layer) */
+	--color-primary-active: #cdffad;
+	--color-primary-neutral: #c5edab;
+	--color-primary-pale: #e2f6d5;
+	--color-on-primary: #0e0f0c;
+
+	/* Surfaces & ink */
+	--color-sage: #e8ebe6;
+	--color-ink: #0e0f0c;
+	--color-ink-deep: #163300;
+	--color-body: #454745;
+	--color-mute: #868685;
+
+	/* Semantic — status only, never the brand green */
+	--color-positive: #2ead4b;
+	--color-positive-deep: #054d28;
+	--color-warning: #ffd11a;
+	--color-warning-deep: #b86700;
+	--color-negative: #d03238;
+	--color-negative-deep: #a72027;
+
+	/* Illustrative accents (inside illustrations only, never UI fills) */
+	--color-accent-orange: #ffc091;
+	--color-accent-cyan: #38c8ff;
+
+	/* Typography — Inter stands in for proprietary Wise Sans */
+	/* 'Manrope' was listed here but never loaded — and sat *after* Inter, so it
+	   could never have been used even if it were. Removed as dead. If the design
+	   really wants Manrope for display type it needs its own @font-face AND to be
+	   ordered ahead of Inter — a deliberate visual change, not a cleanup. */
+	--font-display: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
