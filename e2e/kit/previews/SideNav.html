@@ -1,0 +1,15 @@
+<!-- @dsCard group="Navigation" height=680 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>SideNav</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.SideNav, { active: "verification", sections: [{ items: [{ id: "dash", label: "Dashboard" }] }, { title: "Content", items: [{ id: "quotes", label: "Quotes" }, { id: "subs", label: "Submissions", count: 23 }, { id: "verification", label: "Verification queue", count: 12, attention: true }, { id: "curation", label: "Curation queue", count: 7 }, { id: "reports", label: "Reports", count: 3, attention: true }] }, { title: "Taxonomy", items: [{ id: "a", label: "Authors" }, { id: "s", label: "Sources" }, { id: "t", label: "Topics" }] }, { title: "System", items: [{ id: "u", label: "Users" }, { id: "r", label: "Dataset releases" }, { id: "l", label: "Audit logs" }] }] })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

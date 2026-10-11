@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=150 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Field</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { maxWidth: 420 } }, /* @__PURE__ */ React.createElement(K.Field, { label: "Source URL", optional: true, hint: "Where the words were first published." }, /* @__PURE__ */ React.createElement("input", { className: "qk-control qk-control--mono", defaultValue: "https://www.cs.utexas.edu/~EWD/" }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

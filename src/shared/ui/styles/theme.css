@@ -51,6 +51,7 @@
 	--radius-field: 12px;
 	--radius-card: 14px;
 	--radius-terminal: 16px;
+	--radius-pill: 999px; /* install pill, badges, topic tags, switches */
 
 	/* Effectively one shadow (the terminal); raised is for floating layers. */
 	--shadow-terminal: 0 24px 60px -30px rgba(20, 18, 16, 0.5);

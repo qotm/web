@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=320 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Textarea</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { maxWidth: 560 } }, /* @__PURE__ */ React.createElement(K.Textarea, { label: "Quote", required: true, display: true, rows: 3, maxLength: 280, defaultValue: "Simplicity is prerequisite for reliability.", hint: "The exact words, without quotation marks." }), /* @__PURE__ */ React.createElement(K.Textarea, { label: "Context", optional: true, rows: 2, placeholder: "Where and why it was said." })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!-- @dsCard group="Brand" height=130 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>InstallPill</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, /* @__PURE__ */ React.createElement(K.InstallPill, null), /* @__PURE__ */ React.createElement(K.InstallPill, { command: "qotm sync", copyable: true }), /* @__PURE__ */ React.createElement("span", { style: { background: "var(--qotm-ink)", padding: 14, borderRadius: 14 } }, /* @__PURE__ */ React.createElement(K.InstallPill, { onDark: true, copyable: true })))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!-- @dsCard group="Quotes" height=690 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ProvenancePanel</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+const D = {
+  dijkstra: { id: "q_8f2k1c", text: "Simplicity is prerequisite for reliability.", author: "Edsger W. Dijkstra", authorSlug: "dijkstra", work: "EWD 498", year: 1975, type: "canonical", status: "CURATED", topics: ["simplicity", "software design"], contributor: "kofi", likes: 412, favorites: 188, source: "EWD 498: How do we tell truths that might hurt?", sourceUrl: "https://www.cs.utexas.edu/~EWD/transcriptions/EWD04xx/EWD498.html", context: "From a list of short, deliberately provocative remarks on the state of computing.", verifier: "mireille", verifiedAt: "2026-08-02", releases: ["v2026.08.1", "v2026.08.3"] },
+  sicp: { id: "q_3m9d0a", text: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson & Gerald Jay Sussman", authorSlug: "abelson-sussman", work: "Structure and Interpretation of Computer Programs", year: 1985, type: "canonical", status: "VERIFIED", topics: ["programming", "learning"], contributor: "ada", likes: 301, favorites: 97 },
+  kernighan: { id: "q_1t7c4e", text: "Debugging is twice as hard as writing the code in the first place.", author: "Brian W. Kernighan", authorSlug: "kernighan", work: "The Elements of Programming Style", year: 1978, type: "canonical", status: "CURATED", topics: ["debugging"], contributor: "kofi", likes: 268, favorites: 120, liked: true },
+  karlton: { id: "q_6h2w8r", text: "There are only two hard things in Computer Science: cache invalidation and naming things.", author: "Phil Karlton", authorSlug: "karlton", type: "canonical", status: "NEEDS_EVIDENCE", topics: ["programming"], contributor: "ada", likes: 540, favorites: 76 },
+  torvalds: { id: "q_9b5n2k", text: "Talk is cheap. Show me the code.", author: "Linus Torvalds", authorSlug: "torvalds", work: "linux-kernel mailing list", year: 2e3, type: "canonical", status: "VERIFIED", topics: ["open source"], contributor: "mireille", likes: 190, favorites: 64 },
+  ada: { id: "q_4r8y1p", text: "A green build is a hypothesis, not a proof.", type: "original", status: "PUBLISHED", topics: ["software engineering"], contributor: "ada", likes: 58, favorites: 21, recommends: 14, recommended: true },
+  topics: ["programming", "software design", "software engineering", "unix", "open source", "databases", "distributed systems", "security", "web development", "debugging", "simplicity", "complexity", "engineering leadership", "learning", "creativity"],
+  nav: [{ id: "discover", label: "discover", href: "/discover" }, { id: "latest", label: "latest", href: "/latest" }, { id: "curated", label: "curated", href: "/curated" }, { id: "topics", label: "topics", href: "/topics" }]
+};
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, alignItems: "start" } }, /* @__PURE__ */ React.createElement(K.ProvenancePanel, { quote: D.dijkstra }), /* @__PURE__ */ React.createElement(K.ProvenancePanel, { quote: D.ada })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

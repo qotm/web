@@ -1,0 +1,15 @@
+<!-- @dsCard group="People" height=200 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ProfileHeader</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.ProfileHeader, { name: "Ada Mensah", handle: "ada", role: "VERIFIER", joined: "Aug 2026", bio: "Reads old papers so you don't have to.", stats: [{ label: "quotes", value: 12 }, { label: "contributions", value: 31 }, { label: "curated", value: 6 }] })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!-- @dsCard group="Quotes" height=330 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>LifecycleSteps</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.LifecycleSteps, { track: "canonical", current: "CURATION_REVIEW", dates: { SUBMITTED: "Aug 04", UNDER_REVIEW: "Aug 05", VERIFIED: "Aug 09" } }), /* @__PURE__ */ React.createElement(K.LifecycleSteps, { track: "canonical", current: "UNDER_REVIEW", outcome: "NEEDS_EVIDENCE" }), /* @__PURE__ */ React.createElement(K.LifecycleSteps, { track: "original", current: "PUBLISHED" })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

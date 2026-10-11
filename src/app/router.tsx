@@ -39,6 +39,7 @@ const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
 const AdminHomeRoute = named(() => import('@/routes/admin/home'), 'AdminHomeRoute');
+const KitRoute = named(() => import('@/routes/dev/kit'), 'KitRoute');
 
 /**
  * The site: the community pages, public to everyone, and the account pages,
@@ -121,5 +122,7 @@ export const router = createBrowserRouter([
 		),
 		children: [{ index: true, element: lazyRoute(<AdminHomeRoute />) }]
 	},
+	// Dev only: the kit gallery the component tests compare with qotm_kit.
+	...(import.meta.env.DEV ? [{ path: '/_kit', element: lazyRoute(<KitRoute />) }] : []),
 	{ path: '*', element: <NotFound /> }
 ]);

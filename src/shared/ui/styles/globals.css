@@ -199,6 +199,8 @@
 	--color-body: var(--body);
 	--color-mute: var(--mute);
 	--color-ink-deep: var(--link);
+	/* `text-link`: clay-600 link text on paper and white. */
+	--color-link: var(--link);
 	--color-positive: var(--positive);
 	--color-negative: var(--negative);
 	--color-warning: var(--warning);
@@ -224,7 +226,37 @@
 		background-color: var(--color-background);
 		color: var(--color-foreground);
 		font-family: var(--font-sans);
+		font-size: 17px;
+		line-height: 1.6;
 		-webkit-font-smoothing: antialiased;
 		text-rendering: optimizeLegibility;
+	}
+
+	/* The kit's element defaults (bundle.css): display headings, mono code,
+	   the clay selection and the clay focus ring, 2px at a 2px offset. */
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-display);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		line-height: 1.15;
+	}
+
+	code,
+	pre,
+	kbd {
+		font-family: var(--font-mono);
+	}
+
+	::selection {
+		background: var(--color-clay-200);
+		color: var(--color-ink);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-ring);
+		outline-offset: 2px;
 	}
 }

@@ -1,0 +1,15 @@
+<!-- @dsCard group="Quotes" height=260 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>StatusBadge</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, ["SUBMITTED", "UNDER_REVIEW", "NEEDS_EVIDENCE", "REJECTED", "VERIFIED", "CURATION_REVIEW", "CURATED", "DATASET_RELEASE"].map((s) => /* @__PURE__ */ React.createElement(K.StatusBadge, { key: s, status: s }))), /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, ["ORIGINALITY_CHECK", "PUBLISHED", "COMMUNITY_DISCOVERY", "CURATION_CANDIDATE", "DISPUTED", "WITHDRAWN"].map((s) => /* @__PURE__ */ React.createElement(K.StatusBadge, { key: s, status: s }))), /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, ["CANONICAL", "ORIGINAL", "PRIVATE", "PUBLIC", "PERSONAL", "COMMUNITY"].map((s) => /* @__PURE__ */ React.createElement(K.StatusBadge, { key: s, status: s }))), /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, ["MEMBER", "VERIFIER", "MODERATOR", "ADMIN"].map((s) => /* @__PURE__ */ React.createElement(K.StatusBadge, { key: s, status: s })))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

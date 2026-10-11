@@ -1,0 +1,15 @@
+<!-- @dsCard group="People" height=280 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ContributionRow</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { maxWidth: 720, gap: 0 } }, /* @__PURE__ */ React.createElement(K.ContributionRow, { text: "Simplicity is prerequisite for reliability.", author: "Edsger W. Dijkstra", status: "DATASET_RELEASE", date: "Aug 04", release: "v2026.08.3" }), /* @__PURE__ */ React.createElement(K.ContributionRow, { text: "There are only two hard things in Computer Science: cache invalidation and naming things.", author: "Phil Karlton", status: "NEEDS_EVIDENCE", date: "Aug 21" }), /* @__PURE__ */ React.createElement(K.ContributionRow, { text: "A green build is a hypothesis, not a proof.", type: "original", status: "CURATION_CANDIDATE", date: "Sep 02" })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

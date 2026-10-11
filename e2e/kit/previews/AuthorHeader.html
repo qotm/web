@@ -1,0 +1,15 @@
+<!-- @dsCard group="People" height=250 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>AuthorHeader</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.AuthorHeader, { name: "Edsger W. Dijkstra", line: "1930–2002 · computer scientist", topics: ["simplicity", "programming", "software design"], stats: [{ label: "quotes", value: 42 }, { label: "curated", value: 31 }] })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

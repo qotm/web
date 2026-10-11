@@ -1,0 +1,15 @@
+<!-- @dsCard group="Navigation" height=270 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>SiteFooter</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(K.SiteFooter, { columns: [{ title: "Read", links: [{ id: "d", label: "discover", href: "/discover" }, { id: "c", label: "curated", href: "/curated" }, { id: "t", label: "topics", href: "/topics" }] }, { title: "Contribute", links: [{ id: "s", label: "submit a quote", href: "/submit" }, { id: "g", label: "guidelines", href: "#" }] }, { title: "CLI", links: [{ id: "i", label: "install", href: "#" }, { id: "gh", label: "github", href: "#" }] }] }));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

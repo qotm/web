@@ -1,0 +1,19 @@
+<!-- @dsCard group="Admin" height=460 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>DataTable</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.DataTable, { selectable: true, columns: [{ key: "id", label: "id", mono: true, width: 110 }, { key: "text", label: "quote", render: (v) => /* @__PURE__ */ React.createElement("span", { style: { fontFamily: "var(--qotm-font-display)", fontWeight: 500 } }, v) }, { key: "author", label: "author" }, { key: "by", label: "submitted by", mono: true }, { key: "status", label: "state" }, { key: "age", label: "waiting", mono: true, align: "right" }], rows: [
+    { id: "q_6h2w8r", text: "There are only two hard things in Computer Science…", author: "Phil Karlton", by: "@ada", status: "UNDER_REVIEW", age: "2d" },
+    { id: "q_9b5n2k", text: "Talk is cheap. Show me the code.", author: "Linus Torvalds", by: "@mireille", status: "SUBMITTED", age: "5h" },
+    { id: "q_2x7v3m", text: "Make it work, make it right, make it fast.", author: "Kent Beck", by: "@kofi", status: "NEEDS_EVIDENCE", age: "6d" }
+  ] }), /* @__PURE__ */ React.createElement(K.Pagination, { page: 1, total: 12 })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

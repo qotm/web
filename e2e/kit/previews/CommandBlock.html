@@ -1,0 +1,15 @@
+<!-- @dsCard group="Brand" height=210 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>CommandBlock</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.CommandBlock, { caption: "Open this in your terminal", command: "qotm open q_8f2k1c" }), /* @__PURE__ */ React.createElement(K.CommandBlock, { tone: "light", command: "qotm --favorites", glyph: "~ >" })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

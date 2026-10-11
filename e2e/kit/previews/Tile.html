@@ -1,0 +1,15 @@
+<!-- @dsCard group="Surfaces" height=180 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Tile</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-grid", style: { gridTemplateColumns: "repeat(3,1fr)" } }, /* @__PURE__ */ React.createElement(K.Tile, { caption: "symbol" }, /* @__PURE__ */ React.createElement(K.Logo, { lockup: "symbol", height: 48 })), /* @__PURE__ */ React.createElement(K.Tile, { caption: "reversed", dark: true }, /* @__PURE__ */ React.createElement(K.Logo, { lockup: "symbol", reversed: true, height: 48 })), /* @__PURE__ */ React.createElement(K.Tile, { caption: "divider" }, /* @__PURE__ */ React.createElement(K.Divider, { variant: "mark", gap: "0" })))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

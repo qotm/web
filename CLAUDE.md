@@ -62,8 +62,8 @@ backend's e2e suite: both use the test database.
 - **The guards are UI, not security.** `ProtectedRoute` and `RoleRoute` decide
   what renders; the API decides what data anyone gets. Their `fallback` /
   `forbidden` props are required.
-- **Auth paths stay flat** (`/login`, `/signup`, `/reset-password`…): they are
-  in emails already sent.
+- **Sign-in is passwordless** (magic link or OAuth, BUILD-PLAN §9) and its
+  paths stay flat (`/login`, `/device`).
 - **`VITE_*` is inlined at build time.** A built image is pinned to one
   environment, and nothing secret may ever be a `VITE_*` variable. Read env
   only through `src/lib/env.ts`.
@@ -82,6 +82,17 @@ backend's e2e suite: both use the test database.
   `StateScreen` for errors, from `@/shared/layouts`.
 - **Telemetry**: OpenObserve RUM once `VITE_OPENOBSERVE_*` are set;
   `reportError` from `@/shared/telemetry` for errors you catch.
+
+## The kit (qotm_kit)
+
+Components in `src/shared/ui` follow qotm_kit (the design system) property
+for property. `/_kit` (dev only) lays each one out as the kit's own preview
+does; `e2e/kit.ts` renders the kit's preview from its real bundle
+(`e2e/kit/`) and `expectMatchesKit()` compares computed styles element by
+element, saving `e2e/.screenshots/kit/<Name>-kit.png` and `-web.png` for
+review. A new kit component gets a `/_kit` section and an `expectMatchesKit`
+test. `cn()` knows the theme's own names (text styles, radii, spacing), and
+`glyph()` gives symbols text presentation.
 
 ## Skills
 

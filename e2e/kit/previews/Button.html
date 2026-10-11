@@ -1,0 +1,15 @@
+<!-- @dsCard group="Core" height=150 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Button</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, /* @__PURE__ */ React.createElement(K.Button, null, "Submit a quote"), /* @__PURE__ */ React.createElement(K.Button, { variant: "accent" }, "Publish release"), /* @__PURE__ */ React.createElement(K.Button, { variant: "outline" }, "Build preview"), /* @__PURE__ */ React.createElement(K.Button, { variant: "quiet" }, "Cancel"), /* @__PURE__ */ React.createElement(K.Button, { variant: "danger" }, "Withdraw")), /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, /* @__PURE__ */ React.createElement(K.Button, { size: "sm" }, "Save"), /* @__PURE__ */ React.createElement(K.Button, { size: "lg" }, "Get started"), /* @__PURE__ */ React.createElement(K.Button, { variant: "outline", mono: true, pill: true }, "$ npm i -g qotm"), /* @__PURE__ */ React.createElement(K.Button, { disabled: true }, "Disabled"), /* @__PURE__ */ React.createElement(K.Button, { variant: "accent", disabled: true }, "Publish"))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

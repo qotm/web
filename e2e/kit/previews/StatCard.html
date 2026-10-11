@@ -1,0 +1,15 @@
+<!-- @dsCard group="Admin" height=220 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>StatCard</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-grid", style: { gridTemplateColumns: "repeat(4,1fr)" } }, /* @__PURE__ */ React.createElement(K.StatCard, { label: "Eligible quotes", value: 12631, delta: "+81 since v2026.08.2" }), /* @__PURE__ */ React.createElement(K.StatCard, { label: "Awaiting verification", value: 12, note: "oldest 6 days" }), /* @__PURE__ */ React.createElement(K.StatCard, { label: "Open reports", value: 3 }), /* @__PURE__ */ React.createElement(K.StatCard, { label: "Useful contributions / 100 users", value: 18, note: "last 30 days" }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

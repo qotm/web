@@ -4,6 +4,9 @@ export * from './lib/zod-setup';
 
 // Primitives
 export * from './components/ui/button';
+export * from './components/ui/icon-button';
+export * from './components/ui/text-link';
+export * from './components/ui/kbd';
 export * from './components/ui/input';
 export * from './components/ui/search-input';
 export * from './components/ui/label';

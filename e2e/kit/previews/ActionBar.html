@@ -1,0 +1,15 @@
+<!-- @dsCard group="Quotes" height=160 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ActionBar</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.ActionBar, { counts: { likes: 412, favorites: 188, recommends: 14 }, state: { favorited: true } }), /* @__PURE__ */ React.createElement(K.ActionBar, { size: "sm", actions: ["like", "favorite", "share"], counts: { likes: 268, favorites: 120 }, state: { liked: true } })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

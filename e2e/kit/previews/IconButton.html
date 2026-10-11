@@ -1,0 +1,15 @@
+<!-- @dsCard group="Core" height=100 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>IconButton</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "❯", label: "Open" }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "↗", label: "Share", variant: "ghost" }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "⋯", label: "More" }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "★", label: "Favorited", pressed: true }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "✕", label: "Close", size: "sm", variant: "ghost" }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "→", label: "Next", variant: "solid", size: "lg" }), /* @__PURE__ */ React.createElement(K.IconButton, { glyph: "✕", label: "Disabled", disabled: true }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!-- @dsCard group="Surfaces" height=440 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Dialog</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { height: 440 } }, /* @__PURE__ */ React.createElement(K.Dialog, { inline: true, title: "Report this quote", description: "Reports go to moderators. The quote stays up while it is reviewed.", onClose: () => {
+  }, footer: /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(K.Button, { variant: "quiet" }, "Cancel"), /* @__PURE__ */ React.createElement(K.Button, null, "Send report")) }, /* @__PURE__ */ React.createElement(K.RadioGroup, { defaultValue: "attr", options: [{ value: "attr", label: "Wrong or missing attribution" }, { value: "dup", label: "Duplicate of another quote" }, { value: "orig", label: "Not the submitter’s original" }, { value: "content", label: "Content concern" }] }), /* @__PURE__ */ React.createElement(K.Textarea, { label: "Details", optional: true, rows: 2, placeholder: "A link to the real source helps." }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

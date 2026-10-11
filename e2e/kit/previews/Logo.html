@@ -1,0 +1,15 @@
+<!-- @dsCard group="Core" height=210 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Logo</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row", style: { gap: 32 } }, /* @__PURE__ */ React.createElement(K.Logo, { lockup: "symbol", height: 40 }), /* @__PURE__ */ React.createElement(K.Logo, { lockup: "wordmark", height: 32 }), /* @__PURE__ */ React.createElement(K.Logo, { lockup: "horizontal", height: 36 }), /* @__PURE__ */ React.createElement(K.Logo, { lockup: "stacked", height: 72 })), /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row", style: { gap: 32, background: "var(--qotm-ink)", padding: 20, borderRadius: 14 } }, /* @__PURE__ */ React.createElement(K.Logo, { lockup: "symbol", reversed: true, height: 32 }), /* @__PURE__ */ React.createElement(K.Logo, { lockup: "horizontal", reversed: true, height: 30 }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

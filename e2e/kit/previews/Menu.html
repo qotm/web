@@ -1,0 +1,15 @@
+<!-- @dsCard group="Surfaces" height=330 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Menu</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { alignItems: "flex-end", paddingRight: 40 } }, /* @__PURE__ */ React.createElement(K.Menu, { defaultOpen: true, trigger: /* @__PURE__ */ React.createElement(K.Avatar, { handle: "ada" }), items: [{ heading: "@ada · member" }, { id: "p", label: "Profile" }, { id: "q", label: "My quotes", hint: "12" }, { id: "f", label: "Favorites", hint: "48" }, { id: "s", label: "Settings" }, { divider: true }, { id: "o", label: "Sign out" }] })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

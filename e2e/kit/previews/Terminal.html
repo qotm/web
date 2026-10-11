@@ -1,0 +1,15 @@
+<!-- @dsCard group="Brand" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Terminal</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.Terminal, { title: "~/projects" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(K.Prompt, null), " qotm --topic simplicity"), /* @__PURE__ */ React.createElement("div", { style: { margin: "14px 0 6px", fontFamily: "var(--qotm-font-display)", fontWeight: 600, fontSize: "var(--qotm-t-quote-sm)", lineHeight: 1.25 } }, "Simplicity is prerequisite for reliability."), /* @__PURE__ */ React.createElement("div", { style: { color: "var(--qotm-fg-dark-muted)" } }, /* @__PURE__ */ React.createElement("span", { className: "qk-prompt" }, "—"), "  Edsger W. Dijkstra"), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14 } }, /* @__PURE__ */ React.createElement(K.Prompt, null), /* @__PURE__ */ React.createElement(K.Cursor, null)))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

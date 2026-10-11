@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=350 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Input</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv", style: { maxWidth: 460 } }, /* @__PURE__ */ React.createElement(K.Input, { label: "Author", required: true, placeholder: "Edsger W. Dijkstra" }), /* @__PURE__ */ React.createElement(K.Input, { label: "Username", mono: true, defaultValue: "@ada", hint: "Shown on your profile and on quotes you submit." }), /* @__PURE__ */ React.createElement(K.Input, { label: "Year", defaultValue: "19755", error: "Use a four-digit year." })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

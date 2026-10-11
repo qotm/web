@@ -1,0 +1,15 @@
+<!-- @dsCard group="Surfaces" height=380 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Notice</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.Notice, { title: "Declared original by @ada." }, "No known matching attribution found."), /* @__PURE__ */ React.createElement(K.Notice, { tone: "attention", title: "Needs evidence", action: /* @__PURE__ */ React.createElement(K.Button, { size: "sm", variant: "outline" }, "Add a source") }, "A verifier could not find where Phil Karlton said this. A primary source would help."), /* @__PURE__ */ React.createElement(K.Notice, { tone: "wash", title: "This quote is in your personal dataset." }, "It is private. Run qotm submit to send it for community review."), /* @__PURE__ */ React.createElement(K.Notice, { tone: "dark" }, "No account needed. qotm works offline from its local dataset.")));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=170 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Checkbox</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.Checkbox, { label: "I wrote this quote and have the right to publish it.", description: "Required for community originals.", defaultChecked: true }), /* @__PURE__ */ React.createElement(K.Checkbox, { label: "Email me when a verifier reviews my submission" }), /* @__PURE__ */ React.createElement(K.Checkbox, { label: "Disabled option", disabled: true })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

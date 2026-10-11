@@ -1,0 +1,15 @@
+<!-- @dsCard group="Quotes" height=90 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>TopicTag</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement("div", { className: "qk-pv-row" }, /* @__PURE__ */ React.createElement(K.TopicTag, null, "simplicity"), /* @__PURE__ */ React.createElement(K.TopicTag, null, "software design"), /* @__PURE__ */ React.createElement(K.TopicTag, null, "debugging"), /* @__PURE__ */ React.createElement(K.TopicTag, { selected: true }, "unix"))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@ export default tseslint.config(
 	// gitignored — linting it only produces "rule not found" noise that makes
 	// `yarn lint` fail permanently, hiding real findings. `src/shared/types/api`
 	// is generated from the OpenAPI schema and formatted by its own pipeline.
-	{ ignores: ['dist', 'dev-dist', 'node_modules', 'src/shared/types/api'] },
+	{ ignores: ['dist', 'dev-dist', 'node_modules', 'src/shared/types/api', 'e2e/kit'] },
 	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [

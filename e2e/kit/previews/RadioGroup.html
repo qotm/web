@@ -1,0 +1,19 @@
+<!-- @dsCard group="Forms" height=320 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>RadioGroup</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.RadioGroup, { label: "What are you submitting?", variant: "card", defaultValue: "canonical", options: [
+    { value: "canonical", label: "A quote by someone else", description: "Needs a source. Reviewed by a verifier before it can be curated." },
+    { value: "original", label: "My own original", description: 'Shown as "declared original by @you". Checked for known matches.' },
+    { value: "private", label: "A private note", description: "Only you see it. Never enters the public dataset." }
+  ] }), /* @__PURE__ */ React.createElement(K.RadioGroup, { label: "Reason", options: [{ value: "attr", label: "Wrong attribution" }, { value: "dup", label: "Duplicate" }, { value: "content", label: "Content concern" }], defaultValue: "attr" })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>

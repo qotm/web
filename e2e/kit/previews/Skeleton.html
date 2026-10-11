@@ -1,0 +1,15 @@
+<!-- @dsCard group="Surfaces" height=160 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Skeleton</title></head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.QotmKit;
+function App() {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "qk-pv" }, /* @__PURE__ */ React.createElement(K.Card, null, /* @__PURE__ */ React.createElement(K.Skeleton, { block: true, height: 20, width: "85%" }), /* @__PURE__ */ React.createElement("div", { style: { height: 12 } }), /* @__PURE__ */ React.createElement(K.Skeleton, { lines: 2 }))));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(App, null));
+</script>
+</body>
+</html>
