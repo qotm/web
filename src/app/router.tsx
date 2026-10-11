@@ -38,11 +38,6 @@ const SubmitRoute = named(() => import('@/routes/submit'), 'SubmitRoute');
 const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
-const SignupRoute = named(() => import('@/routes/auth/signup'), 'SignupRoute');
-const ForgotPasswordRoute = named(() => import('@/routes/auth/forgot-password'), 'ForgotPasswordRoute');
-const ResetPasswordRoute = named(() => import('@/routes/auth/reset-password'), 'ResetPasswordRoute');
-const VerifyEmailRoute = named(() => import('@/routes/auth/verify-email'), 'VerifyEmailRoute');
-const VerifiedRoute = named(() => import('@/routes/auth/verified'), 'VerifiedRoute');
 const AdminHomeRoute = named(() => import('@/routes/admin/home'), 'AdminHomeRoute');
 
 /**
@@ -108,13 +103,8 @@ export const router = createBrowserRouter([
 			{ path: ':handle/:tab', element: lazyRoute(<ProfileRoute />) }
 		]
 	},
-	// Flat on purpose: these paths are in emails already sent.
+	// Sign-in: an email link or OAuth, never a password. Flat on purpose.
 	{ path: '/login', element: lazyRoute(<LoginRoute />) },
-	{ path: '/signup', element: lazyRoute(<SignupRoute />) },
-	{ path: '/forgot-password', element: lazyRoute(<ForgotPasswordRoute />) },
-	{ path: '/reset-password', element: lazyRoute(<ResetPasswordRoute />) },
-	{ path: '/verify-email', element: lazyRoute(<VerifyEmailRoute />) },
-	{ path: '/verified', element: lazyRoute(<VerifiedRoute />) },
 	{
 		path: ADMIN_BASE,
 		// The role gate is UI, not security: every endpoint behind it enforces

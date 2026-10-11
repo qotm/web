@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, signIn, test } from './fixtures';
+import { E2E, expect, followMagicLink, signIn, test } from './fixtures';
 
 const robots = (page: Page) => page.locator('meta[name="robots"]');
 
@@ -36,8 +36,9 @@ test.describe('public-first routing', () => {
 			await expect(robots(page)).toHaveAttribute('content', /noindex/);
 
 			await page.getByLabel('Email').fill('test.user@example.com');
-			await page.getByLabel('Password').fill('secret');
-			await page.getByRole('button', { name: 'Log in' }).click();
+			await page.getByRole('button', { name: 'Send sign-in link' }).click();
+			await expect(page.getByText('Check your email.')).toBeVisible();
+			await followMagicLink(page, 'test.user@example.com', `${E2E.web}${path}`);
 			await expect(page).toHaveURL(path);
 			await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 			await expect(robots(page)).toHaveAttribute('content', /noindex/);

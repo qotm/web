@@ -39,11 +39,7 @@ export const APP_BASE = BASE_SEGMENTS.join('/');
  */
 export const appPath = (path = '') => `${APP_BASE}/${path}`.replace(/\/+/g, '/').replace(/(.)\/$/, '$1');
 
-/**
- * Legal pages ship whether or not the marketing site does: the signup consent
- * gate links to them, and a consent checkbox pointing at a 404 is worse than no
- * checkbox at all.
- */
+/** The legal pages, linked from the site footer and the sign-in screen. */
 export const TERMS_PATH = '/terms';
 export const PRIVACY_PATH = '/privacy';
 

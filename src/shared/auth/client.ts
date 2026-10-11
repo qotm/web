@@ -1,11 +1,11 @@
 import { createAuthClient } from 'better-auth/react';
-import { adminClient } from 'better-auth/client/plugins';
+import { adminClient, magicLinkClient } from 'better-auth/client/plugins';
 
 function makeClient(baseURL: string) {
-	// The admin plugin adds `authClient.admin.*` (list/ban/unban/setRole). The
-	// methods are always present but the backend enforces the caller's role, so
-	// including them here is harmless for non-admin apps.
-	return createAuthClient({ baseURL, plugins: [adminClient()] });
+	// Sign-in is by magic link or OAuth only; there are no passwords
+	// (BUILD-PLAN §9). The admin plugin adds `authClient.admin.*`; the backend
+	// enforces the caller's role on every one.
+	return createAuthClient({ baseURL, plugins: [magicLinkClient(), adminClient()] });
 }
 
 let client: ReturnType<typeof makeClient> | null = null;
