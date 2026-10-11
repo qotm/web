@@ -1,12 +1,18 @@
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import {
+	Avatar,
+	Badge,
 	Button,
+	Divider,
+	Eyebrow,
+	Logo,
+	StatusBadge,
+	TopicTag,
 	Card,
 	Checkbox,
 	Dialog,
 	EmptyState,
-	LogoMark,
 	Menu,
 	Notice,
 	Skeleton,
@@ -44,6 +50,23 @@ const TOPICS = [
 	'creativity'
 ];
 
+/** The kit preview's StatusBadge rows: lifecycle, more lifecycle, types and visibility, roles. */
+const STATUS_ROWS = [
+	[
+		'SUBMITTED',
+		'UNDER_REVIEW',
+		'NEEDS_EVIDENCE',
+		'REJECTED',
+		'VERIFIED',
+		'CURATION_REVIEW',
+		'CURATED',
+		'DATASET_RELEASE'
+	],
+	['ORIGINALITY_CHECK', 'PUBLISHED', 'COMMUNITY_DISCOVERY', 'CURATION_CANDIDATE', 'DISPUTED', 'WITHDRAWN'],
+	['CANONICAL', 'ORIGINAL', 'PRIVATE', 'PUBLIC', 'PERSONAL', 'COMMUNITY'],
+	['MEMBER', 'VERIFIER', 'MODERATOR', 'ADMIN']
+];
+
 /**
  * Dev only (`/_kit`, not in production builds): our kit components laid out
  * as qotm_kit's own preview pages lay them out (e2e/kit/previews), so the
@@ -66,6 +89,86 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	Badge: (
+		<Row>
+			<Badge data-probe="neutral">v2026.08.3</Badge>
+			<Badge data-probe="clay" tone="clay">
+				new
+			</Badge>
+			<Badge data-probe="ink" tone="ink">
+				MIT
+			</Badge>
+			<Badge data-probe="upper" uppercase>
+				offline
+			</Badge>
+			<span className="rounded-control bg-ink p-2">
+				<Badge data-probe="dark" tone="dark">
+					schema 1
+				</Badge>
+			</span>
+		</Row>
+	),
+	StatusBadge: (
+		<>
+			{STATUS_ROWS.map((row) => (
+				<Row key={row[0]}>
+					{row.map((s) => (
+						<StatusBadge key={s} status={s} />
+					))}
+				</Row>
+			))}
+		</>
+	),
+	Eyebrow: (
+		<>
+			<div>
+				<Eyebrow data-probe="muted">Discover</Eyebrow>
+				<h1 className="text-h1">What the community is reading.</h1>
+			</div>
+			<div>
+				<Eyebrow data-probe="clay" tone="clay">
+					Canonical · verified
+				</Eyebrow>
+			</div>
+		</>
+	),
+	Divider: (
+		<>
+			<Divider gap="8px" />
+			<Divider variant="graphic" gap="8px" />
+			<Divider variant="mark" gap="8px" />
+		</>
+	),
+	Avatar: (
+		<Row>
+			<Avatar name="Ada Mensah" size={24} />
+			<Avatar handle="@kofi" />
+			<Avatar name="Mireille Laurent" size={40} />
+			<Avatar handle="ada" size={64} />
+		</Row>
+	),
+	TopicTag: (
+		<Row>
+			<TopicTag>simplicity</TopicTag>
+			<TopicTag>software design</TopicTag>
+			<TopicTag>debugging</TopicTag>
+			<TopicTag selected>unix</TopicTag>
+		</Row>
+	),
+	Logo: (
+		<>
+			<div className="flex flex-wrap items-center gap-8">
+				<Logo lockup="symbol" height={40} />
+				<Logo lockup="wordmark" height={32} />
+				<Logo lockup="horizontal" height={36} />
+				<Logo lockup="stacked" height={72} />
+			</div>
+			<div className="flex flex-wrap items-center gap-8 rounded-card bg-ink p-5">
+				<Logo lockup="symbol" reversed height={32} />
+				<Logo lockup="horizontal" reversed height={30} />
+			</div>
+		</>
+	),
 	Button: (
 		<>
 			<Row>
@@ -249,13 +352,13 @@ const KIT_SECTIONS: Record<string, ReactNode> = {
 	Tile: (
 		<div className="grid grid-cols-3 gap-grid">
 			<Tile data-probe="light" caption="symbol">
-				<LogoMark className="h-12 w-auto" />
+				<Logo lockup="symbol" height={48} />
 			</Tile>
 			<Tile data-probe="dark" caption="reversed" dark>
-				<LogoMark className="h-12 w-auto text-dark-foreground" />
+				<Logo lockup="symbol" reversed height={48} />
 			</Tile>
 			<Tile caption="divider">
-				<span className="font-mono text-stone-400">· · ·</span>
+				<Divider variant="mark" gap="0" />
 			</Tile>
 		</div>
 	),

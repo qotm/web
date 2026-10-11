@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
-import { Logo, LogoMark, PageMeta } from '@/shared/ui';
+import { Logo, PageMeta } from '@/shared/ui';
 
 /**
  * Brand-panel watermark, per the design system's Watermark guideline: one large
  * mark, offset, clear of all text, never tiled — "felt, not read".
  *
- * Inline SVG (`LogoMark` fills with `currentColor`), so it costs no request and
- * inverts with the theme for free: ink on the sage panel, near-white on the ink
- * one. The DS quotes 6–8% ink, but that assumes a light surface — the dark panel
+ * The kit's symbol artwork. The DS quotes 6–8% ink, but that assumes a light surface — the dark panel
  * is far darker, so the same alpha reads ~45% stronger against it. Measured in
  * CIELAB against each panel colour and matched: 0.07 light gives ΔE 5.4, 0.05
  * dark gives ΔE 5.6. Don't "simplify" these to one value.
@@ -36,9 +34,11 @@ function BrandWatermark() {
 			 * override the SVG's width/height attributes and the viewBox keeps the ratio.
 			 * Re-check both breakpoints if the card's width or the panel padding changes.
 			 */}
-			<LogoMark
-				width={240}
-				className="absolute -bottom-4 -right-4 h-auto w-40 text-foreground opacity-[0.07] xl:w-60"
+			<Logo
+				lockup="symbol"
+				alt=""
+				style={{ height: 'auto' }}
+				className="absolute -bottom-4 -right-4 w-40 opacity-[0.07] xl:w-60"
 			/>
 		</div>
 	);

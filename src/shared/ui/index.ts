@@ -29,6 +29,13 @@ export * from './components/ui/progress';
 export * from './components/ui/skeleton';
 export * from './components/ui/spinner';
 export * from './components/ui/sonner';
+// Display (qotm_kit)
+export * from './components/ui/badge';
+export * from './components/ui/status-badge';
+export * from './components/ui/eyebrow';
+export * from './components/ui/divider';
+export * from './components/ui/avatar';
+export * from './components/ui/topic-tag';
 
 // Form primitives (Formik + Zod)
 export * from './components/form/form';
