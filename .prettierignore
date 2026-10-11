@@ -5,3 +5,4 @@ yarn.lock
 # generated API types are formatted by their own pipeline
 src/shared/types/api
 e2e/kit/
+*.tmp.mjs

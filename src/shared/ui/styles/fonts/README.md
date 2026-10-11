@@ -12,4 +12,4 @@ with a `unicode-range` each, so they load only on pages that use them:
 | `qotm-glyphs-symbols.woff2`   | ⚑           | Noto Sans Symbols (`@fontsource/noto-sans-symbols`, symbols subset)     |
 
 Rebuild with fontTools, e.g.
-`pyftsubset JetBrainsMono-Regular.woff2 --unicodes=U+276F,U+2192,U+2197,U+2713,U+22EF,U+2715 --flavor=woff2`.
+`pyftsubset JetBrainsMono-Regular.woff2 --unicodes=U+276F,U+2192,U+2197,U+2713,U+22EF,U+2715,U+2190,U+2304 --flavor=woff2`.

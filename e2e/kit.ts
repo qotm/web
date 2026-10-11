@@ -59,10 +59,14 @@ export async function stylesOf(locator: Locator, props: readonly string[] = VISU
 	return locator.evaluate((el, names) => {
 		const style = getComputedStyle(el);
 		const rect = el.getBoundingClientRect();
+		// A border colour only matters where there is a border.
+		const noBorder = (side: string) => style.getPropertyValue(`border-${side}-width`) === '0px';
 		return Object.fromEntries(
 			names.map((name) => {
 				if (name === 'width') return [name, Math.round(rect.width)];
 				if (name === 'height') return [name, Math.round(rect.height)];
+				if (name === 'border-top-color' && noBorder('top')) return [name, 'no border'];
+				if (name === 'border-bottom-color' && noBorder('bottom')) return [name, 'no border'];
 				const value = style.getPropertyValue(name);
 				// The first family is the design's; the fallbacks differ by host.
 				return [name, name === 'font-family' ? value.split(',')[0].replace(/["']/g, '').trim() : value];
@@ -72,21 +76,22 @@ export async function stylesOf(locator: Locator, props: readonly string[] = VISU
 }
 
 /**
- * For each [kit selector, our data-probe] pair, our element's computed
+ * For each [kit selector, ours] pair, our element's computed
  * `props` must equal the kit's. Widths and heights may differ by a pixel
  * (font hinting); text widths are left out unless asked for.
  */
 export async function expectMatchesKit(
 	page: Page,
 	name: string,
-	pairs: [kit: string, probe: string][],
+	/** Ours: a `data-probe` name, or a CSS selector inside our section (`css:…`). */
+	pairs: [kit: string, ours: string][],
 	props: readonly string[] = VISUAL.filter((p) => p !== 'width')
 ) {
 	await renderKitPreview(page, name);
 	const kit: Record<string, Record<string, string | number>> = {};
 	for (const [selector, probe] of pairs) {
 		const el = page.locator(selector).first();
-		await expect(el, `kit ${selector}`).toBeVisible();
+		await expect(el, `kit ${selector}`).toBeAttached();
 		kit[probe] = await stylesOf(el, props);
 	}
 	mkdirSync(path.join(SHOTS, 'kit'), { recursive: true });
@@ -95,7 +100,8 @@ export async function expectMatchesKit(
 	const section = await renderOurs(page, name);
 	await section.screenshot({ path: path.join(SHOTS, 'kit', `${name}-web.png`) });
 	for (const [, probe] of pairs) {
-		const ours = await stylesOf(section.locator(`[data-probe="${probe}"]`).first(), props);
+		const target = probe.startsWith('css:') ? probe.slice(4) : `[data-probe="${probe}"]`;
+		const ours = await stylesOf(section.locator(target).first(), props);
 		for (const prop of props) {
 			const want = kit[probe][prop];
 			const got = ours[prop];

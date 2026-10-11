@@ -1,22 +1,17 @@
 import * as React from 'react';
 import { cn } from '../../lib/utils';
+import { controlClasses } from './field';
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
-	return (
-		<input
-			type={type}
-			data-slot="input"
-			className={cn(
-				'flex h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3.5 py-2 text-base text-foreground transition-colors',
-				'placeholder:text-mute selection:bg-primary selection:text-primary-foreground',
-				'outline-none focus-visible:border-foreground focus-visible:ring-2 focus-visible:ring-ring',
-				'aria-invalid:border-negative aria-invalid:focus-visible:ring-negative/30',
-				'disabled:cursor-not-allowed disabled:opacity-50',
-				className
-			)}
-			{...props}
-		/>
-	);
+type InputProps = Omit<React.ComponentProps<'input'>, 'size'> & {
+	/** Commands, handles, URLs, ids. */
+	mono?: boolean;
+	size?: 'md' | 'sm';
+};
+
+/** qotm_kit Input (the control; wrap it in Field for a label). */
+function Input({ mono, size, className, ...props }: InputProps) {
+	return <input data-slot="input" className={cn(controlClasses(mono, size), className)} {...props} />;
 }
 
 export { Input };
+export type { InputProps };

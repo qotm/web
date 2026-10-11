@@ -1,120 +1,194 @@
 import * as React from 'react';
 import { useField } from 'formik';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
-import { DatePicker } from '../ui/date-picker';
-import { cn } from '../../lib/utils';
+import { Field } from '../ui/field';
+import { Input, type InputProps } from '../ui/input';
+import { Textarea, type TextareaProps } from '../ui/textarea';
+import { Select, type SelectProps } from '../ui/select';
+import { Checkbox, type CheckboxProps } from '../ui/checkbox';
+import { Switch, type SwitchProps } from '../ui/switch';
+import { RadioGroup, type RadioGroupProps } from '../ui/radio-group';
+import { TopicPicker, type TopicPickerProps } from '../ui/topic-picker';
+import { cn, glyph } from '../../lib/utils';
 
-/** Inline field error message (used by the fields below, also usable standalone). */
+/**
+ * Formik-bound kit fields: each renders the kit's Field (mono label, hint,
+ * clay-700 error once touched) around its control. Must render inside a
+ * <Formik>.
+ */
+type Labelled = {
+	name: string;
+	label?: React.ReactNode;
+	hint?: React.ReactNode;
+	required?: boolean;
+	optional?: boolean;
+};
+
+function useKitField<V>(name: string) {
+	const [field, meta, helpers] = useField<V>(name);
+	const error = meta.touched && meta.error ? meta.error : undefined;
+	return { field, helpers, error };
+}
+
+/** A form-level error (the request failed), in the field error's voice. */
 function FormError({ className, children }: { className?: string; children: React.ReactNode }) {
 	return (
-		<p role="alert" className={cn('text-sm text-negative', className)}>
-			{children}
+		<p role="alert" className={cn('m-0 text-meta text-clay-700', className)}>
+			{glyph('×')} {children}
 		</p>
 	);
 }
 
-/** Label + control wrapper shared by the form fields. */
-function Field({
-	id,
+type FormFieldProps = Labelled & Omit<InputProps, 'name'>;
+
+function FormField({ name, label, hint, required, optional, className, id, ...props }: FormFieldProps) {
+	const { field, error } = useKitField<string>(name);
+	const fieldId = id ?? name;
+	return (
+		<Field
+			htmlFor={fieldId}
+			label={label}
+			hint={hint}
+			error={error}
+			required={required}
+			optional={optional}
+			className={className}
+		>
+			<Input id={fieldId} aria-invalid={Boolean(error) || undefined} required={required} {...field} {...props} />
+		</Field>
+	);
+}
+
+type FormTextareaProps = Labelled & Omit<TextareaProps, 'name'>;
+
+/** With a maxLength, the label shows a live count ("42 / 280"). */
+function FormTextarea({
+	name,
 	label,
 	hint,
-	error,
+	required,
+	optional,
 	className,
-	children
-}: {
-	id: string;
-	label?: string;
-	hint?: string;
-	error?: string;
-	className?: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<div className={cn('flex flex-col gap-1.5', className)}>
-			{label ? <Label htmlFor={id}>{label}</Label> : null}
-			{children}
-			{error ? <FormError>{error}</FormError> : hint ? <p className="text-sm text-mute">{hint}</p> : null}
-		</div>
-	);
-}
-
-type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'name'> & {
-	name: string;
-	label?: string;
-	hint?: string;
-};
-
-/**
- * Formik-bound labelled input with error display. Must render inside a <Formik>.
- * The form primitives wrap shadcn parts so a future RHF swap stays contained here.
- */
-function FormField({ name, label, hint, className, id, ...props }: FormFieldProps) {
-	const [field, meta] = useField(name);
+	id,
+	maxLength,
+	...props
+}: FormTextareaProps) {
+	const { field, error } = useKitField<string>(name);
 	const fieldId = id ?? name;
-	const showError = meta.touched && Boolean(meta.error);
-
 	return (
-		<Field id={fieldId} label={label} hint={hint} error={showError ? meta.error : undefined} className={className}>
-			<Input id={fieldId} aria-invalid={showError || undefined} {...field} {...props} />
-		</Field>
-	);
-}
-
-type FormTextareaProps = Omit<React.ComponentProps<typeof Textarea>, 'name'> & {
-	name: string;
-	label?: string;
-	hint?: string;
-};
-
-/** Formik-bound multiline text field. */
-function FormTextarea({ name, label, hint, className, id, ...props }: FormTextareaProps) {
-	const [field, meta] = useField(name);
-	const fieldId = id ?? name;
-	const showError = meta.touched && Boolean(meta.error);
-
-	return (
-		<Field id={fieldId} label={label} hint={hint} error={showError ? meta.error : undefined} className={className}>
-			<Textarea id={fieldId} aria-invalid={showError || undefined} {...field} {...props} />
-		</Field>
-	);
-}
-
-type FormDateFieldProps = {
-	name: string;
-	label?: string;
-	hint?: string;
-	className?: string;
-	id?: string;
-	placeholder?: string;
-};
-
-/**
- * Formik-bound date field: an input-styled trigger opening a Popover calendar.
- * Stores `yyyy-MM-dd`.
- *
- * The composition lives in `DatePicker` so the Formik-less apps (`admin`,
- * `landing`) get the same control without a second copy to keep in sync.
- */
-function FormDateField({ name, label, hint, className, id, placeholder = 'Pick a date' }: FormDateFieldProps) {
-	const [field, meta, helpers] = useField<string>(name);
-	const fieldId = id ?? name;
-	const showError = meta.touched && Boolean(meta.error);
-
-	return (
-		<Field id={fieldId} label={label} hint={hint} error={showError ? meta.error : undefined} className={className}>
-			<DatePicker
+		<Field
+			htmlFor={fieldId}
+			label={label}
+			hint={hint}
+			error={error}
+			required={required}
+			optional={optional}
+			count={maxLength ? `${(field.value ?? '').length} / ${maxLength}` : undefined}
+			className={className}
+		>
+			<Textarea
 				id={fieldId}
-				value={field.value}
-				placeholder={placeholder}
-				invalid={showError}
-				onChange={(value) => void helpers.setValue(value)}
-				onCommit={() => void helpers.setTouched(true)}
+				maxLength={maxLength}
+				aria-invalid={Boolean(error) || undefined}
+				required={required}
+				{...field}
+				{...props}
 			/>
 		</Field>
 	);
 }
 
-export { FormField, FormTextarea, FormDateField, FormError };
-export type { FormFieldProps, FormTextareaProps, FormDateFieldProps };
+type FormSelectProps = Labelled & Omit<SelectProps, 'name'>;
+
+function FormSelect({ name, label, hint, required, optional, className, id, ...props }: FormSelectProps) {
+	const { field, error } = useKitField<string>(name);
+	const fieldId = id ?? name;
+	return (
+		<Field
+			htmlFor={fieldId}
+			label={label}
+			hint={hint}
+			error={error}
+			required={required}
+			optional={optional}
+			className={className}
+		>
+			<Select id={fieldId} aria-invalid={Boolean(error) || undefined} {...field} {...props} />
+		</Field>
+	);
+}
+
+type FormCheckboxProps = { name: string } & Omit<CheckboxProps, 'name' | 'checked'>;
+
+function FormCheckbox({ name, className, ...props }: FormCheckboxProps) {
+	const { field, error } = useKitField<boolean>(name);
+	return (
+		<div className={cn('flex flex-col gap-2', className)}>
+			<Checkbox
+				name={name}
+				checked={Boolean(field.value)}
+				onChange={field.onChange}
+				onBlur={field.onBlur}
+				aria-invalid={Boolean(error) || undefined}
+				{...props}
+			/>
+			{error ? <FormError>{error}</FormError> : null}
+		</div>
+	);
+}
+
+type FormSwitchProps = { name: string } & Omit<SwitchProps, 'name' | 'checked'>;
+
+function FormSwitch({ name, ...props }: FormSwitchProps) {
+	const { field } = useKitField<boolean>(name);
+	return (
+		<Switch name={name} checked={Boolean(field.value)} onChange={field.onChange} onBlur={field.onBlur} {...props} />
+	);
+}
+
+type FormRadioGroupProps = { name: string } & Omit<RadioGroupProps, 'name' | 'value' | 'onChange'>;
+
+function FormRadioGroup({ name, className, ...props }: FormRadioGroupProps) {
+	const { field, helpers, error } = useKitField<string>(name);
+	return (
+		<div className={cn('flex flex-col gap-2', className)}>
+			<RadioGroup
+				name={name}
+				value={field.value}
+				onChange={(value) => {
+					void helpers.setValue(value);
+					void helpers.setTouched(true, false);
+				}}
+				{...props}
+			/>
+			{error ? <FormError>{error}</FormError> : null}
+		</div>
+	);
+}
+
+type FormTopicPickerProps = { name: string } & Omit<TopicPickerProps, 'value' | 'onChange' | 'error'>;
+
+function FormTopicPicker({ name, ...props }: FormTopicPickerProps) {
+	const { field, helpers, error } = useKitField<string[]>(name);
+	return (
+		<TopicPicker
+			value={field.value ?? []}
+			onChange={(slugs) => {
+				void helpers.setValue(slugs);
+				void helpers.setTouched(true, false);
+			}}
+			error={error}
+			{...props}
+		/>
+	);
+}
+
+export { FormField, FormTextarea, FormSelect, FormCheckbox, FormSwitch, FormRadioGroup, FormTopicPicker, FormError };
+export type {
+	FormFieldProps,
+	FormTextareaProps,
+	FormSelectProps,
+	FormCheckboxProps,
+	FormSwitchProps,
+	FormRadioGroupProps,
+	FormTopicPickerProps
+};

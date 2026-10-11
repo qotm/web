@@ -1,6 +1,39 @@
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
-import { Button, IconButton, Kbd, PageMeta, TextLink } from '@/shared/ui';
+import {
+	Button,
+	Checkbox,
+	Field,
+	IconButton,
+	Input,
+	Kbd,
+	PageMeta,
+	RadioGroup,
+	SearchField,
+	Select,
+	Switch,
+	TextLink,
+	Textarea,
+	TopicPicker
+} from '@/shared/ui';
+
+const TOPICS = [
+	'programming',
+	'software design',
+	'software engineering',
+	'unix',
+	'open source',
+	'databases',
+	'distributed systems',
+	'security',
+	'web development',
+	'debugging',
+	'simplicity',
+	'complexity',
+	'engineering leadership',
+	'learning',
+	'creativity'
+];
 
 /**
  * Dev only (`/_kit`, not in production builds): our kit components laid out
@@ -12,6 +45,16 @@ import { Button, IconButton, Kbd, PageMeta, TextLink } from '@/shared/ui';
 const Row = ({ children }: { children: ReactNode }) => (
 	<div className="flex flex-wrap items-center gap-3">{children}</div>
 );
+
+/** The kit preview's own max width, where it sets one. */
+const WIDTHS: Record<string, number> = {
+	Field: 420,
+	Input: 460,
+	Textarea: 560,
+	Select: 360,
+	SearchField: 420,
+	TopicPicker: 640
+};
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
 	Button: (
@@ -77,6 +120,110 @@ const KIT_SECTIONS: Record<string, ReactNode> = {
 			</TextLink>
 		</p>
 	),
+	Field: (
+		<Field label="Source URL" optional hint="Where the words were first published." htmlFor="kit-field">
+			<Input id="kit-field" mono defaultValue="https://www.cs.utexas.edu/~EWD/" />
+		</Field>
+	),
+	Input: (
+		<>
+			<Field label="Author" required htmlFor="kit-author">
+				<Input id="kit-author" placeholder="Edsger W. Dijkstra" />
+			</Field>
+			<Field label="Username" hint="Shown on your profile and on quotes you submit." htmlFor="kit-user">
+				<Input id="kit-user" mono defaultValue="@ada" />
+			</Field>
+			<Field label="Year" error="Use a four-digit year." htmlFor="kit-year">
+				<Input id="kit-year" defaultValue="19755" aria-invalid />
+			</Field>
+		</>
+	),
+	Textarea: (
+		<>
+			<Field
+				label="Quote"
+				required
+				count="43 / 280"
+				hint="The exact words, without quotation marks."
+				htmlFor="kit-quote"
+			>
+				<Textarea
+					id="kit-quote"
+					display
+					rows={3}
+					maxLength={280}
+					defaultValue="Simplicity is prerequisite for reliability."
+				/>
+			</Field>
+			<Field label="Context" optional htmlFor="kit-context">
+				<Textarea id="kit-context" rows={2} placeholder="Where and why it was said." />
+			</Field>
+		</>
+	),
+	Select: (
+		<Field label="Sort" htmlFor="kit-sort">
+			<Select id="kit-sort" options={['Most recent', 'Most favorited', 'Curated first']} />
+		</Field>
+	),
+	Checkbox: (
+		<>
+			<Checkbox
+				label="I wrote this quote and have the right to publish it."
+				description="Required for community originals."
+				defaultChecked
+			/>
+			<Checkbox label="Email me when a verifier reviews my submission" />
+			<Checkbox label="Disabled option" disabled />
+		</>
+	),
+	RadioGroup: (
+		<>
+			<RadioGroup
+				label="What are you submitting?"
+				variant="card"
+				defaultValue="canonical"
+				options={[
+					{
+						value: 'canonical',
+						label: 'A quote by someone else',
+						description: 'Needs a source. Reviewed by a verifier before it can be curated.'
+					},
+					{
+						value: 'original',
+						label: 'My own original',
+						description: 'Shown as "declared original by @you". Checked for known matches.'
+					},
+					{
+						value: 'private',
+						label: 'A private note',
+						description: 'Only you see it. Never enters the public dataset.'
+					}
+				]}
+			/>
+			<RadioGroup
+				label="Reason"
+				defaultValue="attr"
+				options={[
+					{ value: 'attr', label: 'Wrong attribution' },
+					{ value: 'dup', label: 'Duplicate' },
+					{ value: 'content', label: 'Content concern' }
+				]}
+			/>
+		</>
+	),
+	Switch: (
+		<>
+			<Switch label="Show my favorites publicly" defaultChecked />
+			<Switch label="Plain output by default" description="Same as qotm --plain." />
+		</>
+	),
+	SearchField: (
+		<>
+			<SearchField />
+			<SearchField size="sm" placeholder="Filter queue" shortcut={null} />
+		</>
+	),
+	TopicPicker: <TopicPicker topics={TOPICS} defaultValue={['simplicity', 'software design']} />,
 	Kbd: (
 		<p className="m-0">
 			Press <Kbd data-probe="key">/</Kbd> to search. From your terminal, <Kbd>qotm open</Kbd> brings the last quote
@@ -93,7 +240,12 @@ export function KitRoute() {
 		<main className="min-h-screen bg-background">
 			<PageMeta title="Kit" robots="noindex" />
 			{names.map((name) => (
-				<section key={name} data-kit={name} className="flex flex-col gap-4 p-6">
+				<section
+					key={name}
+					data-kit={name}
+					className="flex flex-col gap-4 p-6"
+					style={WIDTHS[name] ? { maxWidth: WIDTHS[name] } : undefined}
+				>
 					{only ? null : <h2 className="text-label text-muted-foreground">{name}</h2>}
 					{KIT_SECTIONS[name]}
 				</section>

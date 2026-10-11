@@ -7,19 +7,20 @@ export * from './components/ui/button';
 export * from './components/ui/icon-button';
 export * from './components/ui/text-link';
 export * from './components/ui/kbd';
+// Forms (qotm_kit): Field wraps a control with its label, hint and error.
+export * from './components/ui/field';
 export * from './components/ui/input';
-export * from './components/ui/search-input';
-export * from './components/ui/label';
+export * from './components/ui/textarea';
+export * from './components/ui/select';
+export * from './components/ui/checkbox';
+export * from './components/ui/radio-group';
+export * from './components/ui/switch';
+export * from './components/ui/search-field';
+export * from './components/ui/topic-picker';
 export * from './components/ui/card';
 export * from './components/ui/alert';
-export * from './components/ui/checkbox';
-export * from './components/ui/select';
 export * from './components/ui/modal';
-export * from './components/ui/textarea';
 export * from './components/ui/popover';
-// Calendar is intentionally NOT re-exported here — it pulls in react-day-picker, and
-// DatePicker lazy-loads it so it stays out of the main bundle.
-export * from './components/ui/date-picker';
 export * from './components/ui/progress';
 export * from './components/ui/skeleton';
 export * from './components/ui/spinner';

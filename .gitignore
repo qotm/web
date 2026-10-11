@@ -37,3 +37,6 @@ openapi.json
 test-results/
 playwright-report/
 e2e/.screenshots/
+
+# Local helpers (screenshot composer)
+*.tmp.mjs
