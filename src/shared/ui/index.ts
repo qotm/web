@@ -41,6 +41,10 @@ export * from './components/ui/tabs';
 export * from './components/ui/pagination';
 export * from './components/ui/breadcrumbs';
 export * from './components/ui/side-nav';
+// Terminal (qotm_kit)
+export * from './components/terminal/terminal';
+export * from './components/terminal/install-pill';
+export * from './components/terminal/command-block';
 
 // Form primitives (Formik + Zod)
 export * from './components/form/form';

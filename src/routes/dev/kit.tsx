@@ -3,6 +3,11 @@ import { useSearchParams } from 'react-router';
 import {
 	Avatar,
 	Badge,
+	CommandBlock,
+	Cursor,
+	InstallPill,
+	Prompt,
+	Terminal,
 	Breadcrumbs,
 	Pagination,
 	SideNav,
@@ -93,6 +98,37 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	Terminal: (
+		<Terminal title="~/projects">
+			<div>
+				<Prompt /> qotm --topic simplicity
+			</div>
+			<div className="mt-stack mb-1.5 text-quote-sm font-semibold">Simplicity is prerequisite for reliability.</div>
+			<div className="text-dark-muted">
+				<Prompt>—</Prompt>
+				{'  '}Edsger W. Dijkstra
+			</div>
+			<div className="mt-stack">
+				<Prompt />
+				<Cursor />
+			</div>
+		</Terminal>
+	),
+	InstallPill: (
+		<Row>
+			<InstallPill />
+			<InstallPill command="qotm sync" copyable />
+			<span className="rounded-card bg-dark p-3.5">
+				<InstallPill onDark copyable />
+			</span>
+		</Row>
+	),
+	CommandBlock: (
+		<>
+			<CommandBlock caption="Open this in your terminal" command="qotm open q_8f2k1c" />
+			<CommandBlock tone="light" command="qotm --favorites" glyph="~ >" />
+		</>
+	),
 	Tabs: (
 		<>
 			<Tabs

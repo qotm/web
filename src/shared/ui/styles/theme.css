@@ -57,6 +57,14 @@
 	--shadow-terminal: 0 24px 60px -30px rgba(20, 18, 16, 0.5);
 	--shadow-raised: 0 12px 32px -20px rgba(20, 18, 16, 0.35);
 
+	/* The terminal cursor's blink (`animate-blink`; off under reduced motion). */
+	--animate-blink: blink 1.05s steps(1) infinite;
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
 	/* The brand's rhythm, 4/8/12/14/18/22/26/32/48/64 (Tailwind's 4px scale
 	   already has every step: 3.5, 4.5, 5.5, 6.5…), with the kit's names for
 	   its roles: gap-inline, gap-stack, gap-grid, p-tile, py-section, px-page. */
