@@ -36,6 +36,11 @@ export * from './components/ui/eyebrow';
 export * from './components/ui/divider';
 export * from './components/ui/avatar';
 export * from './components/ui/topic-tag';
+// Navigation (qotm_kit)
+export * from './components/ui/tabs';
+export * from './components/ui/pagination';
+export * from './components/ui/breadcrumbs';
+export * from './components/ui/side-nav';
 
 // Form primitives (Formik + Zod)
 export * from './components/form/form';

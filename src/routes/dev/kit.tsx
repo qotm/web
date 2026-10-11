@@ -3,6 +3,10 @@ import { useSearchParams } from 'react-router';
 import {
 	Avatar,
 	Badge,
+	Breadcrumbs,
+	Pagination,
+	SideNav,
+	Tabs,
 	Button,
 	Divider,
 	Eyebrow,
@@ -89,6 +93,72 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	Tabs: (
+		<>
+			<Tabs
+				data-probe="feed"
+				items={[
+					{ id: 'discover', label: 'discover' },
+					{ id: 'latest', label: 'latest' },
+					{ id: 'curated', label: 'curated' }
+				]}
+				active="discover"
+			/>
+			<Tabs
+				data-probe="counts"
+				items={[
+					{ id: 'quotes', label: 'quotes', count: 12 },
+					{ id: 'contributions', label: 'contributions', count: 31 }
+				]}
+				active="contributions"
+			/>
+		</>
+	),
+	Pagination: (
+		<>
+			<Pagination page={2} total={12631} />
+			<Pagination mode="more" />
+		</>
+	),
+	Breadcrumbs: (
+		<Breadcrumbs
+			items={[{ label: 'authors', to: '/authors' }, { label: 'dijkstra', to: '/authors/dijkstra' }, 'q_8f2k1c']}
+		/>
+	),
+	SideNav: (
+		<SideNav
+			active="verification"
+			sections={[
+				{ items: [{ id: 'dash', label: 'Dashboard' }] },
+				{
+					title: 'Content',
+					items: [
+						{ id: 'quotes', label: 'Quotes' },
+						{ id: 'subs', label: 'Submissions', count: 23 },
+						{ id: 'verification', label: 'Verification queue', count: 12, attention: true },
+						{ id: 'curation', label: 'Curation queue', count: 7 },
+						{ id: 'reports', label: 'Reports', count: 3, attention: true }
+					]
+				},
+				{
+					title: 'Taxonomy',
+					items: [
+						{ id: 'a', label: 'Authors' },
+						{ id: 's', label: 'Sources' },
+						{ id: 't', label: 'Topics' }
+					]
+				},
+				{
+					title: 'System',
+					items: [
+						{ id: 'u', label: 'Users' },
+						{ id: 'r', label: 'Dataset releases' },
+						{ id: 'l', label: 'Audit logs' }
+					]
+				}
+			]}
+		/>
+	),
 	Badge: (
 		<Row>
 			<Badge data-probe="neutral">v2026.08.3</Badge>
