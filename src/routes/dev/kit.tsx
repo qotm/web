@@ -2,7 +2,16 @@ import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import {
 	Button,
+	Card,
 	Checkbox,
+	Dialog,
+	EmptyState,
+	LogoMark,
+	Menu,
+	Notice,
+	Skeleton,
+	Tile,
+	Toast,
 	Field,
 	IconButton,
 	Input,
@@ -224,6 +233,129 @@ const KIT_SECTIONS: Record<string, ReactNode> = {
 		</>
 	),
 	TopicPicker: <TopicPicker topics={TOPICS} defaultValue={['simplicity', 'software design']} />,
+	Card: (
+		<div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-grid">
+			<Card data-probe="raised" label="Sounds like">
+				<p className="m-0">A thought between commands. Plain verbs, sentence case.</p>
+			</Card>
+			<Card data-probe="wash" tone="wash" label="Curation">
+				<p className="m-0">A verified quote is not automatically curated.</p>
+			</Card>
+			<Card data-probe="dark" tone="dark" label="Offline">
+				<p className="m-0">qotm reads from local SQLite. No network, no account.</p>
+			</Card>
+		</div>
+	),
+	Tile: (
+		<div className="grid grid-cols-3 gap-grid">
+			<Tile data-probe="light" caption="symbol">
+				<LogoMark className="h-12 w-auto" />
+			</Tile>
+			<Tile data-probe="dark" caption="reversed" dark>
+				<LogoMark className="h-12 w-auto text-dark-foreground" />
+			</Tile>
+			<Tile caption="divider">
+				<span className="font-mono text-stone-400">· · ·</span>
+			</Tile>
+		</div>
+	),
+	Dialog: (
+		<div className="h-[440px]">
+			<Dialog
+				inline
+				title="Report this quote"
+				description="Reports go to moderators. The quote stays up while it is reviewed."
+				onClose={() => {}}
+				footer={
+					<>
+						<Button variant="quiet">Cancel</Button>
+						<Button>Send report</Button>
+					</>
+				}
+			>
+				<RadioGroup
+					defaultValue="attr"
+					options={[
+						{ value: 'attr', label: 'Wrong or missing attribution' },
+						{ value: 'dup', label: 'Duplicate of another quote' },
+						{ value: 'orig', label: 'Not the submitter’s original' },
+						{ value: 'content', label: 'Content concern' }
+					]}
+				/>
+				<Field label="Details" optional htmlFor="kit-details">
+					<Textarea id="kit-details" rows={2} placeholder="A link to the real source helps." />
+				</Field>
+			</Dialog>
+		</div>
+	),
+	Menu: (
+		<div className="flex min-h-[282px] flex-col items-end pr-10">
+			<Menu
+				defaultOpen
+				label="Account"
+				trigger={
+					<span className="flex size-8 items-center justify-center rounded-full border border-border bg-card font-mono text-xs">
+						ad
+					</span>
+				}
+				items={[
+					{ heading: '@ada · member' },
+					{ id: 'p', label: 'Profile' },
+					{ id: 'q', label: 'My quotes', hint: '12' },
+					{ id: 'f', label: 'Favorites', hint: '48' },
+					{ id: 's', label: 'Settings' },
+					{ divider: true },
+					{ id: 'o', label: 'Sign out' }
+				]}
+			/>
+		</div>
+	),
+	Toast: (
+		<>
+			<Toast message="Saved to favorites." action="undo" onClose={() => {}} />
+			<Toast glyph="↗" message="Link copied: /q/8f2k1c" />
+		</>
+	),
+	Notice: (
+		<>
+			<Notice title="Declared original by @ada.">No known matching attribution found.</Notice>
+			<Notice
+				tone="attention"
+				title="Needs evidence"
+				action={
+					<Button size="sm" variant="outline">
+						Add a source
+					</Button>
+				}
+			>
+				A verifier could not find where Phil Karlton said this. A primary source would help.
+			</Notice>
+			<Notice tone="wash" title="This quote is in your personal dataset.">
+				It is private. Run qotm submit to send it for community review.
+			</Notice>
+			<Notice tone="dark">No account needed. qotm works offline from its local dataset.</Notice>
+		</>
+	),
+	EmptyState: (
+		<EmptyState
+			command="qotm favorites"
+			title="No favorites yet."
+			action={
+				<Button variant="outline" size="sm">
+					Browse curated quotes
+				</Button>
+			}
+		>
+			Favorite a quote here or run qotm save after one appears in your terminal.
+		</EmptyState>
+	),
+	Skeleton: (
+		<Card>
+			<Skeleton block height={20} width="85%" />
+			<div className="h-3" />
+			<Skeleton lines={2} />
+		</Card>
+	),
 	Kbd: (
 		<p className="m-0">
 			Press <Kbd data-probe="key">/</Kbd> to search. From your terminal, <Kbd>qotm open</Kbd> brings the last quote

@@ -19,8 +19,8 @@ export function AppShellSkeleton() {
 					<div className="mt-1 flex flex-col gap-1">
 						{Array.from({ length: 6 }).map((_, i) => (
 							<div key={i} className="flex items-center gap-3 px-3 py-2.5">
-								<Skeleton className="size-[18px] rounded-md" />
-								<Skeleton className="h-3.5 w-24" />
+								<Skeleton block width={18} height={18} />
+								<Skeleton block width={96} height={14} />
 							</div>
 						))}
 					</div>
@@ -30,9 +30,9 @@ export function AppShellSkeleton() {
 			{/* Main column */}
 			<div className="flex min-h-screen flex-col lg:pl-64">
 				<header className="sticky top-0 z-40 flex items-center gap-2.5 border-b border-border bg-card px-4 py-2.5">
-					<Skeleton className="size-9 rounded-full lg:hidden" />
+					<Skeleton block width={36} height={36} className="rounded-full lg:hidden" />
 					<div className="flex-1" />
-					<Skeleton className="size-9 rounded-full" />
+					<Skeleton block width={36} height={36} className="rounded-full" />
 				</header>
 				<main className="flex-1">
 					{/* Same content skeleton a route transition shows, so a reload and a

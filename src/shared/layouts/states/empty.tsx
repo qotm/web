@@ -1,22 +1,19 @@
 import type { ReactNode } from 'react';
+import { EmptyState } from '@/shared/ui';
 
 type EmptyProps = {
 	title: string;
-	description?: string;
-	icon?: ReactNode;
+	description?: ReactNode;
+	/** The CLI command that would show this list, when there is one. */
+	command?: string;
 	action?: ReactNode;
 };
 
-/** Inline empty state for lists/panels (a card, not a full page). */
-export function Empty({ title, description, icon, action }: EmptyProps) {
+/** Inline empty state for lists and panels: the kit's EmptyState. */
+export function Empty({ title, description, command, action }: EmptyProps) {
 	return (
-		<div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-border bg-card p-10 text-center">
-			{icon ? <div className="text-mute">{icon}</div> : null}
-			<div className="flex flex-col gap-1">
-				<p className="font-semibold text-foreground">{title}</p>
-				{description ? <p className="text-sm text-mute">{description}</p> : null}
-			</div>
-			{action}
-		</div>
+		<EmptyState command={command} title={title} action={action}>
+			{description}
+		</EmptyState>
 	);
 }

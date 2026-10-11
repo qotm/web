@@ -3,21 +3,12 @@ import { Toaster as SonnerToaster } from 'sonner';
 
 type ToasterProps = ComponentProps<typeof SonnerToaster>;
 
+/**
+ * Where `notify()` toasts appear: bottom centre, 24px up, as the kit floats
+ * them. Unstyled: each toast draws itself as the kit's ink Toast.
+ */
 function Toaster(props: ToasterProps) {
-	return (
-		<SonnerToaster
-			position="top-center"
-			toastOptions={{
-				classNames: {
-					toast: 'rounded-2xl border border-border bg-card text-card-foreground',
-					description: 'text-mute',
-					actionButton: 'bg-primary text-primary-foreground',
-					cancelButton: 'bg-secondary text-secondary-foreground'
-				}
-			}}
-			{...props}
-		/>
-	);
+	return <SonnerToaster position="bottom-center" offset={24} toastOptions={{ unstyled: true }} {...props} />;
 }
 
 export { Toaster };

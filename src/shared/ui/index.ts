@@ -17,10 +17,14 @@ export * from './components/ui/radio-group';
 export * from './components/ui/switch';
 export * from './components/ui/search-field';
 export * from './components/ui/topic-picker';
+// Surfaces and feedback (qotm_kit)
 export * from './components/ui/card';
-export * from './components/ui/alert';
-export * from './components/ui/modal';
-export * from './components/ui/popover';
+export * from './components/ui/tile';
+export * from './components/ui/dialog';
+export * from './components/ui/menu';
+export * from './components/ui/toast';
+export * from './components/ui/notice';
+export * from './components/ui/empty-state';
 export * from './components/ui/progress';
 export * from './components/ui/skeleton';
 export * from './components/ui/spinner';

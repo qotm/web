@@ -67,7 +67,9 @@ export async function stylesOf(locator: Locator, props: readonly string[] = VISU
 				if (name === 'height') return [name, Math.round(rect.height)];
 				if (name === 'border-top-color' && noBorder('top')) return [name, 'no border'];
 				if (name === 'border-bottom-color' && noBorder('bottom')) return [name, 'no border'];
-				const value = style.getPropertyValue(name);
+				let value = style.getPropertyValue(name);
+				// Tailwind layers empty shadows under the real one.
+				if (name === 'box-shadow') value = value.replace(/rgba\(0, 0, 0, 0\) 0px 0px 0px 0px(, )?/g, '') || 'none';
 				// The first family is the design's; the fallbacks differ by host.
 				return [name, name === 'font-family' ? value.split(',')[0].replace(/["']/g, '').trim() : value];
 			})
@@ -95,6 +97,12 @@ export async function expectMatchesKit(
 		kit[probe] = await stylesOf(el, props);
 	}
 	mkdirSync(path.join(SHOTS, 'kit'), { recursive: true });
+	// Grow the frame to hold anything positioned outside it (an open menu).
+	await page.evaluate(() => {
+		const root = document.getElementById('root')!;
+		const bottom = Math.max(...[...root.querySelectorAll('*')].map((el) => el.getBoundingClientRect().bottom));
+		root.style.minHeight = `${Math.ceil(bottom - root.getBoundingClientRect().top + 24)}px`;
+	});
 	await page.locator('#root').screenshot({ path: path.join(SHOTS, 'kit', `${name}-kit.png`) });
 
 	const section = await renderOurs(page, name);

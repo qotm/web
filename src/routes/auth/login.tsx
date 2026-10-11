@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { getSafeRedirect } from '@/shared/auth';
 import { AuthLayout } from '@/shared/layouts';
-import { Alert, FormField } from '@/shared/ui';
+import { FormField, Notice } from '@/shared/ui';
 import { AuthCard } from '@/features/auth/components/auth-card';
 import { GoogleButton } from '@/features/auth/components/google-button';
 import { OrDivider } from '@/features/auth/components/or-divider';
@@ -34,9 +34,9 @@ export function LoginRoute() {
 				}
 			>
 				{error ? (
-					<Alert variant="destructive" className="mb-4">
+					<Notice tone="attention" title="The link was not sent.">
 						{error}
-					</Alert>
+					</Notice>
 				) : null}
 				{sentTo ? null : (
 					<Formik
