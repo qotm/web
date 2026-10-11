@@ -12,7 +12,7 @@
  * via the `@/shared/ui/meta/brand` subpath, exactly as it does `./theme-colors`.
  */
 export const BRAND = {
-	name: 'Qotm Web',
+	name: 'qotm',
 	/** The console needs its own suffix so an admin can tell two tabs apart. */
-	adminName: 'Qotm Web Admin'
+	adminName: 'qotm admin'
 } as const;

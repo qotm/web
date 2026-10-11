@@ -16,6 +16,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aurostack/secrets@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@aurostack/secrets@npm:0.1.1"
+  bin:
+    secrets: dist/cli.js
+  checksum: 10c0/54d528077a8bf3908b5f05f92110a314e3d34279de087e0180e4cd840b45cf06b490849527d2f12cd7e9b1f4ec3c3fb8b5100c9a11d96f6c6404285b570664d7
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.29.7":
   version: 7.29.7
   resolution: "@babel/code-frame@npm:7.29.7"
@@ -493,6 +502,20 @@ __metadata:
   version: 5.3.0
   resolution: "@fontsource-variable/inter@npm:5.3.0"
   checksum: 10c0/46fbe41e8482a718f99634c8254346c6081d615415059be12e177224c903d688199125967825e75d4b8122668fd83f70880e11d4e02d08c20b503c65fe2a96d1
+  languageName: node
+  linkType: hard
+
+"@fontsource-variable/jetbrains-mono@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource-variable/jetbrains-mono@npm:5.3.0"
+  checksum: 10c0/ba983321b530a56696b12390a377c79a962376a33359eeda37c9a2141450802e0b630e6c232d90aab0281179e623d01c77d1bc8059ce595fe865fbc6d6022ffb
+  languageName: node
+  linkType: hard
+
+"@fontsource-variable/space-grotesk@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource-variable/space-grotesk@npm:5.3.0"
+  checksum: 10c0/5b92b6c2878be04996caf1785bb7b0920e33c097da1d0c3568355a33a63797c809c1f3b14d19711561129cb2273f1c81adadadd8e6af6165b8f70310a0923189
   languageName: node
   linkType: hard
 
@@ -3960,8 +3983,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "qotm-web@workspace:."
   dependencies:
+    "@aurostack/secrets": "npm:^0.1.1"
     "@eslint/js": "npm:^10.0.1"
     "@fontsource-variable/inter": "npm:^5.3.0"
+    "@fontsource-variable/jetbrains-mono": "npm:^5.3.0"
+    "@fontsource-variable/space-grotesk": "npm:^5.3.0"
     "@hey-api/client-fetch": "npm:^0.5.2"
     "@hey-api/openapi-ts": "npm:^0.59.1"
     "@openobserve/browser-logs": "npm:^0.4.3"
