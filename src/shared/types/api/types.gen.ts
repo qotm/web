@@ -10,6 +10,7 @@ export type CurrentUserEntity = {
     updatedAt: string;
     role: string | null;
     onboardingCompletedAt: string | null;
+    handle: string;
 };
 
 export type FileEntity = {
@@ -21,7 +22,28 @@ export type PaginatedUserEntity = {
     pageSize: number;
     currentPage: number;
     lastPage: number;
-    list: Array<UserEntity>;
+    list: Array<AdminUserEntity>;
+};
+
+export type AdminUserEntity = {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image: string | null;
+    createdAt: string;
+    updatedAt: string;
+    role: string | null;
+    banned: boolean | null;
+    banReason: string | null;
+    banExpires: string | null;
+    onboardingCompletedAt: string | null;
+    handle: string;
+    bio: string | null;
+    showFavorites: boolean;
+    emailOnReview: boolean;
+    contributions: number;
+    curated: number;
 };
 
 export type UserEntity = {
@@ -37,6 +59,831 @@ export type UserEntity = {
     banReason: string | null;
     banExpires: string | null;
     onboardingCompletedAt: string | null;
+    handle: string;
+    bio: string | null;
+    showFavorites: boolean;
+    emailOnReview: boolean;
+};
+
+export type MeEntity = {
+    id: string;
+    name: string;
+    handle: string;
+    email: string;
+    image: string | null;
+    bio: string | null;
+    role: string | null;
+    showFavorites: boolean;
+    emailOnReview: boolean;
+    joinedAt: string;
+};
+
+export type UpdateMe = {
+    name?: string;
+    handle?: string;
+    bio?: string | null;
+    showFavorites?: boolean;
+    emailOnReview?: boolean;
+};
+
+export type DeleteMe = {
+    confirm: string;
+};
+
+export type OkEntity = {
+    status: number;
+    message: string;
+};
+
+export type ProfileEntity = {
+    handle: string;
+    name: string;
+    image: string | null;
+    bio: string | null;
+    role: 'member' | 'verifier' | 'moderator' | 'admin';
+    joinedAt: string;
+    showFavorites: boolean;
+    stats: {
+        quotes: number;
+        contributions: number;
+        curated: number;
+    };
+};
+
+export type PaginatedContributionEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<ContributionEntity>;
+};
+
+export type ContributionEntity = {
+    id: string;
+    text: string;
+    author: string | null;
+    type: 'canonical' | 'original';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    submittedAt: string;
+    release: string | null;
+};
+
+export type ContributionStatsEntity = {
+    submitted: number;
+    verified: number;
+    curated: number;
+    correctionsAccepted: number;
+};
+
+export type ProfileFavoritesEntity = {
+    list: Array<QuoteCardEntity>;
+};
+
+export type QuoteCardEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+};
+
+export type QuoteAuthorEntity = {
+    slug: string;
+    name: string;
+};
+
+export type QuoteTopicEntity = {
+    slug: string;
+    name: string;
+};
+
+export type QuoteViewerEntity = {
+    liked: boolean;
+    favorited: boolean;
+    recommended: boolean;
+};
+
+export type QuoteFeedEntity = {
+    list: Array<QuoteCardEntity>;
+    nextCursor: string | null;
+};
+
+export type QuoteEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+    context: string | null;
+    sourceUrl: string | null;
+    source: {
+        title: string;
+        year: number | null;
+        kind: 'BOOK' | 'PAPER' | 'MANUSCRIPT' | 'LECTURE' | 'TALK' | 'POST';
+        url: string | null;
+    } | null;
+    verifier: {
+        handle: string;
+    } | null;
+    verifiedAt: string | null;
+    lifecycle: Array<{
+        status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        at: string;
+    }>;
+    releases: Array<string>;
+};
+
+export type RelatedQuotesEntity = {
+    list: Array<QuoteCardEntity>;
+};
+
+export type SubmitQuote = {
+    type: 'canonical';
+    text: string;
+    attribution: string;
+    source: string;
+    year?: number;
+    sourceUrl?: string;
+    context?: string;
+    /**
+     * Topic slugs.
+     */
+    topics: Array<string>;
+} | {
+    type: 'original';
+    text: string;
+    /**
+     * Topic slugs.
+     */
+    topics: Array<string>;
+    rights: true;
+} | {
+    type: 'private';
+    text: string;
+    attribution?: string;
+    source?: string;
+    year?: number;
+    sourceUrl?: string;
+    context?: string;
+    /**
+     * Topic slugs.
+     */
+    topics?: Array<string>;
+};
+
+export type AddEvidence = {
+    note: string;
+    sourceUrl?: string;
+    source?: string;
+};
+
+export type MatchQuote = {
+    text: string;
+    exclude?: string;
+};
+
+export type MatchEntity = {
+    match: {
+        id: string;
+        text: string;
+        author: string | null;
+    } | null;
+    method: 'exact' | 'fuzzy';
+    score: number | null;
+};
+
+export type MyQuotesEntity = {
+    list: Array<MyQuoteEntity>;
+    nextCursor: string | null;
+    tabs: {
+        all: number;
+        private: number;
+        review: number;
+        public: number;
+    };
+};
+
+export type MyQuoteEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+    lifecycle: Array<{
+        status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        at: string;
+    }>;
+    review: {
+        note: string;
+        by: string | null;
+        at: string;
+    } | null;
+};
+
+export type EditQuote = {
+    text?: string;
+    attribution?: string | null;
+    source?: string | null;
+    year?: number | null;
+    sourceUrl?: string | null;
+    context?: string | null;
+    /**
+     * Topic slugs.
+     */
+    topics?: Array<string>;
+};
+
+export type SubmitPrivate = {
+    rights: true;
+    /**
+     * Topic slugs.
+     */
+    topics?: Array<string>;
+};
+
+export type QueuePageEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<QueueItemEntity>;
+};
+
+export type QueueItemEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+    waitingSince: string;
+    match: {
+        id: string;
+        text: string;
+        author: string | null;
+        method: 'exact' | 'fuzzy' | 'author';
+        score: number;
+        dismissed: boolean;
+    } | null;
+};
+
+export type SubmissionMatchesEntity = {
+    submitted: {
+        id: string;
+        text: string;
+    };
+    matches: Array<{
+        id: string;
+        text: string;
+        author: string | null;
+        method: 'exact' | 'fuzzy' | 'author';
+        score: number;
+        dismissed: boolean;
+    }>;
+};
+
+export type ModerationDecision = {
+    decision: 'publish';
+    note?: string;
+} | {
+    decision: 'mark_disputed';
+    note: string;
+} | {
+    decision: 'withdraw';
+    note: string;
+};
+
+export type VerificationDecision = {
+    decision: 'verify';
+    note?: string;
+} | {
+    decision: 'needs_evidence';
+    note: string;
+} | {
+    decision: 'reject';
+    note: string;
+};
+
+export type CorrectQuote = {
+    text?: string;
+    author?: string | null;
+    sourceId?: string | null;
+    year?: number | null;
+    sourceUrl?: string | null;
+    context?: string | null;
+    note: string;
+};
+
+export type CurationDecision = {
+    decision: 'curate';
+    /**
+     * Every item of the curation checklist, ticked or not.
+     */
+    checklist: {
+        on_topic: boolean;
+        stands_alone: boolean;
+        accurate: boolean;
+        concise: boolean;
+        not_duplicate: boolean;
+        lasting: boolean;
+        no_open_reports: boolean;
+    };
+    note?: string;
+} | {
+    decision: 'keep_out';
+    /**
+     * Every item of the curation checklist, ticked or not.
+     */
+    checklist: {
+        on_topic: boolean;
+        stands_alone: boolean;
+        accurate: boolean;
+        concise: boolean;
+        not_duplicate: boolean;
+        lasting: boolean;
+        no_open_reports: boolean;
+    };
+    note: string;
+};
+
+export type AdminReportPageEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminReportEntity>;
+};
+
+export type AdminReportEntity = {
+    id: string;
+    reason: 'attribution' | 'content' | 'originality' | 'duplicate' | 'other';
+    details: string | null;
+    status: 'SUBMITTED' | 'UNDER_REVIEW' | 'DISPUTED' | 'RESOLVED';
+    reporter: string | null;
+    createdAt: string;
+    resolvedAt: string | null;
+    quote: QuoteCardEntity;
+    inRelease: string | null;
+};
+
+export type ReportDecision = {
+    decision: 'dismiss';
+    note?: string;
+} | {
+    decision: 'mark_disputed';
+    note: string;
+} | {
+    decision: 'withdraw';
+    note: string;
+};
+
+export type CreateReport = {
+    reason: 'attribution' | 'content' | 'originality' | 'duplicate' | 'other';
+    details?: string;
+};
+
+export type ReportEntity = {
+    id: string;
+    quote: string;
+    reason: 'attribution' | 'content' | 'originality' | 'duplicate' | 'other';
+    details: string | null;
+    status: 'SUBMITTED' | 'UNDER_REVIEW' | 'DISPUTED' | 'RESOLVED';
+    createdAt: string;
+};
+
+export type RegisterDevice = {
+    label: string;
+};
+
+export type DeviceEntity = {
+    id: string;
+    label: string;
+    authorizedAt: string;
+    lastSyncAt: string | null;
+    datasetVersion: string | null;
+    revokedAt: string | null;
+    current?: boolean;
+};
+
+export type DeviceListEntity = {
+    list: Array<DeviceEntity>;
+};
+
+export type ReactionEntity = {
+    active: boolean;
+    count: number;
+};
+
+export type PaginatedFavoriteEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<FavoriteEntity>;
+};
+
+export type FavoriteEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+    savedAt: string;
+};
+
+export type FavoritesSyncEntity = {
+    favorites: Array<{
+        id: string;
+        addedAt: string;
+    }>;
+    skipped: Array<string>;
+};
+
+export type FavoritesSyncChanges = {
+    add?: Array<string>;
+    remove?: Array<string>;
+};
+
+export type TopicListEntity = {
+    list: Array<TopicEntity>;
+};
+
+export type TopicEntity = {
+    slug: string;
+    name: string;
+    description: string | null;
+    counts: {
+        quotes: number;
+        curated: number;
+    };
+};
+
+export type AuthorEntity = {
+    slug: string;
+    name: string;
+    bornYear: number | null;
+    diedYear: number | null;
+    description: string | null;
+    line: string;
+    topics: Array<{
+        slug: string;
+        name: string;
+    }>;
+    tabs: {
+        all: number;
+        curated: number;
+        review: number;
+    };
+};
+
+export type SearchEntity = {
+    q: string;
+    type: 'quotes' | 'authors' | 'topics';
+    counts: {
+        quotes: number;
+        authors: number;
+        topics: number;
+    };
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    quotes: Array<QuoteCardEntity>;
+    authors: Array<SearchAuthorEntity>;
+    topics: Array<TopicEntity>;
+};
+
+export type SearchAuthorEntity = {
+    slug: string;
+    name: string;
+    line: string;
+    quotes: number;
+};
+
+export type PaginatedAdminAuthorEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminAuthorEntity>;
+};
+
+export type AdminAuthorEntity = {
+    id: string;
+    name: string;
+    slug: string;
+    bornYear: number | null;
+    diedYear: number | null;
+    description: string | null;
+    dates: string;
+    quotes: number;
+    curated: number;
+};
+
+export type PaginatedAdminSourceEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminSourceEntity>;
+};
+
+export type AdminSourceEntity = {
+    id: string;
+    title: string;
+    author: {
+        slug: string;
+        name: string;
+    } | null;
+    year: number | null;
+    kind: 'BOOK' | 'PAPER' | 'MANUSCRIPT' | 'LECTURE' | 'TALK' | 'POST';
+    url: string | null;
+    quotes: number;
+};
+
+export type PaginatedAdminTopicEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminTopicEntity>;
+};
+
+export type AdminTopicEntity = {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    quotes: number;
+    curated: number;
+};
+
+export type PaginatedAuditEntryEntity = {
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AuditEntryEntity>;
+};
+
+export type AuditEntryEntity = {
+    id: string;
+    at: string;
+    actor: {
+        handle: string;
+    } | null;
+    action: string;
+    label: string;
+    target: {
+        type: string;
+        id: string;
+    };
+    note: string | null;
+};
+
+export type AuditActionListEntity = {
+    list: Array<{
+        action: string;
+        label: string;
+    }>;
+};
+
+export type AdminReleasesEntity = {
+    current: AdminReleaseEntity | null;
+    building: boolean;
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminReleaseEntity>;
+};
+
+export type AdminReleaseEntity = {
+    version: string;
+    state: 'DRAFT' | 'PREVIEW' | 'PUBLISHED';
+    schemaVersion: number;
+    eligible: number;
+    added: number;
+    corrected: number;
+    withdrawn: number;
+    changes: string;
+    sizeBytes: number | null;
+    sha256: string | null;
+    previewBuiltAt: string | null;
+    publishedAt: string | null;
+    publishedBy: {
+        handle: string;
+    } | null;
+};
+
+export type ReleaseJobEntity = {
+    release: AdminReleaseEntity;
+    queued: true;
+};
+
+export type ManifestEntity = {
+    version: string;
+    schemaVersion: number;
+    publishedAt: string;
+    url: string;
+    size: number;
+    sha256: string;
+    changes: {
+        eligible: number;
+        added: number;
+        corrected: number;
+        withdrawn: number;
+    };
+};
+
+export type CurrentReleaseEntity = {
+    version: string;
+    publishedAt: string;
+    schemaVersion: number;
+    quotes: number;
+    changes: {
+        eligible: number;
+        added: number;
+        corrected: number;
+        withdrawn: number;
+    };
+};
+
+export type AdminQuoteListEntity = {
+    counts: {
+        public: number;
+        eligible: number;
+    };
+    total: number;
+    pageSize: number;
+    currentPage: number;
+    lastPage: number;
+    list: Array<AdminQuoteRowEntity>;
+};
+
+export type AdminQuoteRowEntity = {
+    id: string;
+    text: string;
+    author: string | null;
+    type: 'canonical' | 'original';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    lastRelease: string | null;
+    createdAt: string;
+};
+
+export type ExportJobEntity = {
+    id: string;
+};
+
+export type ExportStatusEntity = {
+    id: string;
+    state: 'waiting' | 'running' | 'ready' | 'failed';
+    rows: number | null;
+    bytes: number | null;
+    error: string | null;
+    requestedAt: string;
+};
+
+export type DashboardStatsEntity = {
+    queues: {
+        verification: {
+            count: number;
+            oldestSince: string | null;
+            needsEvidence: number;
+        };
+        curation: {
+            count: number;
+            oldestSince: string | null;
+            communityCandidates: number;
+        };
+        reports: {
+            count: number;
+            oldestSince: string | null;
+            onCurated: number;
+        };
+        submissions: {
+            count: number;
+            oldestSince: string | null;
+            originalityChecks: number;
+        };
+    };
+    period: {
+        from: string;
+        to: string;
+        rolledUpAt: string;
+    };
+    quality: {
+        verificationAcceptance: number | null;
+        duplicateRate: number | null;
+        curated: number;
+        usefulContributionsPer100Users: number | null;
+    };
+    community: {
+        npmDownloads: number | null;
+        datasetSyncs: number;
+        registrations: number;
+        returningContributors: number;
+    };
+};
+
+export type QueueCountsEntity = {
+    verification: number;
+    curation: number;
+    reports: number;
+    submissions: number;
+};
+
+export type OldestItemsEntity = {
+    list: Array<{
+        id: string;
+        queue: 'verification' | 'curation' | 'submissions' | 'reports';
+        state: string;
+        waitingSince: string;
+    }>;
 };
 
 export type UserData = {
@@ -96,7 +943,7 @@ export type AvatarResponses = {
 
 export type AvatarResponse = AvatarResponses[keyof AvatarResponses];
 
-export type UsersData = {
+export type AdminUsersData = {
     body?: never;
     path?: never;
     query?: {
@@ -105,25 +952,25 @@ export type UsersData = {
         page?: number;
         role?: string;
     };
-    url: '/v1/users';
+    url: '/v1/admin/users';
 };
 
-export type UsersResponses = {
+export type AdminUsersResponses = {
     200: PaginatedUserEntity;
 };
 
-export type UsersResponse = UsersResponses[keyof UsersResponses];
+export type AdminUsersResponse = AdminUsersResponses[keyof AdminUsersResponses];
 
-export type UsersIdData = {
+export type AdminUsersIdData = {
     body?: never;
     path: {
         id: string;
     };
     query?: never;
-    url: '/v1/users/{id}';
+    url: '/v1/admin/users/{id}';
 };
 
-export type UsersIdErrors = {
+export type AdminUsersIdErrors = {
     400: unknown;
     /**
      * User not found
@@ -131,8 +978,1476 @@ export type UsersIdErrors = {
     404: unknown;
 };
 
-export type UsersIdResponses = {
+export type AdminUsersIdResponses = {
     200: UserEntity;
 };
 
-export type UsersIdResponse = UsersIdResponses[keyof UsersIdResponses];
+export type AdminUsersIdResponse = AdminUsersIdResponses[keyof AdminUsersIdResponses];
+
+export type AdminUsersIdRoleData = {
+    body: {
+        role: 'member' | 'verifier' | 'moderator' | 'admin';
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/users/{id}/role';
+};
+
+export type AdminUsersIdRoleErrors = {
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * The superuser’s role, or demoting the last admin
+     */
+    409: unknown;
+};
+
+export type AdminUsersIdRoleResponses = {
+    200: UserEntity;
+};
+
+export type AdminUsersIdRoleResponse = AdminUsersIdRoleResponses[keyof AdminUsersIdRoleResponses];
+
+export type MeDeleteData = {
+    body: DeleteMe;
+    path?: never;
+    query?: never;
+    url: '/v1/me';
+};
+
+export type MeDeleteErrors = {
+    /**
+     * The confirmation is not your handle
+     */
+    400: unknown;
+    /**
+     * The superuser account cannot be deleted
+     */
+    409: unknown;
+};
+
+export type MeDeleteResponses = {
+    200: OkEntity;
+};
+
+export type MeDeleteResponse = MeDeleteResponses[keyof MeDeleteResponses];
+
+export type MeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me';
+};
+
+export type MeResponses = {
+    200: MeEntity;
+};
+
+export type MeResponse = MeResponses[keyof MeResponses];
+
+export type MeUpdateData = {
+    body: UpdateMe;
+    path?: never;
+    query?: never;
+    url: '/v1/me';
+};
+
+export type MeUpdateErrors = {
+    /**
+     * The handle is taken
+     */
+    409: unknown;
+};
+
+export type MeUpdateResponses = {
+    200: MeEntity;
+};
+
+export type MeUpdateResponse = MeUpdateResponses[keyof MeUpdateResponses];
+
+export type UsersHandleData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/v1/users/{handle}';
+};
+
+export type UsersHandleErrors = {
+    404: unknown;
+};
+
+export type UsersHandleResponses = {
+    200: ProfileEntity;
+};
+
+export type UsersHandleResponse = UsersHandleResponses[keyof UsersHandleResponses];
+
+export type UsersHandleContributionsData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/users/{handle}/contributions';
+};
+
+export type UsersHandleContributionsErrors = {
+    404: unknown;
+};
+
+export type UsersHandleContributionsResponses = {
+    200: PaginatedContributionEntity;
+};
+
+export type UsersHandleContributionsResponse = UsersHandleContributionsResponses[keyof UsersHandleContributionsResponses];
+
+export type UsersHandleStatsData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/v1/users/{handle}/stats';
+};
+
+export type UsersHandleStatsErrors = {
+    404: unknown;
+};
+
+export type UsersHandleStatsResponses = {
+    200: ContributionStatsEntity;
+};
+
+export type UsersHandleStatsResponse = UsersHandleStatsResponses[keyof UsersHandleStatsResponses];
+
+export type UsersHandleFavoritesData = {
+    body?: never;
+    path: {
+        handle: string;
+    };
+    query?: never;
+    url: '/v1/users/{handle}/favorites';
+};
+
+export type UsersHandleFavoritesErrors = {
+    /**
+     * No such member, or their favorites are private
+     */
+    404: unknown;
+};
+
+export type UsersHandleFavoritesResponses = {
+    200: ProfileFavoritesEntity;
+};
+
+export type UsersHandleFavoritesResponse = UsersHandleFavoritesResponses[keyof UsersHandleFavoritesResponses];
+
+export type QuotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * discover: mixed, the same order for everyone each day (not personalised, not ranked by engagement) · latest: newest first · curated: the current release
+         */
+        feed?: 'discover' | 'latest' | 'curated';
+        topic?: string;
+        author?: string;
+        contributor?: string;
+        type?: 'canonical' | 'original';
+        /**
+         * all · curated (curated or shipped) · review (public, still being checked; the author page tab)
+         */
+        state?: 'all' | 'curated' | 'review';
+        /**
+         * The `nextCursor` of the previous page.
+         */
+        cursor?: string;
+        limit?: number;
+    };
+    url: '/v1/quotes';
+};
+
+export type QuotesResponses = {
+    200: QuoteFeedEntity;
+};
+
+export type QuotesResponse = QuotesResponses[keyof QuotesResponses];
+
+export type QuotesIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}';
+};
+
+export type QuotesIdErrors = {
+    /**
+     * Unknown, private or not yet checked; or withdrawn (the message says so)
+     */
+    404: unknown;
+};
+
+export type QuotesIdResponses = {
+    200: QuoteEntity;
+};
+
+export type QuotesIdResponse = QuotesIdResponses[keyof QuotesIdResponses];
+
+export type QuotesIdRelatedData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/related';
+};
+
+export type QuotesIdRelatedErrors = {
+    /**
+     * The quote is not visible
+     */
+    404: unknown;
+};
+
+export type QuotesIdRelatedResponses = {
+    200: RelatedQuotesEntity;
+};
+
+export type QuotesIdRelatedResponse = QuotesIdRelatedResponses[keyof QuotesIdRelatedResponses];
+
+export type SubmissionsCreateData = {
+    body: SubmitQuote;
+    path?: never;
+    query?: never;
+    url: '/v1/submissions';
+};
+
+export type SubmissionsCreateResponses = {
+    200: QuoteEntity;
+};
+
+export type SubmissionsCreateResponse = SubmissionsCreateResponses[keyof SubmissionsCreateResponses];
+
+export type SubmissionsIdEvidenceData = {
+    body: AddEvidence;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/submissions/{id}/evidence';
+};
+
+export type SubmissionsIdEvidenceErrors = {
+    /**
+     * Not one of your quotes
+     */
+    404: unknown;
+    /**
+     * The quote is not waiting for evidence
+     */
+    409: unknown;
+};
+
+export type SubmissionsIdEvidenceResponses = {
+    200: QuoteEntity;
+};
+
+export type SubmissionsIdEvidenceResponse = SubmissionsIdEvidenceResponses[keyof SubmissionsIdEvidenceResponses];
+
+export type QuotesMatchData = {
+    body: MatchQuote;
+    path?: never;
+    query?: never;
+    url: '/v1/quotes/match';
+};
+
+export type QuotesMatchResponses = {
+    200: MatchEntity;
+};
+
+export type QuotesMatchResponse = QuotesMatchResponses[keyof QuotesMatchResponses];
+
+export type MeQuotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        tab?: 'all' | 'private' | 'review' | 'public';
+        cursor?: string;
+        limit?: number;
+    };
+    url: '/v1/me/quotes';
+};
+
+export type MeQuotesResponses = {
+    200: MyQuotesEntity;
+};
+
+export type MeQuotesResponse = MeQuotesResponses[keyof MeQuotesResponses];
+
+export type MeQuotesIdDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/me/quotes/{id}';
+};
+
+export type MeQuotesIdDeleteErrors = {
+    /**
+     * Not one of your quotes
+     */
+    404: unknown;
+    /**
+     * Public: a moderator withdraws it
+     */
+    409: unknown;
+};
+
+export type MeQuotesIdDeleteResponses = {
+    200: OkEntity;
+};
+
+export type MeQuotesIdDeleteResponse = MeQuotesIdDeleteResponses[keyof MeQuotesIdDeleteResponses];
+
+export type MeQuotesIdUpdateData = {
+    body: EditQuote;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/me/quotes/{id}';
+};
+
+export type MeQuotesIdUpdateErrors = {
+    /**
+     * Not one of your quotes
+     */
+    404: unknown;
+    /**
+     * Only a private quote can be edited
+     */
+    409: unknown;
+};
+
+export type MeQuotesIdUpdateResponses = {
+    200: QuoteEntity;
+};
+
+export type MeQuotesIdUpdateResponse = MeQuotesIdUpdateResponses[keyof MeQuotesIdUpdateResponses];
+
+export type MeQuotesIdSubmitData = {
+    body: SubmitPrivate;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/me/quotes/{id}/submit';
+};
+
+export type MeQuotesIdSubmitErrors = {
+    /**
+     * Not one of your quotes
+     */
+    404: unknown;
+    /**
+     * Not a private quote
+     */
+    409: unknown;
+};
+
+export type MeQuotesIdSubmitResponses = {
+    200: QuoteEntity;
+};
+
+export type MeQuotesIdSubmitResponse = MeQuotesIdSubmitResponses[keyof MeQuotesIdSubmitResponses];
+
+export type AdminSubmissionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/submissions';
+};
+
+export type AdminSubmissionsResponses = {
+    200: QueuePageEntity;
+};
+
+export type AdminSubmissionsResponse = AdminSubmissionsResponses[keyof AdminSubmissionsResponses];
+
+export type AdminSubmissionsIdMatchData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/submissions/{id}/match';
+};
+
+export type AdminSubmissionsIdMatchErrors = {
+    404: unknown;
+};
+
+export type AdminSubmissionsIdMatchResponses = {
+    200: SubmissionMatchesEntity;
+};
+
+export type AdminSubmissionsIdMatchResponse = AdminSubmissionsIdMatchResponses[keyof AdminSubmissionsIdMatchResponses];
+
+export type AdminSubmissionsIdDecisionData = {
+    body: ModerationDecision;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/submissions/{id}/decision';
+};
+
+export type AdminSubmissionsIdDecisionErrors = {
+    404: unknown;
+    /**
+     * Not waiting for a moderator, or decided meanwhile
+     */
+    409: unknown;
+};
+
+export type AdminSubmissionsIdDecisionResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminSubmissionsIdDecisionResponse = AdminSubmissionsIdDecisionResponses[keyof AdminSubmissionsIdDecisionResponses];
+
+export type AdminVerificationData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/verification';
+};
+
+export type AdminVerificationResponses = {
+    200: QueuePageEntity;
+};
+
+export type AdminVerificationResponse = AdminVerificationResponses[keyof AdminVerificationResponses];
+
+export type AdminQuotesIdVerificationData = {
+    body: VerificationDecision;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/quotes/{id}/verification';
+};
+
+export type AdminQuotesIdVerificationErrors = {
+    404: unknown;
+    /**
+     * Not in verification, author not linked, or decided meanwhile
+     */
+    409: unknown;
+};
+
+export type AdminQuotesIdVerificationResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminQuotesIdVerificationResponse = AdminQuotesIdVerificationResponses[keyof AdminQuotesIdVerificationResponses];
+
+export type AdminQuotesIdUpdateData = {
+    body: CorrectQuote;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/quotes/{id}';
+};
+
+export type AdminQuotesIdUpdateErrors = {
+    404: unknown;
+};
+
+export type AdminQuotesIdUpdateResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminQuotesIdUpdateResponse = AdminQuotesIdUpdateResponses[keyof AdminQuotesIdUpdateResponses];
+
+export type AdminCurationData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/curation';
+};
+
+export type AdminCurationResponses = {
+    200: QueuePageEntity;
+};
+
+export type AdminCurationResponse = AdminCurationResponses[keyof AdminCurationResponses];
+
+export type AdminQuotesIdCurationData = {
+    body: CurationDecision;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/quotes/{id}/curation';
+};
+
+export type AdminQuotesIdCurationErrors = {
+    404: unknown;
+    /**
+     * Not waiting for curation, checklist incomplete, open reports, or decided meanwhile
+     */
+    409: unknown;
+};
+
+export type AdminQuotesIdCurationResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminQuotesIdCurationResponse = AdminQuotesIdCurationResponses[keyof AdminQuotesIdCurationResponses];
+
+export type AdminReportsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        status?: 'open' | 'resolved';
+    };
+    url: '/v1/admin/reports';
+};
+
+export type AdminReportsResponses = {
+    200: AdminReportPageEntity;
+};
+
+export type AdminReportsResponse = AdminReportsResponses[keyof AdminReportsResponses];
+
+export type AdminReportsIdDecisionData = {
+    body: ReportDecision;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/reports/{id}/decision';
+};
+
+export type AdminReportsIdDecisionErrors = {
+    /**
+     * No such report
+     */
+    404: unknown;
+    /**
+     * Already resolved, or decided meanwhile
+     */
+    409: unknown;
+};
+
+export type AdminReportsIdDecisionResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminReportsIdDecisionResponse = AdminReportsIdDecisionResponses[keyof AdminReportsIdDecisionResponses];
+
+export type QuotesIdShareImageData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        variant?: 'quote' | 'terminal';
+    };
+    url: '/v1/quotes/{id}/share-image';
+};
+
+export type QuotesIdShareImageErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type QuotesIdShareImageResponses = {
+    /**
+     * A placeholder; a render is queued
+     */
+    200: Blob | File;
+};
+
+export type QuotesIdShareImageResponse = QuotesIdShareImageResponses[keyof QuotesIdShareImageResponses];
+
+export type QuotesIdOgPngData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/og.png';
+};
+
+export type QuotesIdOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type QuotesIdOgPngResponses = {
+    /**
+     * A placeholder; a render is queued
+     */
+    200: Blob | File;
+};
+
+export type QuotesIdOgPngResponse = QuotesIdOgPngResponses[keyof QuotesIdOgPngResponses];
+
+export type QuotesIdReportsData = {
+    body: CreateReport;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/reports';
+};
+
+export type QuotesIdReportsErrors = {
+    /**
+     * The quote is not public
+     */
+    404: unknown;
+    /**
+     * You already have an open report on this quote
+     */
+    409: unknown;
+    429: unknown;
+};
+
+export type QuotesIdReportsResponses = {
+    200: ReportEntity;
+};
+
+export type QuotesIdReportsResponse = QuotesIdReportsResponses[keyof QuotesIdReportsResponses];
+
+export type MeDevicesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me/devices';
+};
+
+export type MeDevicesResponses = {
+    200: DeviceListEntity;
+};
+
+export type MeDevicesResponse = MeDevicesResponses[keyof MeDevicesResponses];
+
+export type MeDevicesRegisterData = {
+    body: RegisterDevice;
+    headers: {
+        'x-qotm-dataset': string;
+        /**
+         * The dataset version the terminal holds (v2026.09.1).
+         */
+        'X-Qotm-Dataset'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/me/devices';
+};
+
+export type MeDevicesRegisterResponses = {
+    200: DeviceEntity;
+};
+
+export type MeDevicesRegisterResponse = MeDevicesRegisterResponses[keyof MeDevicesRegisterResponses];
+
+export type MeDevicesCurrentDeleteData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me/devices/current';
+};
+
+export type MeDevicesCurrentDeleteResponses = {
+    200: OkEntity;
+};
+
+export type MeDevicesCurrentDeleteResponse = MeDevicesCurrentDeleteResponses[keyof MeDevicesCurrentDeleteResponses];
+
+export type MeDevicesIdDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/me/devices/{id}';
+};
+
+export type MeDevicesIdDeleteErrors = {
+    /**
+     * Not one of your terminals
+     */
+    404: unknown;
+};
+
+export type MeDevicesIdDeleteResponses = {
+    200: OkEntity;
+};
+
+export type MeDevicesIdDeleteResponse = MeDevicesIdDeleteResponses[keyof MeDevicesIdDeleteResponses];
+
+export type QuotesIdLikeDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/like';
+};
+
+export type QuotesIdLikeDeleteErrors = {
+    404: unknown;
+};
+
+export type QuotesIdLikeDeleteResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdLikeDeleteResponse = QuotesIdLikeDeleteResponses[keyof QuotesIdLikeDeleteResponses];
+
+export type QuotesIdLikeData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/like';
+};
+
+export type QuotesIdLikeErrors = {
+    404: unknown;
+};
+
+export type QuotesIdLikeResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdLikeResponse = QuotesIdLikeResponses[keyof QuotesIdLikeResponses];
+
+export type QuotesIdFavoriteDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/favorite';
+};
+
+export type QuotesIdFavoriteDeleteErrors = {
+    404: unknown;
+};
+
+export type QuotesIdFavoriteDeleteResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdFavoriteDeleteResponse = QuotesIdFavoriteDeleteResponses[keyof QuotesIdFavoriteDeleteResponses];
+
+export type QuotesIdFavoriteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/favorite';
+};
+
+export type QuotesIdFavoriteErrors = {
+    404: unknown;
+};
+
+export type QuotesIdFavoriteResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdFavoriteResponse = QuotesIdFavoriteResponses[keyof QuotesIdFavoriteResponses];
+
+export type QuotesIdRecommendationDeleteData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/recommendation';
+};
+
+export type QuotesIdRecommendationDeleteErrors = {
+    404: unknown;
+};
+
+export type QuotesIdRecommendationDeleteResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdRecommendationDeleteResponse = QuotesIdRecommendationDeleteResponses[keyof QuotesIdRecommendationDeleteResponses];
+
+export type QuotesIdRecommendationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/quotes/{id}/recommendation';
+};
+
+export type QuotesIdRecommendationErrors = {
+    /**
+     * Only community originals can be recommended
+     */
+    400: unknown;
+    404: unknown;
+    /**
+     * Already in curation or curated
+     */
+    409: unknown;
+};
+
+export type QuotesIdRecommendationResponses = {
+    200: ReactionEntity;
+};
+
+export type QuotesIdRecommendationResponse = QuotesIdRecommendationResponses[keyof QuotesIdRecommendationResponses];
+
+export type MeFavoritesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        q?: string | '';
+        sort?: 'recent' | 'author' | 'likes';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/me/favorites';
+};
+
+export type MeFavoritesResponses = {
+    200: PaginatedFavoriteEntity;
+};
+
+export type MeFavoritesResponse = MeFavoritesResponses[keyof MeFavoritesResponses];
+
+export type MeFavoritesSyncData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/me/favorites/sync';
+};
+
+export type MeFavoritesSyncResponses = {
+    200: FavoritesSyncEntity;
+};
+
+export type MeFavoritesSyncResponse = MeFavoritesSyncResponses[keyof MeFavoritesSyncResponses];
+
+export type MeFavoritesSyncUpdateData = {
+    body: FavoritesSyncChanges;
+    path?: never;
+    query?: never;
+    url: '/v1/me/favorites/sync';
+};
+
+export type MeFavoritesSyncUpdateResponses = {
+    200: FavoritesSyncEntity;
+};
+
+export type MeFavoritesSyncUpdateResponse = MeFavoritesSyncUpdateResponses[keyof MeFavoritesSyncUpdateResponses];
+
+export type TopicsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/topics';
+};
+
+export type TopicsResponses = {
+    200: TopicListEntity;
+};
+
+export type TopicsResponse = TopicsResponses[keyof TopicsResponses];
+
+export type TopicsSlugData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/topics/{slug}';
+};
+
+export type TopicsSlugErrors = {
+    404: unknown;
+};
+
+export type TopicsSlugResponses = {
+    200: TopicEntity;
+};
+
+export type TopicsSlugResponse = TopicsSlugResponses[keyof TopicsSlugResponses];
+
+export type AuthorsSlugData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/authors/{slug}';
+};
+
+export type AuthorsSlugErrors = {
+    404: unknown;
+};
+
+export type AuthorsSlugResponses = {
+    200: AuthorEntity;
+};
+
+export type AuthorsSlugResponse = AuthorsSlugResponses[keyof AuthorsSlugResponses];
+
+export type SearchData = {
+    body?: never;
+    path?: never;
+    query: {
+        q: string;
+        /**
+         * Which tab to list; the counts cover all three.
+         */
+        type?: 'quotes' | 'authors' | 'topics';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/search';
+};
+
+export type SearchResponses = {
+    200: SearchEntity;
+};
+
+export type SearchResponse = SearchResponses[keyof SearchResponses];
+
+export type AdminAuthorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string | '';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/authors';
+};
+
+export type AdminAuthorsResponses = {
+    200: PaginatedAdminAuthorEntity;
+};
+
+export type AdminAuthorsResponse = AdminAuthorsResponses[keyof AdminAuthorsResponses];
+
+export type AdminAuthorsCreateData = {
+    body: {
+        name: string;
+        slug?: string;
+        bornYear?: number | null;
+        diedYear?: number | null;
+        description?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/admin/authors';
+};
+
+export type AdminAuthorsCreateErrors = {
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminAuthorsCreateResponses = {
+    200: AdminAuthorEntity;
+};
+
+export type AdminAuthorsCreateResponse = AdminAuthorsCreateResponses[keyof AdminAuthorsCreateResponses];
+
+export type AdminAuthorsIdData = {
+    body: {
+        name?: string;
+        slug?: string;
+        bornYear?: number | null;
+        diedYear?: number | null;
+        description?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/authors/{id}';
+};
+
+export type AdminAuthorsIdErrors = {
+    404: unknown;
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminAuthorsIdResponses = {
+    200: AdminAuthorEntity;
+};
+
+export type AdminAuthorsIdResponse = AdminAuthorsIdResponses[keyof AdminAuthorsIdResponses];
+
+export type AdminSourcesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string | '';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/sources';
+};
+
+export type AdminSourcesResponses = {
+    200: PaginatedAdminSourceEntity;
+};
+
+export type AdminSourcesResponse = AdminSourcesResponses[keyof AdminSourcesResponses];
+
+export type AdminSourcesCreateData = {
+    body: {
+        title: string;
+        author?: string | null;
+        year?: number | null;
+        kind: 'BOOK' | 'PAPER' | 'MANUSCRIPT' | 'LECTURE' | 'TALK' | 'POST';
+        url?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/admin/sources';
+};
+
+export type AdminSourcesCreateErrors = {
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminSourcesCreateResponses = {
+    200: AdminSourceEntity;
+};
+
+export type AdminSourcesCreateResponse = AdminSourcesCreateResponses[keyof AdminSourcesCreateResponses];
+
+export type AdminSourcesIdData = {
+    body: {
+        title?: string;
+        author?: string | null;
+        year?: number | null;
+        kind?: 'BOOK' | 'PAPER' | 'MANUSCRIPT' | 'LECTURE' | 'TALK' | 'POST';
+        url?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/sources/{id}';
+};
+
+export type AdminSourcesIdErrors = {
+    404: unknown;
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminSourcesIdResponses = {
+    200: AdminSourceEntity;
+};
+
+export type AdminSourcesIdResponse = AdminSourcesIdResponses[keyof AdminSourcesIdResponses];
+
+export type AdminTopicsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string | '';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/topics';
+};
+
+export type AdminTopicsResponses = {
+    200: PaginatedAdminTopicEntity;
+};
+
+export type AdminTopicsResponse = AdminTopicsResponses[keyof AdminTopicsResponses];
+
+export type AdminTopicsCreateData = {
+    body: {
+        name: string;
+        slug?: string;
+        description?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/admin/topics';
+};
+
+export type AdminTopicsCreateErrors = {
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminTopicsCreateResponses = {
+    200: AdminTopicEntity;
+};
+
+export type AdminTopicsCreateResponse = AdminTopicsCreateResponses[keyof AdminTopicsCreateResponses];
+
+export type AdminTopicsIdData = {
+    body: {
+        name?: string;
+        slug?: string;
+        description?: string | null;
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/topics/{id}';
+};
+
+export type AdminTopicsIdErrors = {
+    404: unknown;
+    /**
+     * The slug is taken
+     */
+    409: unknown;
+};
+
+export type AdminTopicsIdResponses = {
+    200: AdminTopicEntity;
+};
+
+export type AdminTopicsIdResponse = AdminTopicsIdResponses[keyof AdminTopicsIdResponses];
+
+export type AdminAuditData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Actor handle, action, target or note: `@kofi`, `withdrew`, `q_5d3a8w`
+         */
+        q?: string;
+        action?: 'quote.verified' | 'quote.evidence_requested' | 'quote.rejected' | 'quote.published' | 'quote.curated' | 'quote.kept_out' | 'quote.disputed' | 'quote.restored' | 'quote.withdrawn' | 'quote.corrected' | 'report.resolved' | 'release.preview_built' | 'release.published' | 'user.role_changed' | 'author.created' | 'author.updated' | 'source.created' | 'source.updated' | 'topic.created' | 'topic.updated';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/audit';
+};
+
+export type AdminAuditResponses = {
+    200: PaginatedAuditEntryEntity;
+};
+
+export type AdminAuditResponse = AdminAuditResponses[keyof AdminAuditResponses];
+
+export type AdminAuditActionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/audit/actions';
+};
+
+export type AdminAuditActionsResponses = {
+    200: AuditActionListEntity;
+};
+
+export type AdminAuditActionsResponse = AdminAuditActionsResponses[keyof AdminAuditActionsResponses];
+
+export type AdminReleasesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/releases';
+};
+
+export type AdminReleasesResponses = {
+    200: AdminReleasesEntity;
+};
+
+export type AdminReleasesResponse = AdminReleasesResponses[keyof AdminReleasesResponses];
+
+export type AdminReleasesPreviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/releases/preview';
+};
+
+export type AdminReleasesPreviewErrors = {
+    /**
+     * A build is already running
+     */
+    409: unknown;
+};
+
+export type AdminReleasesPreviewResponses = {
+    200: ReleaseJobEntity;
+};
+
+export type AdminReleasesPreviewResponse = AdminReleasesPreviewResponses[keyof AdminReleasesPreviewResponses];
+
+export type AdminReleasesVersionPublishData = {
+    body: {
+        reviewed: true;
+    };
+    path: {
+        version: string;
+    };
+    query?: never;
+    url: '/v1/admin/releases/{version}/publish';
+};
+
+export type AdminReleasesVersionPublishErrors = {
+    404: unknown;
+    /**
+     * No preview built, already published, or a build running
+     */
+    409: unknown;
+};
+
+export type AdminReleasesVersionPublishResponses = {
+    200: ReleaseJobEntity;
+};
+
+export type AdminReleasesVersionPublishResponse = AdminReleasesVersionPublishResponses[keyof AdminReleasesVersionPublishResponses];
+
+export type DatasetManifestData = {
+    body?: never;
+    headers?: {
+        /**
+         * The version the CLI holds (`v2026.09.1`); with a bearer, recorded on its terminal
+         */
+        'x-qotm-dataset'?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/dataset/manifest';
+};
+
+export type DatasetManifestErrors = {
+    /**
+     * No release has been published yet
+     */
+    404: unknown;
+};
+
+export type DatasetManifestResponses = {
+    200: ManifestEntity;
+};
+
+export type DatasetManifestResponse = DatasetManifestResponses[keyof DatasetManifestResponses];
+
+export type DatasetDownloadData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/dataset/download';
+};
+
+export type DatasetDownloadErrors = {
+    /**
+     * No release has been published yet
+     */
+    404: unknown;
+};
+
+export type ReleasesCurrentData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/releases/current';
+};
+
+export type ReleasesCurrentErrors = {
+    /**
+     * No release has been published yet
+     */
+    404: unknown;
+};
+
+export type ReleasesCurrentResponses = {
+    200: CurrentReleaseEntity;
+};
+
+export type ReleasesCurrentResponse = ReleasesCurrentResponses[keyof ReleasesCurrentResponses];
+
+export type AdminQuotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Text, author or id: `simplicity`, `dijkstra`, `q_8f2k1c`
+         */
+        q?: string;
+        type?: 'canonical' | 'original';
+        state?: 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        page?: number;
+        limit?: number;
+    };
+    url: '/v1/admin/quotes';
+};
+
+export type AdminQuotesResponses = {
+    200: AdminQuoteListEntity;
+};
+
+export type AdminQuotesResponse = AdminQuotesResponses[keyof AdminQuotesResponses];
+
+export type AdminQuotesExportData = {
+    body: {
+        /**
+         * Text, author or id: `simplicity`, `dijkstra`, `q_8f2k1c`
+         */
+        q?: string;
+        type?: 'canonical' | 'original';
+        state?: 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/admin/quotes/export';
+};
+
+export type AdminQuotesExportResponses = {
+    200: ExportJobEntity;
+};
+
+export type AdminQuotesExportResponse = AdminQuotesExportResponses[keyof AdminQuotesExportResponses];
+
+export type AdminExportsIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/exports/{id}';
+};
+
+export type AdminExportsIdErrors = {
+    /**
+     * Unknown, expired, or someone else’s
+     */
+    404: unknown;
+};
+
+export type AdminExportsIdResponses = {
+    200: ExportStatusEntity;
+};
+
+export type AdminExportsIdResponse = AdminExportsIdResponses[keyof AdminExportsIdResponses];
+
+export type AdminExportsIdDownloadData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/exports/{id}/download';
+};
+
+export type AdminExportsIdDownloadErrors = {
+    /**
+     * Unknown, expired, or someone else’s
+     */
+    404: unknown;
+    /**
+     * Not ready yet
+     */
+    409: unknown;
+};
+
+export type AdminExportsIdDownloadResponses = {
+    200: Blob | File;
+};
+
+export type AdminExportsIdDownloadResponse = AdminExportsIdDownloadResponses[keyof AdminExportsIdDownloadResponses];
+
+export type AdminStatsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/stats';
+};
+
+export type AdminStatsResponses = {
+    200: DashboardStatsEntity;
+};
+
+export type AdminStatsResponse = AdminStatsResponses[keyof AdminStatsResponses];
+
+export type AdminStatsCountsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/stats/counts';
+};
+
+export type AdminStatsCountsResponses = {
+    200: QueueCountsEntity;
+};
+
+export type AdminStatsCountsResponse = AdminStatsCountsResponses[keyof AdminStatsCountsResponses];
+
+export type AdminQueuesOldestData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/queues/oldest';
+};
+
+export type AdminQueuesOldestResponses = {
+    200: OldestItemsEntity;
+};
+
+export type AdminQueuesOldestResponse = AdminQueuesOldestResponses[keyof AdminQueuesOldestResponses];

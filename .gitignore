@@ -32,3 +32,8 @@ dev-dist/
 # they are the contract this app compiles against — but the dump itself is a
 # build artefact of whatever backend happened to be running.
 openapi.json
+
+# Playwright
+test-results/
+playwright-report/
+e2e/.screenshots/

@@ -11,7 +11,8 @@ export const zCurrentUserEntity = z.object({
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     role: z.unknown(),
-    onboardingCompletedAt: z.unknown()
+    onboardingCompletedAt: z.unknown(),
+    handle: z.string()
 });
 
 export const zFileEntity = z.object({
@@ -35,8 +36,35 @@ export const zPaginatedUserEntity = z.object({
         banned: z.unknown(),
         banReason: z.unknown(),
         banExpires: z.unknown(),
-        onboardingCompletedAt: z.unknown()
+        onboardingCompletedAt: z.unknown(),
+        handle: z.string(),
+        bio: z.unknown(),
+        showFavorites: z.boolean(),
+        emailOnReview: z.boolean(),
+        contributions: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991)
     }))
+});
+
+export const zAdminUserEntity = z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+    emailVerified: z.boolean(),
+    image: z.unknown(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+    role: z.unknown(),
+    banned: z.unknown(),
+    banReason: z.unknown(),
+    banExpires: z.unknown(),
+    onboardingCompletedAt: z.unknown(),
+    handle: z.string(),
+    bio: z.unknown(),
+    showFavorites: z.boolean(),
+    emailOnReview: z.boolean(),
+    contributions: z.number().gte(-9007199254740991).lte(9007199254740991),
+    curated: z.number().gte(-9007199254740991).lte(9007199254740991)
 });
 
 export const zUserEntity = z.object({
@@ -51,5 +79,1255 @@ export const zUserEntity = z.object({
     banned: z.unknown(),
     banReason: z.unknown(),
     banExpires: z.unknown(),
-    onboardingCompletedAt: z.unknown()
+    onboardingCompletedAt: z.unknown(),
+    handle: z.string(),
+    bio: z.unknown(),
+    showFavorites: z.boolean(),
+    emailOnReview: z.boolean()
+});
+
+export const zMeEntity = z.object({
+    id: z.string(),
+    name: z.string(),
+    handle: z.string(),
+    email: z.string(),
+    image: z.unknown(),
+    bio: z.unknown(),
+    role: z.unknown(),
+    showFavorites: z.boolean(),
+    emailOnReview: z.boolean(),
+    joinedAt: z.string().datetime()
+});
+
+export const zUpdateMe = z.object({
+    name: z.string().min(1).max(80).optional(),
+    handle: z.string().optional(),
+    bio: z.unknown().optional(),
+    showFavorites: z.boolean().optional(),
+    emailOnReview: z.boolean().optional()
+});
+
+export const zDeleteMe = z.object({
+    confirm: z.string()
+});
+
+export const zOKEntity = z.object({
+    status: z.number(),
+    message: z.string()
+});
+
+export const zProfileEntity = z.object({
+    handle: z.string(),
+    name: z.string(),
+    image: z.unknown(),
+    bio: z.unknown(),
+    role: z.enum([
+        'member',
+        'verifier',
+        'moderator',
+        'admin'
+    ]),
+    joinedAt: z.string().datetime(),
+    showFavorites: z.boolean(),
+    stats: z.object({
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        contributions: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zPaginatedContributionEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        author: z.unknown(),
+        type: z.enum([
+            'canonical',
+            'original'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        submittedAt: z.string().datetime(),
+        release: z.unknown()
+    }))
+});
+
+export const zContributionEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    author: z.unknown(),
+    type: z.enum([
+        'canonical',
+        'original'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    submittedAt: z.string().datetime(),
+    release: z.unknown()
+});
+
+export const zContributionStatsEntity = z.object({
+    submitted: z.number().gte(-9007199254740991).lte(9007199254740991),
+    verified: z.number().gte(-9007199254740991).lte(9007199254740991),
+    curated: z.number().gte(-9007199254740991).lte(9007199254740991),
+    correctionsAccepted: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zProfileFavoritesEntity = z.object({
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        type: z.enum([
+            'canonical',
+            'original',
+            'private'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        author: z.unknown(),
+        attribution: z.unknown(),
+        work: z.unknown(),
+        year: z.unknown(),
+        contributor: z.unknown(),
+        topics: z.array(z.object({
+            slug: z.string(),
+            name: z.string()
+        })),
+        counts: z.object({
+            likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+            favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+            recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        publishedAt: z.unknown(),
+        viewer: z.object({
+            liked: z.boolean(),
+            favorited: z.boolean(),
+            recommended: z.boolean()
+        }).optional()
+    }))
+});
+
+export const zQuoteCardEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(z.object({
+        slug: z.string(),
+        name: z.string()
+    })),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: z.object({
+        liked: z.boolean(),
+        favorited: z.boolean(),
+        recommended: z.boolean()
+    }).optional()
+});
+
+export const zQuoteAuthorEntity = z.object({
+    slug: z.string(),
+    name: z.string()
+});
+
+export const zQuoteTopicEntity = z.object({
+    slug: z.string(),
+    name: z.string()
+});
+
+export const zQuoteViewerEntity = z.object({
+    liked: z.boolean(),
+    favorited: z.boolean(),
+    recommended: z.boolean()
+});
+
+export const zQuoteFeedEntity = z.object({
+    list: z.array(zQuoteCardEntity),
+    nextCursor: z.unknown()
+});
+
+export const zQuoteEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(zQuoteTopicEntity),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: zQuoteViewerEntity.optional(),
+    context: z.unknown(),
+    sourceUrl: z.unknown(),
+    source: z.unknown(),
+    verifier: z.unknown(),
+    verifiedAt: z.unknown(),
+    lifecycle: z.array(z.object({
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        at: z.string().datetime()
+    })),
+    releases: z.array(z.string())
+});
+
+export const zRelatedQuotesEntity = z.object({
+    list: z.array(zQuoteCardEntity)
+});
+
+export const zSubmitQuote = z.unknown();
+
+export const zAddEvidence = z.object({
+    note: z.string().min(3).max(1000),
+    sourceUrl: z.string().url().max(2048).optional(),
+    source: z.string().max(300).optional()
+});
+
+export const zMatchQuote = z.object({
+    text: z.string().max(400),
+    exclude: z.string().optional()
+});
+
+export const zMatchEntity = z.object({
+    match: z.unknown(),
+    method: z.enum([
+        'exact',
+        'fuzzy'
+    ]),
+    score: z.unknown()
+});
+
+export const zMyQuotesEntity = z.object({
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        type: z.enum([
+            'canonical',
+            'original',
+            'private'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        author: z.unknown(),
+        attribution: z.unknown(),
+        work: z.unknown(),
+        year: z.unknown(),
+        contributor: z.unknown(),
+        topics: z.array(zQuoteTopicEntity),
+        counts: z.object({
+            likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+            favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+            recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        publishedAt: z.unknown(),
+        viewer: zQuoteViewerEntity.optional(),
+        lifecycle: z.array(z.object({
+            status: z.enum([
+                'PRIVATE',
+                'SUBMITTED',
+                'CURATION_REVIEW',
+                'CURATED',
+                'DATASET_RELEASE',
+                'UNDER_REVIEW',
+                'VERIFIED',
+                'ORIGINALITY_CHECK',
+                'PUBLISHED',
+                'COMMUNITY_DISCOVERY',
+                'CURATION_CANDIDATE',
+                'NEEDS_EVIDENCE',
+                'DISPUTED',
+                'REJECTED',
+                'WITHDRAWN'
+            ]),
+            at: z.string().datetime()
+        })),
+        review: z.unknown()
+    })),
+    nextCursor: z.unknown(),
+    tabs: z.object({
+        all: z.number().gte(-9007199254740991).lte(9007199254740991),
+        private: z.number().gte(-9007199254740991).lte(9007199254740991),
+        review: z.number().gte(-9007199254740991).lte(9007199254740991),
+        public: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zMyQuoteEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(zQuoteTopicEntity),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: zQuoteViewerEntity.optional(),
+    lifecycle: z.array(z.object({
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        at: z.string().datetime()
+    })),
+    review: z.unknown()
+});
+
+export const zEditQuote = z.object({
+    text: z.string().optional(),
+    attribution: z.unknown().optional(),
+    source: z.unknown().optional(),
+    year: z.unknown().optional(),
+    sourceUrl: z.unknown().optional(),
+    context: z.unknown().optional(),
+    topics: z.array(z.string().max(60)).max(5).optional()
+});
+
+export const zSubmitPrivate = z.object({
+    rights: z.unknown(),
+    topics: z.array(z.string().max(60)).min(1).max(5).optional()
+});
+
+export const zQueuePageEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        type: z.enum([
+            'canonical',
+            'original',
+            'private'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        author: z.unknown(),
+        attribution: z.unknown(),
+        work: z.unknown(),
+        year: z.unknown(),
+        contributor: z.unknown(),
+        topics: z.array(zQuoteTopicEntity),
+        counts: z.object({
+            likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+            favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+            recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        publishedAt: z.unknown(),
+        viewer: zQuoteViewerEntity.optional(),
+        waitingSince: z.string().datetime(),
+        match: z.unknown()
+    }))
+});
+
+export const zQueueItemEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(zQuoteTopicEntity),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: zQuoteViewerEntity.optional(),
+    waitingSince: z.string().datetime(),
+    match: z.unknown()
+});
+
+export const zSubmissionMatchesEntity = z.object({
+    submitted: z.object({
+        id: z.string(),
+        text: z.string()
+    }),
+    matches: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        author: z.unknown(),
+        method: z.enum([
+            'exact',
+            'fuzzy',
+            'author'
+        ]),
+        score: z.number(),
+        dismissed: z.boolean()
+    }))
+});
+
+export const zModerationDecision = z.unknown();
+
+export const zVerificationDecision = z.unknown();
+
+export const zCorrectQuote = z.object({
+    text: z.string().optional(),
+    author: z.unknown().optional(),
+    sourceId: z.unknown().optional(),
+    year: z.unknown().optional(),
+    sourceUrl: z.unknown().optional(),
+    context: z.unknown().optional(),
+    note: z.string().min(3).max(1000)
+});
+
+export const zCurationDecision = z.unknown();
+
+export const zAdminReportPageEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        reason: z.enum([
+            'attribution',
+            'content',
+            'originality',
+            'duplicate',
+            'other'
+        ]),
+        details: z.unknown(),
+        status: z.enum([
+            'SUBMITTED',
+            'UNDER_REVIEW',
+            'DISPUTED',
+            'RESOLVED'
+        ]),
+        reporter: z.unknown(),
+        createdAt: z.string().datetime(),
+        resolvedAt: z.unknown(),
+        quote: zQuoteCardEntity,
+        inRelease: z.unknown()
+    }))
+});
+
+export const zAdminReportEntity = z.object({
+    id: z.string(),
+    reason: z.enum([
+        'attribution',
+        'content',
+        'originality',
+        'duplicate',
+        'other'
+    ]),
+    details: z.unknown(),
+    status: z.enum([
+        'SUBMITTED',
+        'UNDER_REVIEW',
+        'DISPUTED',
+        'RESOLVED'
+    ]),
+    reporter: z.unknown(),
+    createdAt: z.string().datetime(),
+    resolvedAt: z.unknown(),
+    quote: zQuoteCardEntity,
+    inRelease: z.unknown()
+});
+
+export const zReportDecision = z.unknown();
+
+export const zCreateReport = z.object({
+    reason: z.enum([
+        'attribution',
+        'content',
+        'originality',
+        'duplicate',
+        'other'
+    ]),
+    details: z.string().max(2000).optional()
+});
+
+export const zReportEntity = z.object({
+    id: z.string(),
+    quote: z.string(),
+    reason: z.enum([
+        'attribution',
+        'content',
+        'originality',
+        'duplicate',
+        'other'
+    ]),
+    details: z.unknown(),
+    status: z.enum([
+        'SUBMITTED',
+        'UNDER_REVIEW',
+        'DISPUTED',
+        'RESOLVED'
+    ]),
+    createdAt: z.string().datetime()
+});
+
+export const zRegisterDevice = z.object({
+    label: z.string().min(1).max(80)
+});
+
+export const zDeviceEntity = z.object({
+    id: z.string(),
+    label: z.string(),
+    authorizedAt: z.string().datetime(),
+    lastSyncAt: z.unknown(),
+    datasetVersion: z.unknown(),
+    revokedAt: z.unknown(),
+    current: z.boolean().optional()
+});
+
+export const zDeviceListEntity = z.object({
+    list: z.array(zDeviceEntity)
+});
+
+export const zReactionEntity = z.object({
+    active: z.boolean(),
+    count: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zPaginatedFavoriteEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        type: z.enum([
+            'canonical',
+            'original',
+            'private'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        author: z.unknown(),
+        attribution: z.unknown(),
+        work: z.unknown(),
+        year: z.unknown(),
+        contributor: z.unknown(),
+        topics: z.array(zQuoteTopicEntity),
+        counts: z.object({
+            likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+            favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+            recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        publishedAt: z.unknown(),
+        viewer: zQuoteViewerEntity.optional(),
+        savedAt: z.string().datetime()
+    }))
+});
+
+export const zFavoriteEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(zQuoteTopicEntity),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: zQuoteViewerEntity.optional(),
+    savedAt: z.string().datetime()
+});
+
+export const zFavoritesSyncEntity = z.object({
+    favorites: z.array(z.object({
+        id: z.string(),
+        addedAt: z.string().datetime()
+    })),
+    skipped: z.array(z.string())
+});
+
+export const zFavoritesSyncChanges = z.object({
+    add: z.array(z.string()).max(500).optional().default([]),
+    remove: z.array(z.string()).max(500).optional().default([])
+});
+
+export const zTopicListEntity = z.object({
+    list: z.array(z.object({
+        slug: z.string(),
+        name: z.string(),
+        description: z.unknown(),
+        counts: z.object({
+            quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+            curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+        })
+    }))
+});
+
+export const zTopicEntity = z.object({
+    slug: z.string(),
+    name: z.string(),
+    description: z.unknown(),
+    counts: z.object({
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zAuthorEntity = z.object({
+    slug: z.string(),
+    name: z.string(),
+    bornYear: z.unknown(),
+    diedYear: z.unknown(),
+    description: z.unknown(),
+    line: z.string(),
+    topics: z.array(z.object({
+        slug: z.string(),
+        name: z.string()
+    })),
+    tabs: z.object({
+        all: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991),
+        review: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zSearchEntity = z.object({
+    q: z.string(),
+    type: z.enum([
+        'quotes',
+        'authors',
+        'topics'
+    ]),
+    counts: z.object({
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        authors: z.number().gte(-9007199254740991).lte(9007199254740991),
+        topics: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    total: z.number().gte(-9007199254740991).lte(9007199254740991),
+    pageSize: z.number().gte(-9007199254740991).lte(9007199254740991),
+    currentPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    lastPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    quotes: z.array(zQuoteCardEntity),
+    authors: z.array(z.object({
+        slug: z.string(),
+        name: z.string(),
+        line: z.string(),
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })),
+    topics: z.array(zTopicEntity)
+});
+
+export const zSearchAuthorEntity = z.object({
+    slug: z.string(),
+    name: z.string(),
+    line: z.string(),
+    quotes: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zPaginatedAdminAuthorEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        bornYear: z.unknown(),
+        diedYear: z.unknown(),
+        description: z.unknown(),
+        dates: z.string(),
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }))
+});
+
+export const zAdminAuthorEntity = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    bornYear: z.unknown(),
+    diedYear: z.unknown(),
+    description: z.unknown(),
+    dates: z.string(),
+    quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+    curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zPaginatedAdminSourceEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        author: z.unknown(),
+        year: z.unknown(),
+        kind: z.enum([
+            'BOOK',
+            'PAPER',
+            'MANUSCRIPT',
+            'LECTURE',
+            'TALK',
+            'POST'
+        ]),
+        url: z.unknown(),
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }))
+});
+
+export const zAdminSourceEntity = z.object({
+    id: z.string(),
+    title: z.string(),
+    author: z.unknown(),
+    year: z.unknown(),
+    kind: z.enum([
+        'BOOK',
+        'PAPER',
+        'MANUSCRIPT',
+        'LECTURE',
+        'TALK',
+        'POST'
+    ]),
+    url: z.unknown(),
+    quotes: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zPaginatedAdminTopicEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        description: z.unknown(),
+        quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }))
+});
+
+export const zAdminTopicEntity = z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.unknown(),
+    quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+    curated: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zPaginatedAuditEntryEntity = z.object({
+    total: z.number(),
+    pageSize: z.number(),
+    currentPage: z.number(),
+    lastPage: z.number(),
+    list: z.array(z.object({
+        id: z.string(),
+        at: z.string().datetime(),
+        actor: z.unknown(),
+        action: z.string(),
+        label: z.string(),
+        target: z.object({
+            type: z.string(),
+            id: z.string()
+        }),
+        note: z.unknown()
+    }))
+});
+
+export const zAuditEntryEntity = z.object({
+    id: z.string(),
+    at: z.string().datetime(),
+    actor: z.unknown(),
+    action: z.string(),
+    label: z.string(),
+    target: z.object({
+        type: z.string(),
+        id: z.string()
+    }),
+    note: z.unknown()
+});
+
+export const zAuditActionListEntity = z.object({
+    list: z.array(z.object({
+        action: z.string(),
+        label: z.string()
+    }))
+});
+
+export const zAdminReleasesEntity = z.object({
+    current: z.unknown(),
+    building: z.boolean(),
+    total: z.number().gte(-9007199254740991).lte(9007199254740991),
+    pageSize: z.number().gte(-9007199254740991).lte(9007199254740991),
+    currentPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    lastPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    list: z.array(z.object({
+        version: z.string(),
+        state: z.enum([
+            'DRAFT',
+            'PREVIEW',
+            'PUBLISHED'
+        ]),
+        schemaVersion: z.number().gte(-9007199254740991).lte(9007199254740991),
+        eligible: z.number().gte(-9007199254740991).lte(9007199254740991),
+        added: z.number().gte(-9007199254740991).lte(9007199254740991),
+        corrected: z.number().gte(-9007199254740991).lte(9007199254740991),
+        withdrawn: z.number().gte(-9007199254740991).lte(9007199254740991),
+        changes: z.string(),
+        sizeBytes: z.unknown(),
+        sha256: z.unknown(),
+        previewBuiltAt: z.unknown(),
+        publishedAt: z.unknown(),
+        publishedBy: z.unknown()
+    }))
+});
+
+export const zAdminReleaseEntity = z.object({
+    version: z.string(),
+    state: z.enum([
+        'DRAFT',
+        'PREVIEW',
+        'PUBLISHED'
+    ]),
+    schemaVersion: z.number().gte(-9007199254740991).lte(9007199254740991),
+    eligible: z.number().gte(-9007199254740991).lte(9007199254740991),
+    added: z.number().gte(-9007199254740991).lte(9007199254740991),
+    corrected: z.number().gte(-9007199254740991).lte(9007199254740991),
+    withdrawn: z.number().gte(-9007199254740991).lte(9007199254740991),
+    changes: z.string(),
+    sizeBytes: z.unknown(),
+    sha256: z.unknown(),
+    previewBuiltAt: z.unknown(),
+    publishedAt: z.unknown(),
+    publishedBy: z.unknown()
+});
+
+export const zReleaseJobEntity = z.object({
+    release: zAdminReleaseEntity,
+    queued: z.unknown()
+});
+
+export const zManifestEntity = z.object({
+    version: z.string(),
+    schemaVersion: z.number().gte(-9007199254740991).lte(9007199254740991),
+    publishedAt: z.string().datetime(),
+    url: z.string(),
+    size: z.number().gte(-9007199254740991).lte(9007199254740991),
+    sha256: z.string(),
+    changes: z.object({
+        eligible: z.number().gte(-9007199254740991).lte(9007199254740991),
+        added: z.number().gte(-9007199254740991).lte(9007199254740991),
+        corrected: z.number().gte(-9007199254740991).lte(9007199254740991),
+        withdrawn: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zCurrentReleaseEntity = z.object({
+    version: z.string(),
+    publishedAt: z.string().datetime(),
+    schemaVersion: z.number().gte(-9007199254740991).lte(9007199254740991),
+    quotes: z.number().gte(-9007199254740991).lte(9007199254740991),
+    changes: z.object({
+        eligible: z.number().gte(-9007199254740991).lte(9007199254740991),
+        added: z.number().gte(-9007199254740991).lte(9007199254740991),
+        corrected: z.number().gte(-9007199254740991).lte(9007199254740991),
+        withdrawn: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zAdminQuoteListEntity = z.object({
+    counts: z.object({
+        public: z.number().gte(-9007199254740991).lte(9007199254740991),
+        eligible: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    total: z.number().gte(-9007199254740991).lte(9007199254740991),
+    pageSize: z.number().gte(-9007199254740991).lte(9007199254740991),
+    currentPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    lastPage: z.number().gte(-9007199254740991).lte(9007199254740991),
+    list: z.array(z.object({
+        id: z.string(),
+        text: z.string(),
+        author: z.unknown(),
+        type: z.enum([
+            'canonical',
+            'original'
+        ]),
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        lastRelease: z.unknown(),
+        createdAt: z.string().datetime()
+    }))
+});
+
+export const zAdminQuoteRowEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    author: z.unknown(),
+    type: z.enum([
+        'canonical',
+        'original'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    lastRelease: z.unknown(),
+    createdAt: z.string().datetime()
+});
+
+export const zExportJobEntity = z.object({
+    id: z.string()
+});
+
+export const zExportStatusEntity = z.object({
+    id: z.string(),
+    state: z.enum([
+        'waiting',
+        'running',
+        'ready',
+        'failed'
+    ]),
+    rows: z.unknown(),
+    bytes: z.unknown(),
+    error: z.unknown(),
+    requestedAt: z.string().datetime()
+});
+
+export const zDashboardStatsEntity = z.object({
+    queues: z.object({
+        verification: z.object({
+            count: z.number().gte(-9007199254740991).lte(9007199254740991),
+            oldestSince: z.unknown(),
+            needsEvidence: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        curation: z.object({
+            count: z.number().gte(-9007199254740991).lte(9007199254740991),
+            oldestSince: z.unknown(),
+            communityCandidates: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        reports: z.object({
+            count: z.number().gte(-9007199254740991).lte(9007199254740991),
+            oldestSince: z.unknown(),
+            onCurated: z.number().gte(-9007199254740991).lte(9007199254740991)
+        }),
+        submissions: z.object({
+            count: z.number().gte(-9007199254740991).lte(9007199254740991),
+            oldestSince: z.unknown(),
+            originalityChecks: z.number().gte(-9007199254740991).lte(9007199254740991)
+        })
+    }),
+    period: z.object({
+        from: z.string().datetime(),
+        to: z.string().datetime(),
+        rolledUpAt: z.string().datetime()
+    }),
+    quality: z.object({
+        verificationAcceptance: z.unknown(),
+        duplicateRate: z.unknown(),
+        curated: z.number().gte(-9007199254740991).lte(9007199254740991),
+        usefulContributionsPer100Users: z.unknown()
+    }),
+    community: z.object({
+        npmDownloads: z.unknown(),
+        datasetSyncs: z.number().gte(-9007199254740991).lte(9007199254740991),
+        registrations: z.number().gte(-9007199254740991).lte(9007199254740991),
+        returningContributors: z.number().gte(-9007199254740991).lte(9007199254740991)
+    })
+});
+
+export const zQueueCountsEntity = z.object({
+    verification: z.number().gte(-9007199254740991).lte(9007199254740991),
+    curation: z.number().gte(-9007199254740991).lte(9007199254740991),
+    reports: z.number().gte(-9007199254740991).lte(9007199254740991),
+    submissions: z.number().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zOldestItemsEntity = z.object({
+    list: z.array(z.object({
+        id: z.string(),
+        queue: z.enum([
+            'verification',
+            'curation',
+            'submissions',
+            'reports'
+        ]),
+        state: z.string(),
+        waitingSince: z.string().datetime()
+    }))
 });

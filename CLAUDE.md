@@ -9,13 +9,23 @@ to a NestJS API at `VITE_APP_API_URL`.
 ## Commands
 
 ```sh
-yarn dev                 # http://localhost:3000
+yarn dev                 # http://localhost:5062 (https://qotm.site through the dev tunnel)
 yarn typecheck && yarn lint && yarn format:check
 yarn build               # typecheck + vite build (what CI runs, with lint and format:check)
+yarn test                # Vitest + Testing Library: src/**/*.test.{ts,tsx}, jsdom
+yarn test:e2e            # Playwright: e2e/*.spec.ts in Chromium
 yarn gen                 # regenerate API types from the running API's OpenAPI document
 ```
 
-There is no test runner yet.
+**The browser suite** (`playwright.config.ts`) starts its own API from the
+backend's compiled build (`backend/apps/api/dist`, kept current by the dev
+API's watch) with `.env.test`, on port 5160, and a web dev server pointed at it
+on 5162, so the dev API (5060) and web (5062) keep running.
+`e2e/global-setup.ts` resets the test database with the backend's
+`yarn test:db:seed:e2e` (test users and the design's sample content). Sign in
+with `signIn(page, 'member' | 'admin')` from `e2e/fixtures.ts` (password
+sign-in, on in the test environment only). Never run it alongside the
+backend's e2e suite: both use the test database.
 
 ## Layout
 
