@@ -1,0 +1,9 @@
+# The community pages are public; account pages and the console are not.
+User-agent: *
+Disallow: /admin
+Disallow: /favorites
+Disallow: /my-quotes
+Disallow: /settings
+Disallow: /submit
+Disallow: /login
+Disallow: /device

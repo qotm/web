@@ -1,4 +1,4 @@
-import { Home, Settings } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { ShieldCheck } from 'lucide-react';
 import type { NavItem } from '@/shared/layouts';
 import { appPath } from '@/lib/paths';
@@ -13,11 +13,6 @@ import { ADMIN_BASE } from '@/lib/paths';
  * mount point moves when the marketing site is included. `icon` is a rendered
  * element, not a component reference.
  */
-export const NAV_ITEMS: NavItem[] = [
-	{ to: appPath(), label: 'Home', icon: <Home className="size-4" />, end: true },
-	{ to: appPath('settings'), label: 'Settings', icon: <Settings className="size-4" /> }
-];
-
 /**
  * The console's own nav. Separate from `NAV_ITEMS` on purpose: the admin section
  * is a different branch of the router behind a different guard, and mixing an
@@ -26,5 +21,5 @@ export const NAV_ITEMS: NavItem[] = [
  */
 export const ADMIN_NAV_ITEMS: NavItem[] = [
 	{ to: ADMIN_BASE, label: 'Overview', icon: <ShieldCheck className="size-4" />, end: true },
-	{ to: appPath(), label: 'Back to app', icon: <Home className="size-4" /> }
+	{ to: appPath(), label: 'View site', icon: <Home className="size-4" /> }
 ];

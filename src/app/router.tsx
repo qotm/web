@@ -1,53 +1,64 @@
 import { Suspense, lazy, type ReactNode } from 'react';
-import { createBrowserRouter } from 'react-router';
-import { ProtectedRoute, signOut, useAuth } from '@/shared/auth';
-import { RoleRoute } from '@/shared/auth';
-import { AppShell, AppShellSkeleton, ErrorBoundary, MarketingLayout, NotFound, RouteFallback } from '@/shared/layouts';
-import { Forbidden } from '@/shared/layouts';
-import { appPath } from '@/lib/paths';
+import { Outlet, createBrowserRouter } from 'react-router';
+import { ProtectedRoute, RoleRoute, signOut, useAuth } from '@/shared/auth';
+import {
+	AppShell,
+	AppShellSkeleton,
+	ErrorBoundary,
+	Forbidden,
+	MarketingLayout,
+	NotFound,
+	PageSkeleton,
+	RouteFallback
+} from '@/shared/layouts';
 import { ADMIN_BASE } from '@/lib/paths';
-import { NAV_ITEMS } from './nav';
 import { ADMIN_NAV_ITEMS } from './nav';
-import { HomeRoute } from '@/routes/home';
+import { LandingRoute } from '@/routes/landing';
 
 /**
- * Everything but the first page is lazy, so the initial download is the shell
- * plus one route. The auth screens are lazy too: a logged-in user should never
- * pay for the login form, and a logged-out one never pays for the app.
+ * Every route but the landing page is lazy, so the first download is the shell
+ * plus one route.
  */
-const SettingsRoute = lazy(() => import('@/routes/settings').then((m) => ({ default: m.SettingsRoute })));
-const TermsRoute = lazy(() => import('@/routes/legal/terms').then((m) => ({ default: m.TermsRoute })));
-const PrivacyRoute = lazy(() => import('@/routes/legal/privacy').then((m) => ({ default: m.PrivacyRoute })));
-const LoginRoute = lazy(() => import('@/routes/auth/login').then((m) => ({ default: m.LoginRoute })));
-const SignupRoute = lazy(() => import('@/routes/auth/signup').then((m) => ({ default: m.SignupRoute })));
-const ForgotPasswordRoute = lazy(() =>
-	import('@/routes/auth/forgot-password').then((m) => ({ default: m.ForgotPasswordRoute }))
-);
-const ResetPasswordRoute = lazy(() =>
-	import('@/routes/auth/reset-password').then((m) => ({ default: m.ResetPasswordRoute }))
-);
-const VerifyEmailRoute = lazy(() =>
-	import('@/routes/auth/verify-email').then((m) => ({ default: m.VerifyEmailRoute }))
-);
-const VerifiedRoute = lazy(() => import('@/routes/auth/verified').then((m) => ({ default: m.VerifiedRoute })));
-const AdminHomeRoute = lazy(() => import('@/routes/admin/home').then((m) => ({ default: m.AdminHomeRoute })));
-
 const lazyRoute = (element: ReactNode) => <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
+const named = <K extends string>(load: () => Promise<Record<K, () => ReactNode>>, name: K) =>
+	lazy(() => load().then((m) => ({ default: m[name] })));
+
+const DiscoverRoute = named(() => import('@/routes/feeds/discover'), 'DiscoverRoute');
+const LatestRoute = named(() => import('@/routes/feeds/latest'), 'LatestRoute');
+const CuratedRoute = named(() => import('@/routes/feeds/curated'), 'CuratedRoute');
+const QuoteRoute = named(() => import('@/routes/quote'), 'QuoteRoute');
+const AuthorRoute = named(() => import('@/routes/author'), 'AuthorRoute');
+const TopicRoute = named(() => import('@/routes/topic'), 'TopicRoute');
+const SearchRoute = named(() => import('@/routes/search'), 'SearchRoute');
+const ProfileRoute = named(() => import('@/routes/profile/profile'), 'ProfileRoute');
+const FavoritesRoute = named(() => import('@/routes/favorites'), 'FavoritesRoute');
+const MyQuotesRoute = named(() => import('@/routes/my-quotes'), 'MyQuotesRoute');
+const SettingsRoute = named(() => import('@/routes/settings'), 'SettingsRoute');
+const SubmitRoute = named(() => import('@/routes/submit'), 'SubmitRoute');
+const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
+const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
+const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
+const SignupRoute = named(() => import('@/routes/auth/signup'), 'SignupRoute');
+const ForgotPasswordRoute = named(() => import('@/routes/auth/forgot-password'), 'ForgotPasswordRoute');
+const ResetPasswordRoute = named(() => import('@/routes/auth/reset-password'), 'ResetPasswordRoute');
+const VerifyEmailRoute = named(() => import('@/routes/auth/verify-email'), 'VerifyEmailRoute');
+const VerifiedRoute = named(() => import('@/routes/auth/verified'), 'VerifiedRoute');
+const AdminHomeRoute = named(() => import('@/routes/admin/home'), 'AdminHomeRoute');
 
 /**
- * The shell reads the session itself rather than taking it as a prop —
- * `ProtectedRoute` has already established the user is authenticated by the time
- * this renders.
- *
- * `ErrorBoundary` wraps the shell rather than being passed as the route's
- * `errorElement`: it is a plain React error boundary taking `children`, so it
- * catches render errors anywhere below, including inside a lazy chunk.
+ * The site: the community pages, public to everyone, and the account pages,
+ * which need a session. One layout for both, so the header and footer stay put
+ * when a member moves from a feed to their favorites. (The site header and
+ * footer arrive with QOT-69.)
  */
-function Shell() {
-	const { user } = useAuth();
+function SiteShell() {
 	return (
 		<ErrorBoundary>
-			<AppShell nav={NAV_ITEMS} user={user ?? {}} onSignOut={() => void signOut()} />
+			<MarketingLayout>
+				<div className="mx-auto w-full max-w-page-wide px-page py-8">
+					<Outlet />
+				</div>
+			</MarketingLayout>
 		</ErrorBoundary>
 	);
 }
@@ -62,22 +73,42 @@ function AdminShell() {
 }
 
 export const router = createBrowserRouter([
-	// Legal pages ship whether or not the marketing site does: the signup consent
-	// gate links to them, so they have to resolve either way.
 	{
-		element: (
-			<ErrorBoundary>
-				<MarketingLayout />
-			</ErrorBoundary>
-		),
+		element: <SiteShell />,
 		children: [
+			// Public: anyone, signed in or not, and indexable.
+			{ index: true, element: <LandingRoute /> },
+			{ path: 'discover', element: lazyRoute(<DiscoverRoute />) },
+			{ path: 'latest', element: lazyRoute(<LatestRoute />) },
+			{ path: 'curated', element: lazyRoute(<CuratedRoute />) },
+			{ path: 'q/:id', element: lazyRoute(<QuoteRoute />) },
+			{ path: 'authors/:slug', element: lazyRoute(<AuthorRoute />) },
+			{ path: 'topics', element: lazyRoute(<TopicRoute />) },
+			{ path: 'topics/:slug', element: lazyRoute(<TopicRoute />) },
+			{ path: 'search', element: lazyRoute(<SearchRoute />) },
 			{ path: 'terms', element: lazyRoute(<TermsRoute />) },
-			{ path: 'privacy', element: lazyRoute(<PrivacyRoute />) }
+			{ path: 'privacy', element: lazyRoute(<PrivacyRoute />) },
+			// The account pages: a session, or /login?redirect= and back.
+			{
+				element: (
+					<ProtectedRoute fallback={<PageSkeleton />}>
+						<Outlet />
+					</ProtectedRoute>
+				),
+				children: [
+					{ path: 'favorites', element: lazyRoute(<FavoritesRoute />) },
+					{ path: 'my-quotes', element: lazyRoute(<MyQuotesRoute />) },
+					{ path: 'settings', element: lazyRoute(<SettingsRoute />) },
+					{ path: 'submit', element: lazyRoute(<SubmitRoute />) }
+				]
+			},
+			// `/@ada`: the profile checks for the `@` (a segment cannot carry a
+			// literal prefix). Last, so every named route above wins.
+			{ path: ':handle', element: lazyRoute(<ProfileRoute />) },
+			{ path: ':handle/:tab', element: lazyRoute(<ProfileRoute />) }
 		]
 	},
-	// Public, and deliberately flat: these paths are baked into verification and
-	// password-reset emails that are already in people's inboxes, so moving one
-	// breaks links that have already been sent.
+	// Flat on purpose: these paths are in emails already sent.
 	{ path: '/login', element: lazyRoute(<LoginRoute />) },
 	{ path: '/signup', element: lazyRoute(<SignupRoute />) },
 	{ path: '/forgot-password', element: lazyRoute(<ForgotPasswordRoute />) },
@@ -85,29 +116,16 @@ export const router = createBrowserRouter([
 	{ path: '/verify-email', element: lazyRoute(<VerifyEmailRoute />) },
 	{ path: '/verified', element: lazyRoute(<VerifiedRoute />) },
 	{
-		// `/app` with the marketing site, `/` without it. Children stay relative so
-		// they follow it either way.
-		path: appPath(),
-		// `fallback` is required and must not be blank: the session round trip takes
-		// most of a second on a cold load, and rendering nothing for that long reads
-		// as a broken app.
-		element: (
-			<ProtectedRoute fallback={<AppShellSkeleton />}>
-				<Shell />
-			</ProtectedRoute>
-		),
-		children: [
-			{ index: true, element: <HomeRoute /> },
-			{ path: 'settings', element: lazyRoute(<SettingsRoute />) }
-		]
-	},
-	{
 		path: ADMIN_BASE,
-		// The role gate is UI, not security: it decides what to render from the
-		// session the browser holds. Every endpoint behind it enforces the same
-		// role server-side, or the console is an honour system.
+		// The role gate is UI, not security: every endpoint behind it enforces
+		// the same roles server-side. Staff with any review role see the console;
+		// each page narrows it further (QOT-70).
 		element: (
-			<RoleRoute allow={['admin', 'superuser']} fallback={<AppShellSkeleton />} forbidden={<Forbidden />}>
+			<RoleRoute
+				allow={['verifier', 'moderator', 'admin', 'superuser']}
+				fallback={<AppShellSkeleton />}
+				forbidden={<Forbidden />}
+			>
 				<AdminShell />
 			</RoleRoute>
 		),

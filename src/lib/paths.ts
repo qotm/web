@@ -53,3 +53,31 @@ export const PRIVACY_PATH = '/privacy';
  * repeated per page — and so an admin-only nav never renders for anyone else.
  */
 export const ADMIN_BASE = '/admin';
+
+/**
+ * Every screen's URL, built in one place (BUILD-PLAN §3). Public community
+ * routes first; the account pages require a session; the console is under
+ * `ADMIN_BASE`. Handles are shown with their `@`: `/@ada`.
+ */
+export const paths = {
+	home: '/',
+	discover: '/discover',
+	latest: '/latest',
+	curated: '/curated',
+	quote: (id: string) => `/q/${id.replace(/^q_/, '')}`,
+	author: (slug: string) => `/authors/${slug}`,
+	topics: '/topics',
+	topic: (slug: string) => `/topics/${slug}`,
+	search: (q?: string) => (q ? `/search?q=${encodeURIComponent(q)}` : '/search'),
+	profile: (handle: string, tab?: 'quotes' | 'contributions') => `/@${handle.replace(/^@/, '')}${tab ? `/${tab}` : ''}`,
+	login: '/login',
+	device: '/device',
+	favorites: '/favorites',
+	myQuotes: '/my-quotes',
+	settings: '/settings',
+	submit: '/submit',
+	admin: ADMIN_BASE
+} as const;
+
+/** Routes that must never be indexed: the account pages and the console. */
+export const PRIVATE_PREFIXES = ['/favorites', '/my-quotes', '/settings', '/submit', '/login', '/device', ADMIN_BASE];

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Logo, LogoMark } from '@/shared/ui';
+import { Logo, LogoMark, PageMeta } from '@/shared/ui';
 
 /**
  * Brand-panel watermark, per the design system's Watermark guideline: one large
@@ -96,6 +96,8 @@ type AuthLayoutProps = {
 export function AuthLayout({ children, aside }: AuthLayoutProps) {
 	return (
 		<div className="min-h-screen w-full bg-background lg:grid lg:grid-cols-2">
+			{/* Sign-in and device approval are account pages: never indexed. */}
+			<PageMeta robots="noindex" />
 			{/*
 			 * `isolate` so the watermark's -z-10 stays above the panel background.
 			 *

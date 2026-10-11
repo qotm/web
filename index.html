@@ -18,18 +18,14 @@
 				background: %THEME_COLOR%;
 			}
 		</style>
-		<meta name="description" content="Qotm Web." />
+		<meta
+			name="description"
+			content="qotm: one considered programming quote in your terminal, from a community that verifies and curates them."
+		/>
 		<!--
-			Every route this app serves is private, so nothing here should be indexed.
-			`robots.txt` only discourages crawling, while `noindex` prevents listing,
-			so both belong in a deployment. This app's routes include password-reset
-			and email-verify URLs.
-
-			With the marketing site included this tag goes away: indexing is then
-			decided per route by `PageMeta`, and the build emits a `noindex` of its own
-			on any non-production origin. See vite.config.ts.
+			Indexing is decided per route by `PageMeta`: the community pages are public,
+			the account, admin and error pages pass `robots="noindex"`.
 		-->
-		<meta name="robots" content="noindex, nofollow" />
 		<title>%APP_TITLE%</title>
 	</head>
 	<body>
