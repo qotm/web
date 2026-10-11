@@ -1,4 +1,4 @@
-// @/shared/ui — shared shadcn/ui components (Wise design system), theme, and primitives.
+// @/shared/ui — the UI kit (qotm_kit on shadcn/ui), its theme, and primitives.
 export * from './lib/utils';
 export * from './lib/zod-setup';
 
@@ -26,12 +26,7 @@ export * from './components/ui/sonner';
 export * from './components/form/form';
 
 // Theme (light/dark/system) — shared by every app
-export { ThemeProvider } from './theme/theme-provider';
-export { ThemeToggle } from './theme/theme-toggle';
-export { useTheme } from './theme/use-theme';
-export { themeInitScript } from './theme/init-script';
-export { THEME_STORAGE_KEY, THEME_COLORS } from './theme/theme-context';
-export type { ThemeMode, ResolvedTheme } from './theme/theme-context';
+export { THEME_COLOR } from './theme/theme-colors';
 
 // Document metadata (per-route titles, description, robots, canonical)
 export { PageMeta } from './meta/page-meta';

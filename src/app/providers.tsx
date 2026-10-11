@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { configureApi } from '@/shared/api';
 import { AuthProvider, configureAuth, redirectToLogin } from '@/shared/auth';
-import { MetaProvider, ThemeProvider, Toaster, installZodErrorMap } from '@/shared/ui';
+import { MetaProvider, Toaster, installZodErrorMap } from '@/shared/ui';
 import { API_URL } from '@/lib/env';
 import { appPath } from '@/lib/paths';
 import { store } from './store';
@@ -22,18 +22,13 @@ installZodErrorMap();
 
 export function Providers({ children }: { children: ReactNode }) {
 	return (
-		// ThemeProvider above the Redux Provider: it only touches the document
-		// (`dark` class, color-scheme, theme-color meta) and must not re-render
-		// through the store.
-		<ThemeProvider>
-			<MetaProvider>
-				<Provider store={store}>
-					<AuthProvider>
-						{children}
-						<Toaster />
-					</AuthProvider>
-				</Provider>
-			</MetaProvider>
-		</ThemeProvider>
+		<MetaProvider>
+			<Provider store={store}>
+				<AuthProvider>
+					{children}
+					<Toaster />
+				</AuthProvider>
+			</Provider>
+		</MetaProvider>
 	);
 }

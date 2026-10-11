@@ -8,37 +8,14 @@
 		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="manifest" href="/site.webmanifest" />
-		<meta name="theme-color" content="%THEME_LIGHT%" />
-		<!--
-			Applies the saved (or system) theme before first paint, so the app never
-			flashes light then flips to dark. Mirrors `themeInitScript` in
-			src/shared/ui — inlined because it must run before any module loads. Keep
-			the two in sync. %THEME_LIGHT/DARK% come from THEME_COLORS via vite.config.
-		-->
-		<script>
-			(function () {
-				try {
-					var m = localStorage.getItem('qotm-web-theme');
-					var d =
-						m === 'dark' || ((m === null || m === 'system') && matchMedia('(prefers-color-scheme: dark)').matches);
-					var r = document.documentElement;
-					r.classList.toggle('dark', d);
-					r.style.colorScheme = d ? 'dark' : 'light';
-					var t = document.querySelector('meta[name="theme-color"]');
-					if (t) t.setAttribute('content', d ? '%THEME_DARK%' : '%THEME_LIGHT%');
-				} catch (e) {}
-			})();
-		</script>
+		<meta name="theme-color" content="%THEME_COLOR%" />
 		<!--
 			globals.css only styles `body`, so without this the UA canvas paints white
-			for the moment before the stylesheet lands — a white flash on a dark load.
+			for the moment before the stylesheet lands. One theme ("Paper").
 		-->
 		<style>
 			html {
-				background: %THEME_LIGHT%;
-			}
-			html.dark {
-				background: %THEME_DARK%;
+				background: %THEME_COLOR%;
 			}
 		</style>
 		<meta name="description" content="Qotm Web." />

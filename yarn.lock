@@ -4711,6 +4711,7 @@ __metadata:
     "@radix-ui/react-select": "npm:^2.3.4"
     "@radix-ui/react-slot": "npm:^1.2.5"
     "@reduxjs/toolkit": "npm:^2.12.0"
+    "@tailwindcss/node": "npm:4.3.3"
     "@tailwindcss/vite": "npm:^4.3.0"
     "@testing-library/dom": "npm:^10.4.2"
     "@testing-library/jest-dom": "npm:^7.0.1"

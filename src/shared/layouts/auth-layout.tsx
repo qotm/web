@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Logo, LogoMark, ThemeToggle } from '@/shared/ui';
+import { Logo, LogoMark } from '@/shared/ui';
 
 /**
  * Brand-panel watermark, per the design system's Watermark guideline: one large
@@ -38,7 +38,7 @@ function BrandWatermark() {
 			 */}
 			<LogoMark
 				width={240}
-				className="absolute -bottom-4 -right-4 h-auto w-40 text-foreground opacity-[0.07] dark:opacity-[0.05] xl:w-60"
+				className="absolute -bottom-4 -right-4 h-auto w-40 text-foreground opacity-[0.07] xl:w-60"
 			/>
 		</div>
 	);
@@ -120,16 +120,7 @@ export function AuthLayout({ children, aside }: AuthLayoutProps) {
 					)}
 				</div>
 			</aside>
-			{/*
-			 * The auth app has no topbar, so the toggle rides the form panel. Placed
-			 * here rather than per-route because every auth screen goes through this
-			 * layout. `relative` on the panel keeps it inside the right-hand column at
-			 * desktop instead of over the brand panel.
-			 */}
 			<main className="relative flex min-h-screen items-center justify-center p-6">
-				<div className="absolute right-4 top-4">
-					<ThemeToggle />
-				</div>
 				<div className="w-full max-w-md">{children}</div>
 			</main>
 		</div>

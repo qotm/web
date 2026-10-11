@@ -48,7 +48,7 @@ backend's e2e suite: both use the test database.
 - **Tokens, not literals.** Colours, radii and fonts come from the theme
   (`src/shared/ui/styles/globals.css` and `theme.css`): `bg-card`,
   `text-muted-foreground`, `border-border`, `text-primary`. No hex values or
-  arbitrary colours in components. `THEME_COLORS` must equal `--background`.
+  arbitrary colours in components. `THEME_COLOR` must equal `--background` (one theme, "Paper").
 - **One `baseApi`.** Every endpoint is `baseApi.injectEndpoints(...)` in a
   feature's `api.ts`. Cache tags are one global namespace: add yours to
   `tagTypes` in `src/shared/api/base-api.ts`, with a specific name.

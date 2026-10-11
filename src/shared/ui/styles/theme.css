@@ -25,7 +25,151 @@
 	/* Solid (ink) button hover: slightly lifted ink. */
 	--color-primary-active: #241f1b;
 
-	--font-display: 'Space Grotesk', system-ui, sans-serif;
-	--font-sans: 'Inter', system-ui, sans-serif;
-	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+	/* `qotm glyphs` fills the kit's icon glyphs (❯ → ↗ ♡ ★ ⚑ ✓ …) the latin
+	   subsets lack; see globals.css. */
+	--font-display: 'Space Grotesk', 'qotm glyphs', system-ui, sans-serif;
+	--font-sans: 'Inter', 'qotm glyphs', system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', 'qotm glyphs', ui-monospace, monospace;
+
+	/* The dark field: the terminal, the footer band, dark notices and the
+	   terminal share card (`bg-dark text-dark-foreground border-dark-rule`). */
+	--color-dark: #141210; /* ink */
+	--color-dark-foreground: #f4f2ed; /* paper */
+	--color-dark-muted: #a7a29a; /* stone-400: 7.4:1 on ink */
+	--color-dark-accent: #c67457; /* clay-400: prompts and the cursor */
+	--color-dark-rule: #2a2724; /* ink-rule */
+
+	/* Radii: 8 buttons and small controls, 12 inputs and menus, 14 cards,
+	   tables and dialogs, 16 the terminal and share cards; pills are
+	   rounded-full. The size names are remapped so template classes land on
+	   the kit's steps. */
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 14px;
+	--radius-xl: 16px;
+	--radius-control: 8px;
+	--radius-field: 12px;
+	--radius-card: 14px;
+	--radius-terminal: 16px;
+
+	/* Effectively one shadow (the terminal); raised is for floating layers. */
+	--shadow-terminal: 0 24px 60px -30px rgba(20, 18, 16, 0.5);
+	--shadow-raised: 0 12px 32px -20px rgba(20, 18, 16, 0.35);
+
+	/* The brand's rhythm, 4/8/12/14/18/22/26/32/48/64 (Tailwind's 4px scale
+	   already has every step: 3.5, 4.5, 5.5, 6.5…), with the kit's names for
+	   its roles: gap-inline, gap-stack, gap-grid, p-tile, py-section, px-page. */
+	--spacing-inline: 12px;
+	--spacing-stack: 14px;
+	--spacing-grid: 18px;
+	--spacing-card-y: 22px;
+	--spacing-card-x: 24px;
+	--spacing-tile: 26px;
+	--spacing-page: 32px;
+	--spacing-section: 64px;
+	--spacing-control: 40px; /* control height (md) */
+	--spacing-control-sm: 32px;
+	--spacing-sidebar: 240px;
+	--spacing-header: 64px;
+
+	/* Page widths: the reading column and the app shell with a side column
+	   (`max-w-page`, `max-w-page-wide`), and body copy's measure. */
+	--container-page: 960px;
+	--container-page-wide: 1180px;
+	--container-measure: 60ch;
+
+	/* The kit's one breakpoint: grids collapse and the header nav hides. */
+	--breakpoint-kit: 760px;
+}
+
+/*
+ * The kit's text styles (tokens.json "type"), one utility each: family,
+ * size, line height, weight and tracking together, as the design sets them.
+ */
+@utility text-display {
+	font-family: var(--font-display);
+	font-size: 52px;
+	line-height: 1;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+@utility text-h1 {
+	font-family: var(--font-display);
+	font-size: 32px;
+	line-height: 1.15;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-h2 {
+	font-family: var(--font-display);
+	font-size: 24px;
+	line-height: 1.15;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-h3 {
+	font-family: var(--font-display);
+	font-size: 18px;
+	line-height: 1.15;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-quote {
+	font-family: var(--font-display);
+	font-size: 36px;
+	line-height: 1.25;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-quote-sm {
+	font-family: var(--font-display);
+	font-size: 26px;
+	line-height: 1.25;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-quote-card {
+	font-family: var(--font-display);
+	font-size: 20px;
+	line-height: 1.35;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+@utility text-body {
+	font-family: var(--font-sans);
+	font-size: 17px;
+	line-height: 1.6;
+	font-weight: 400;
+}
+@utility text-ui {
+	font-family: var(--font-sans);
+	font-size: 15px;
+	line-height: 1.5;
+	font-weight: 400;
+}
+@utility text-ui-strong {
+	font-family: var(--font-sans);
+	font-size: 15px;
+	line-height: 1.5;
+	font-weight: 500;
+}
+@utility text-mono {
+	font-family: var(--font-mono);
+	font-size: 15px;
+	line-height: 1.5;
+	font-weight: 400;
+}
+@utility text-meta {
+	font-family: var(--font-mono);
+	font-size: 13px;
+	line-height: 1.5;
+	font-weight: 400;
+}
+@utility text-label {
+	font-family: var(--font-mono);
+	font-size: 12px;
+	line-height: 1.5;
+	font-weight: 400;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
 }

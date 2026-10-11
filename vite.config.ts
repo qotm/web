@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 import { BRAND } from './src/shared/ui/meta/brand';
-import { THEME_COLORS } from './src/shared/ui/theme/theme-colors';
+import { THEME_COLOR } from './src/shared/ui/theme/theme-colors';
 
 /**
  * Opens the connection to the API origin while the HTML is still parsing.
@@ -50,24 +50,19 @@ function apiPreconnect(apiUrl: string): Plugin {
 }
 
 /**
- * Substitutes `%THEME_LIGHT%` / `%THEME_DARK%` / `%APP_TITLE%` in `index.html`.
+ * Substitutes `%THEME_COLOR%` / `%APP_TITLE%` in `index.html`.
  *
- * The `<head>` needs the theme background twice over — the pre-paint script that
- * sets the `dark` class before first paint, and the `html` background that stops
- * a white flash on a dark load — and HTML cannot import. The static `<title>` is
- * the same story: it must match the suffix `MetaProvider` appends at runtime, so
- * it comes from `BRAND` rather than being typed out a second time.
+ * The `<head>` needs the page background (the `theme-color` meta, and the `html`
+ * background that stops a white flash before the stylesheet lands) and HTML
+ * cannot import. The static `<title>` must match the suffix `MetaProvider`
+ * appends at runtime, so it comes from `BRAND` rather than being typed twice.
  *
  * Runs for `vite dev` as well as the build.
  */
 function injectHtmlConstants(): Plugin {
 	return {
 		name: 'app:inject-html-constants',
-		transformIndexHtml: (html) =>
-			html
-				.replaceAll('%THEME_LIGHT%', THEME_COLORS.light)
-				.replaceAll('%THEME_DARK%', THEME_COLORS.dark)
-				.replaceAll('%APP_TITLE%', BRAND.name)
+		transformIndexHtml: (html) => html.replaceAll('%THEME_COLOR%', THEME_COLOR).replaceAll('%APP_TITLE%', BRAND.name)
 	};
 }
 
