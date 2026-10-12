@@ -49,6 +49,9 @@ const AdminReleasesRoute = lazy(() =>
 	import('@/routes/admin/releases').then((m) => ({ default: m.AdminReleasesRoute }))
 );
 const AdminQuotesRoute = lazy(() => import('@/routes/admin/quotes').then((m) => ({ default: m.AdminQuotesRoute })));
+const AdminAuthorsRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) => ({ default: m.AdminAuthorsRoute })));
+const AdminSourcesRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) => ({ default: m.AdminSourcesRoute })));
+const AdminTopicsRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) => ({ default: m.AdminTopicsRoute })));
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -127,9 +130,9 @@ export const router = createBrowserRouter([
 			adminPage('verification', 'Verification queue', <AdminVerificationRoute />),
 			adminPage('curation', 'Curation queue', <AdminCurationRoute />),
 			adminPage('reports', 'Reports', <AdminReportsRoute />),
-			adminPage('authors', 'Authors'),
-			adminPage('sources', 'Sources'),
-			adminPage('topics', 'Topics'),
+			adminPage('authors', 'Authors', <AdminAuthorsRoute />),
+			adminPage('sources', 'Sources', <AdminSourcesRoute />),
+			adminPage('topics', 'Topics', <AdminTopicsRoute />),
 			adminPage('users', 'Users'),
 			adminPage('releases', 'Dataset releases', <AdminReleasesRoute />),
 			adminPage('audit', 'Audit logs')

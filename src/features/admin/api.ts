@@ -1,5 +1,21 @@
 import { baseApi } from '@/shared/api';
 import type {
+	AdminAuthorsCreateData,
+	AdminAuthorsCreateResponse,
+	AdminAuthorsIdData,
+	AdminAuthorsIdResponse,
+	AdminSourcesCreateData,
+	AdminSourcesCreateResponse,
+	AdminSourcesData,
+	AdminSourcesIdData,
+	AdminSourcesIdResponse,
+	AdminSourcesResponse,
+	AdminTopicsCreateData,
+	AdminTopicsCreateResponse,
+	AdminTopicsData,
+	AdminTopicsIdData,
+	AdminTopicsIdResponse,
+	AdminTopicsResponse,
 	AdminAuthorsData,
 	AdminCurationData,
 	AdminExportsIdResponse,
@@ -104,6 +120,41 @@ export const adminApi = baseApi.injectEndpoints({
 			query: (params) => ({ url: '/v1/admin/authors', params: params ?? undefined }),
 			providesTags: ['AdminAuthors']
 		}),
+		/** Add an author (audited; 409 when the slug is taken). */
+		createAuthor: build.mutation<AdminAuthorsCreateResponse, AdminAuthorsCreateData['body']>({
+			query: (body) => ({ url: '/v1/admin/authors', method: 'POST', body }),
+			invalidatesTags: ['AdminAuthors']
+		}),
+		updateAuthor: build.mutation<AdminAuthorsIdResponse, { id: string; body: AdminAuthorsIdData['body'] }>({
+			query: ({ id, body }) => ({ url: `/v1/admin/authors/${id}`, method: 'PATCH', body }),
+			invalidatesTags: ['AdminAuthors']
+		}),
+		/** Sources quotes are verified against, searched by title. */
+		adminSources: build.query<AdminSourcesResponse, AdminSourcesData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/sources', params: params ?? undefined }),
+			providesTags: ['AdminSources']
+		}),
+		createSource: build.mutation<AdminSourcesCreateResponse, AdminSourcesCreateData['body']>({
+			query: (body) => ({ url: '/v1/admin/sources', method: 'POST', body }),
+			invalidatesTags: ['AdminSources']
+		}),
+		updateSource: build.mutation<AdminSourcesIdResponse, { id: string; body: AdminSourcesIdData['body'] }>({
+			query: ({ id, body }) => ({ url: `/v1/admin/sources/${id}`, method: 'PATCH', body }),
+			invalidatesTags: ['AdminSources']
+		}),
+		/** The controlled topic list, with how many quotes (and curated ones) each has. */
+		adminTopics: build.query<AdminTopicsResponse, AdminTopicsData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/topics', params: params ?? undefined }),
+			providesTags: ['AdminTopics']
+		}),
+		createTopic: build.mutation<AdminTopicsCreateResponse, AdminTopicsCreateData['body']>({
+			query: (body) => ({ url: '/v1/admin/topics', method: 'POST', body }),
+			invalidatesTags: ['AdminTopics', 'Topics']
+		}),
+		updateTopic: build.mutation<AdminTopicsIdResponse, { id: string; body: AdminTopicsIdData['body'] }>({
+			query: ({ id, body }) => ({ url: `/v1/admin/topics/${id}`, method: 'PATCH', body }),
+			invalidatesTags: ['AdminTopics', 'Topics']
+		}),
 		/** Verified quotes and community candidates waiting for a curator, with their signals. */
 		adminCuration: build.query<AdminCurationResponse, AdminCurationData['query'] | void>({
 			query: (params) => ({ url: '/v1/admin/curation', params: params ?? undefined }),
@@ -179,5 +230,13 @@ export const {
 	usePublishReleaseMutation,
 	useAdminQuotesQuery,
 	useExportQuotesMutation,
-	useExportStatusQuery
+	useExportStatusQuery,
+	useCreateAuthorMutation,
+	useUpdateAuthorMutation,
+	useAdminSourcesQuery,
+	useCreateSourceMutation,
+	useUpdateSourceMutation,
+	useAdminTopicsQuery,
+	useCreateTopicMutation,
+	useUpdateTopicMutation
 } = adminApi;

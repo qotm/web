@@ -153,6 +153,12 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'publish', path: '/admin/releases', as: 'admin', press: 'Publish' }
 	],
 	'QOT-84': [{ name: 'quotes', path: '/admin/quotes', as: 'admin' }],
+	'QOT-89': [
+		{ name: 'authors', path: '/admin/authors', as: 'admin' },
+		{ name: 'sources', path: '/admin/sources', as: 'admin' },
+		{ name: 'topics', path: '/admin/topics', as: 'admin' },
+		{ name: 'add-author', path: '/admin/authors', as: 'admin', press: 'Add author' }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }
