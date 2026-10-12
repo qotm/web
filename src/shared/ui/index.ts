@@ -46,6 +46,9 @@ export * from './components/quote/quote-block';
 export * from './components/quote/attribution';
 export * from './components/quote/action-bar';
 export * from './components/quote/quote-card';
+export * from './components/quote/provenance-panel';
+export * from './components/quote/lifecycle-steps';
+export * from './components/quote/lifecycle';
 // Terminal (qotm_kit)
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';

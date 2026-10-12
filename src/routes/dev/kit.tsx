@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
-import type { QuoteCardEntity } from '@/shared/types';
+import type { QuoteCardEntity, QuoteEntity } from '@/shared/types';
 import {
 	Avatar,
 	ActionBar,
 	Attribution,
 	Badge,
+	LifecycleSteps,
+	ProvenancePanel,
 	QuoteBlock,
 	QuoteCard,
 	CommandBlock,
@@ -111,6 +113,30 @@ const SAMPLE = {
 	})
 };
 
+/** The kit's ProvenancePanel samples, as GET /v1/quotes/:id returns them. */
+const detail = (q: QuoteCardEntity, extra: Partial<QuoteEntity> = {}): QuoteEntity => ({
+	...q,
+	context: null,
+	sourceUrl: null,
+	source: null,
+	verifier: null,
+	verifiedAt: null,
+	lifecycle: [],
+	releases: [],
+	...extra
+});
+const PROVENANCE = {
+	dijkstra: detail(SAMPLE.dijkstra, {
+		source: { title: 'EWD 498: How do we tell truths that might hurt?', year: 1975, kind: 'MANUSCRIPT', url: null },
+		sourceUrl: 'https://www.cs.utexas.edu/~EWD/transcriptions/EWD04xx/EWD498.html',
+		context: 'From a list of short, deliberately provocative remarks on the state of computing.',
+		verifier: { handle: 'mireille' },
+		verifiedAt: '2026-08-02T10:00:00.000Z',
+		releases: ['v2026.08.1', 'v2026.08.3']
+	}),
+	ada: detail(SAMPLE.ada)
+};
+
 /** The kit preview's StatusBadge rows: lifecycle, more lifecycle, types and visibility, roles. */
 const STATUS_ROWS = [
 	[
@@ -152,6 +178,22 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	ProvenancePanel: (
+		<div className="grid grid-cols-2 items-start gap-grid">
+			<ProvenancePanel quote={PROVENANCE.dijkstra} />
+			<ProvenancePanel quote={PROVENANCE.ada} />
+		</div>
+	),
+	LifecycleSteps: (
+		<>
+			<LifecycleSteps
+				current="CURATION_REVIEW"
+				dates={{ SUBMITTED: 'Aug 04', UNDER_REVIEW: 'Aug 05', VERIFIED: 'Aug 09' }}
+			/>
+			<LifecycleSteps current="UNDER_REVIEW" outcome="NEEDS_EVIDENCE" />
+			<LifecycleSteps track="original" current="PUBLISHED" />
+		</>
+	),
 	QuoteBlock: (
 		<>
 			<QuoteBlock
