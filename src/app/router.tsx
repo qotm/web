@@ -48,6 +48,7 @@ const AdminReportsRoute = lazy(() => import('@/routes/admin/reports').then((m) =
 const AdminReleasesRoute = lazy(() =>
 	import('@/routes/admin/releases').then((m) => ({ default: m.AdminReleasesRoute }))
 );
+const AdminQuotesRoute = lazy(() => import('@/routes/admin/quotes').then((m) => ({ default: m.AdminQuotesRoute })));
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -121,7 +122,7 @@ export const router = createBrowserRouter([
 				handle: { admin: 'dashboard' },
 				element: <AdminIndex dashboard={lazyRoute(<AdminDashboardRoute />)} />
 			},
-			adminPage('quotes', 'Quotes'),
+			adminPage('quotes', 'Quotes', <AdminQuotesRoute />),
 			adminPage('submissions', 'Submissions', <AdminSubmissionsRoute />),
 			adminPage('verification', 'Verification queue', <AdminVerificationRoute />),
 			adminPage('curation', 'Curation queue', <AdminCurationRoute />),

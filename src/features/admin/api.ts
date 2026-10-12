@@ -2,6 +2,11 @@ import { baseApi } from '@/shared/api';
 import type {
 	AdminAuthorsData,
 	AdminCurationData,
+	AdminExportsIdResponse,
+	AdminQuotesData,
+	AdminQuotesExportData,
+	AdminQuotesExportResponse,
+	AdminQuotesResponse,
 	AdminReportsData,
 	AdminReportsIdDecisionData,
 	AdminReportsIdDecisionResponse,
@@ -133,6 +138,19 @@ export const adminApi = baseApi.injectEndpoints({
 			}),
 			invalidatesTags: ['AdminReleases', 'AdminStats', 'Release']
 		}),
+		/** Every public quote, searched and filtered, with the public and release-eligible counts. */
+		adminQuotes: build.query<AdminQuotesResponse, AdminQuotesData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/quotes', params: params ?? undefined }),
+			providesTags: ['AdminQueue']
+		}),
+		/** Queues a CSV export of the filtered list; poll exportStatus for it. */
+		exportQuotes: build.mutation<AdminQuotesExportResponse, AdminQuotesExportData['body']>({
+			query: (body) => ({ url: '/v1/admin/quotes/export', method: 'POST', body })
+		}),
+		/** An export's progress: waiting, running, ready (rows, bytes) or failed. */
+		exportStatus: build.query<AdminExportsIdResponse, string>({
+			query: (id) => `/v1/admin/exports/${id}`
+		}),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -158,5 +176,8 @@ export const {
 	useCurateQuoteMutation,
 	useAdminReportsQuery,
 	useDecideReportMutation,
-	usePublishReleaseMutation
+	usePublishReleaseMutation,
+	useAdminQuotesQuery,
+	useExportQuotesMutation,
+	useExportStatusQuery
 } = adminApi;

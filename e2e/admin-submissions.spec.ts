@@ -36,7 +36,7 @@ test.describe('admin submissions', () => {
 		// A canonical quote goes to the verifiers instead.
 		const canonical = queue.list.find((q: { type: string }) => q.type === 'canonical');
 		await table.getByRole('row', { name: new RegExp(`^Review ${canonical.id}`) }).click();
-		await expect(page.getByText('Canonical quotes go to verification.')).toBeVisible();
+		await expect(page.getByText('Canonical quotes go to verification.', { exact: true })).toBeVisible();
 		await expect(page.getByRole('region', { name: 'Moderation decision' })).toHaveCount(0);
 	});
 
