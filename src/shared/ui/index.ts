@@ -49,6 +49,12 @@ export * from './components/quote/quote-card';
 export * from './components/quote/provenance-panel';
 export * from './components/quote/lifecycle-steps';
 export * from './components/quote/lifecycle';
+export * from './components/quote/share-card';
+// People (qotm_kit)
+export * from './components/people/stats';
+export * from './components/people/author-header';
+export * from './components/people/profile-header';
+export * from './components/people/contribution-row';
 // Terminal (qotm_kit)
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';

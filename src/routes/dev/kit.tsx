@@ -5,7 +5,11 @@ import {
 	Avatar,
 	ActionBar,
 	Attribution,
+	AuthorHeader,
 	Badge,
+	ContributionRow,
+	ProfileHeader,
+	ShareCard,
 	LifecycleSteps,
 	ProvenancePanel,
 	QuoteBlock,
@@ -169,6 +173,7 @@ const Row = ({ children }: { children: ReactNode }) => (
 const WIDTHS: Record<string, number> = {
 	// The kit's .qk-pv is content-box: 680 plus its 24px padding.
 	QuoteCard: 728,
+	ContributionRow: 768,
 	Field: 420,
 	Input: 460,
 	Textarea: 560,
@@ -178,6 +183,98 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	ShareCard: (
+		<div className="flex flex-wrap items-start gap-3">
+			<ShareCard
+				quote="Programs must be written for people to read, and only incidentally for machines to execute."
+				author="Abelson & Sussman, SICP"
+				id="q_3m9d0a"
+				width={400}
+			/>
+			<ShareCard
+				variant="terminal"
+				quote="Simplicity is prerequisite for reliability."
+				author="Edsger W. Dijkstra"
+				width={400}
+			/>
+		</div>
+	),
+	/** Not a kit preview: the fit with the longest quote the seed has (Hoare, 220 characters). */
+	ShareCardFit: (
+		<div className="flex flex-wrap items-start gap-3">
+			{(['quote', 'terminal'] as const).map((variant) => (
+				<ShareCard
+					key={variant}
+					variant={variant}
+					quote="There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies."
+					author="C. A. R. Hoare"
+					id="q_9t4n2v"
+					width={600}
+				/>
+			))}
+		</div>
+	),
+	AuthorHeader: (
+		<AuthorHeader
+			name="Edsger W. Dijkstra"
+			line="1930–2002 · computer scientist"
+			topics={[t('simplicity'), t('programming'), t('software design')]}
+			stats={[
+				{ label: 'quotes', value: 42 },
+				{ label: 'curated', value: 31 }
+			]}
+		/>
+	),
+	ProfileHeader: (
+		<ProfileHeader
+			profile={{
+				handle: 'ada',
+				name: 'Ada Mensah',
+				image: null,
+				bio: 'Reads old papers so you don’t have to.',
+				role: 'verifier',
+				joinedAt: '2026-08-12T09:00:00.000Z',
+				stats: { quotes: 12, contributions: 31, curated: 6 }
+			}}
+		/>
+	),
+	ContributionRow: (
+		<div className="flex flex-col">
+			<ContributionRow
+				contribution={{
+					id: 'q_8f2k1c',
+					text: 'Simplicity is prerequisite for reliability.',
+					author: 'Edsger W. Dijkstra',
+					type: 'canonical',
+					status: 'DATASET_RELEASE',
+					submittedAt: '2026-08-04T09:00:00.000Z',
+					release: 'v2026.08.3'
+				}}
+			/>
+			<ContributionRow
+				contribution={{
+					id: 'q_6h2w8r',
+					text: 'There are only two hard things in Computer Science: cache invalidation and naming things.',
+					author: 'Phil Karlton',
+					type: 'canonical',
+					status: 'NEEDS_EVIDENCE',
+					submittedAt: '2026-08-21T09:00:00.000Z',
+					release: null
+				}}
+			/>
+			<ContributionRow
+				contribution={{
+					id: 'q_4r8y1p',
+					text: 'A green build is a hypothesis, not a proof.',
+					author: null,
+					type: 'original',
+					status: 'CURATION_CANDIDATE',
+					submittedAt: '2026-09-02T09:00:00.000Z',
+					release: null
+				}}
+			/>
+		</div>
+	),
 	ProvenancePanel: (
 		<div className="grid grid-cols-2 items-start gap-grid">
 			<ProvenancePanel quote={PROVENANCE.dijkstra} />
