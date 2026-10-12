@@ -12,6 +12,8 @@ type Shot = {
 	/** The page, or a function that prepares one (a device code) and returns it. */
 	path: string | (() => Promise<string>);
 	as?: keyof typeof USERS;
+	/** A button to press before the shot (a dialog). */
+	press?: string;
 };
 
 const SHOTS: Record<string, Shot[]> = {
@@ -33,6 +35,12 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'discover', path: '/discover', as: 'member' },
 		{ name: 'latest', path: '/latest', as: 'member' },
 		{ name: 'curated', path: '/curated', as: 'member' }
+	],
+	'QOT-73': [
+		{ name: 'canonical', path: '/q/8f2k1c', as: 'member' },
+		{ name: 'original', path: '/q/4r8y1p', as: 'member' },
+		{ name: 'share', path: '/q/8f2k1c', as: 'member', press: 'Share this quote' },
+		{ name: 'report', path: '/q/8f2k1c', as: 'member', press: 'report' }
 	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
@@ -56,6 +64,10 @@ test.describe('screens', () => {
 				await page.getByRole('banner').waitFor();
 				await page.waitForLoadState('networkidle');
 				await page.evaluate(() => document.fonts.ready);
+				if (shot.press) {
+					await page.getByRole('button', { name: shot.press, exact: true }).click();
+					await page.getByRole('dialog').waitFor();
+				}
 				if (shot.name === 'admin-menu') {
 					const trigger = page.getByRole('button', { name: width > 760 ? 'Account' : 'Menu' });
 					await trigger.click();

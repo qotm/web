@@ -1,10 +1,15 @@
 import { baseApi } from '@/shared/api';
 import type {
+	AuthorsSlugResponse,
+	CreateReport,
 	QuoteCardEntity,
 	QuotesData,
+	QuotesIdRelatedResponse,
+	QuotesIdResponse,
 	QuotesResponse,
 	ReactionEntity,
 	ReleasesCurrentResponse,
+	ReportEntity,
 	TopicsResponse
 } from '@/shared/types';
 
@@ -38,6 +43,22 @@ export const quotesApi = baseApi.injectEndpoints({
 			query: (args) => `/v1/quotes?${query(args)}`,
 			providesTags: ['QuoteFeed']
 		}),
+		/** One quote's page (a withdrawn one keeps its record). */
+		quote: build.query<QuotesIdResponse, string>({
+			query: (id) => `/v1/quotes/${id}`,
+			providesTags: (_r, _e, id) => [{ type: 'Quote', id }]
+		}),
+		relatedQuotes: build.query<QuotesIdRelatedResponse, string>({
+			query: (id) => `/v1/quotes/${id}/related`,
+			providesTags: ['QuoteFeed']
+		}),
+		author: build.query<AuthorsSlugResponse, string>({
+			query: (slug) => `/v1/authors/${slug}`
+		}),
+		/** Reports a quote to the moderators (409: the member already has one open). */
+		reportQuote: build.mutation<ReportEntity, { id: string } & CreateReport>({
+			query: ({ id, ...body }) => ({ url: `/v1/quotes/${id}/reports`, method: 'POST', body })
+		}),
 		topics: build.query<TopicsResponse, void>({
 			query: () => '/v1/topics',
 			providesTags: ['Topics']
@@ -62,15 +83,30 @@ export const quotesApi = baseApi.injectEndpoints({
 				method: on ? 'POST' : 'DELETE'
 			}),
 			async onQueryStarted({ id, reaction, on }, { dispatch, getState, queryFulfilled }) {
-				const patch = (count?: number) =>
-					quotesApi.util.selectCachedArgsForQuery(getState(), 'quoteFeed').map((args) =>
+				const state = getState();
+				const patch = (count?: number) => [
+					...quotesApi.util.selectCachedArgsForQuery(state, 'quoteFeed').map((args) =>
 						dispatch(
 							quotesApi.util.updateQueryData('quoteFeed', args, (page) => {
 								const card = page.list.find((q) => q.id === id);
 								if (card) react(card, reaction, on, count);
 							})
 						)
-					);
+					),
+					...quotesApi.util.selectCachedArgsForQuery(state, 'relatedQuotes').map((args) =>
+						dispatch(
+							quotesApi.util.updateQueryData('relatedQuotes', args, (page) => {
+								const card = page.list.find((q) => q.id === id);
+								if (card) react(card, reaction, on, count);
+							})
+						)
+					),
+					dispatch(
+						quotesApi.util.updateQueryData('quote', id, (quote) => {
+							react(quote, reaction, on, count);
+						})
+					)
+				];
 				const optimistic = patch();
 				try {
 					const { data } = await queryFulfilled;
@@ -84,5 +120,14 @@ export const quotesApi = baseApi.injectEndpoints({
 	})
 });
 
-export const { useQuoteFeedQuery, useTopicsQuery, useCurrentReleaseQuery, useReactMutation } = quotesApi;
+export const {
+	useQuoteFeedQuery,
+	useQuoteQuery,
+	useRelatedQuotesQuery,
+	useAuthorQuery,
+	useReportQuoteMutation,
+	useTopicsQuery,
+	useCurrentReleaseQuery,
+	useReactMutation
+} = quotesApi;
 export { react as applyReaction };

@@ -27,7 +27,14 @@ export function makeStore(options: MakeStoreOptions = {}) {
 					// Upload endpoints (see `uploadBaseQuery`) carry a FormData body and an
 					// `onProgress` callback in their args. Neither is serializable, and
 					// neither is ever persisted or replayed — only read once, in flight.
-					ignoredActionPaths: ['meta.arg.originalArgs.body', 'meta.arg.originalArgs.onProgress']
+					// Setting the list replaces RTK's defaults, so they are repeated:
+					// RTK Query's own request/response meta is never serializable.
+					ignoredActionPaths: [
+						'meta.arg',
+						'meta.baseQueryMeta',
+						'meta.arg.originalArgs.body',
+						'meta.arg.originalArgs.onProgress'
+					]
 				}
 			}).concat(baseApi.middleware, ...(options.middleware ?? []))
 	});

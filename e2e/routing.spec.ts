@@ -8,7 +8,7 @@ const COMMUNITY = [
 	['/discover', 'Discover.'],
 	['/latest', 'Latest.'],
 	['/curated', 'Curated.'],
-	['/q/8f2k1c', 'Quote.'],
+	['/q/8f2k1c', 'Quote by Edsger W. Dijkstra'],
 	['/authors/dijkstra', 'Author.'],
 	['/topics', 'Topics.'],
 	['/topics/debugging', 'Topics.'],
