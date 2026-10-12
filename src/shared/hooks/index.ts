@@ -4,3 +4,4 @@
 // feature; this is for the ones two features would otherwise each grow their own
 // copy of — a media query, a debounce, a BroadcastChannel wrapper.
 export {};
+export { useDebouncedValue } from './use-debounced-value';

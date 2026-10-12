@@ -14,6 +14,8 @@ type Shot = {
 	as?: keyof typeof USERS;
 	/** A button to press before the shot (a dialog). */
 	press?: string;
+	/** A radio to choose before the shot. */
+	choose?: RegExp;
 };
 
 const SHOTS: Record<string, Shot[]> = {
@@ -53,6 +55,10 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'authors', path: '/search?q=dijkstra&type=authors', as: 'member' },
 		{ name: 'empty', path: '/search?q=dijkstra&type=topics', as: 'member' }
 	],
+	'QOT-78': [
+		{ name: 'canonical', path: '/submit', as: 'member' },
+		{ name: 'original', path: '/submit', as: 'member', choose: /My own original/ }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }
@@ -75,6 +81,9 @@ test.describe('screens', () => {
 				await page.getByRole('banner').waitFor();
 				await page.waitForLoadState('networkidle');
 				await page.evaluate(() => document.fonts.ready);
+				if (shot.choose) await page.getByRole('radio', { name: shot.choose }).check();
+				// Let colour transitions (180ms) finish before the shot.
+				await page.waitForTimeout(300);
 				if (shot.press) {
 					await page.getByRole('button', { name: shot.press, exact: true }).click();
 					await page.getByRole('dialog').waitFor();

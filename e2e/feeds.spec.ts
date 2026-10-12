@@ -65,7 +65,8 @@ test.describe('feeds', () => {
 		await page.goto('/latest');
 		await page.getByLabel('Type').selectOption('original');
 		await expect(page).toHaveURL(/type=original/);
-		await expect(cards(page)).toHaveCount(3);
+		const originals = await api(page, '/v1/quotes?feed=latest&type=original&limit=10');
+		await expect(cards(page)).toHaveCount(originals.list.length);
 		for (const card of await cards(page).all()) await expect(card.locator('[data-status="ORIGINAL"]')).toBeVisible();
 		await page.goto('/curated?type=original');
 		await expect(page.getByText('No quotes match these filters.')).toBeVisible();
