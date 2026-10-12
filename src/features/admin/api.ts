@@ -21,6 +21,7 @@ import type {
 	AdminReleasesData,
 	AdminReleasesPreviewResponse,
 	AdminReleasesResponse,
+	AdminReleasesVersionPublishResponse,
 	AdminStatsCountsResponse,
 	AdminStatsResponse,
 	AdminSubmissionsData,
@@ -123,6 +124,15 @@ export const adminApi = baseApi.injectEndpoints({
 			query: ({ id, body }) => ({ url: `/v1/admin/reports/${id}/decision`, method: 'POST', body }),
 			invalidatesTags: [...DECIDED]
 		}),
+		/** Queues the publish of a built preview; the admin confirms reviewing it (409: no preview, or a build running). */
+		publishRelease: build.mutation<AdminReleasesVersionPublishResponse, string>({
+			query: (version) => ({
+				url: `/v1/admin/releases/${version}/publish`,
+				method: 'POST',
+				body: { reviewed: true }
+			}),
+			invalidatesTags: ['AdminReleases', 'AdminStats', 'Release']
+		}),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -147,5 +157,6 @@ export const {
 	useAdminCurationQuery,
 	useCurateQuoteMutation,
 	useAdminReportsQuery,
-	useDecideReportMutation
+	useDecideReportMutation,
+	usePublishReleaseMutation
 } = adminApi;

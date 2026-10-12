@@ -1,5 +1,5 @@
 import type { AdminReleaseEntity } from '@/shared/types';
-import { fileSize } from '../../lib/format';
+import { fileSize, releaseVersion, shortSha } from '../../lib/format';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 import { Eyebrow } from '../ui/eyebrow';
@@ -9,9 +9,6 @@ const STATE = {
 	PREVIEW: ['preview built', 'border-stone-400 bg-card text-ink'],
 	PUBLISHED: ['published', 'border-transparent bg-ink text-paper']
 } as const;
-
-/** "9f3c2a…7e1b": enough of a digest to compare by eye. */
-const shortSha = (sha: string) => (sha.length > 12 ? `${sha.slice(0, 6)}…${sha.slice(-4)}` : sha);
 
 type ReleaseSummaryProps = {
 	release: Pick<
@@ -38,7 +35,7 @@ function ReleaseSummary({ release: r, onBuildPreview, onPublish, busy = false, c
 		r.sha256 ? ['sha256', shortSha(r.sha256)] : null,
 		r.publishedAt ? ['published', r.publishedAt.slice(0, 10)] : null
 	].filter((m): m is [string, string] => m !== null);
-	const version = r.version.startsWith('v') ? r.version : `v${r.version}`;
+	const version = releaseVersion(r.version);
 	return (
 		<section
 			aria-label={`Dataset ${version}`}

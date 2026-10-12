@@ -11,4 +11,10 @@ function fileSize(bytes: number) {
 	return `${n.toFixed(1)} ${units[i]}`;
 }
 
-export { fileSize };
+/** "9f3c2a…7e1b": enough of a digest to compare by eye. */
+const shortSha = (sha: string) => (sha.length > 12 ? `${sha.slice(0, 6)}…${sha.slice(-4)}` : sha);
+
+/** A release version as it is shown: "v2026.09.1". */
+const releaseVersion = (v: string) => (v.startsWith('v') ? v : `v${v}`);
+
+export { fileSize, releaseVersion, shortSha };

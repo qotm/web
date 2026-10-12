@@ -45,6 +45,9 @@ const AdminCurationRoute = lazy(() =>
 	import('@/routes/admin/curation').then((m) => ({ default: m.AdminCurationRoute }))
 );
 const AdminReportsRoute = lazy(() => import('@/routes/admin/reports').then((m) => ({ default: m.AdminReportsRoute })));
+const AdminReleasesRoute = lazy(() =>
+	import('@/routes/admin/releases').then((m) => ({ default: m.AdminReleasesRoute }))
+);
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -127,7 +130,7 @@ export const router = createBrowserRouter([
 			adminPage('sources', 'Sources'),
 			adminPage('topics', 'Topics'),
 			adminPage('users', 'Users'),
-			adminPage('releases', 'Dataset releases'),
+			adminPage('releases', 'Dataset releases', <AdminReleasesRoute />),
 			adminPage('audit', 'Audit logs')
 		]
 	},
