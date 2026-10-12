@@ -48,6 +48,11 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'topic', path: '/topics/debugging', as: 'member' },
 		{ name: 'topics', path: '/topics', as: 'member' }
 	],
+	'QOT-76': [
+		{ name: 'quotes', path: '/search?q=complexity', as: 'member' },
+		{ name: 'authors', path: '/search?q=dijkstra&type=authors', as: 'member' },
+		{ name: 'empty', path: '/search?q=dijkstra&type=topics', as: 'member' }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }

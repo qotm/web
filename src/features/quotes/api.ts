@@ -7,6 +7,8 @@ import type {
 	QuotesIdRelatedResponse,
 	QuotesIdResponse,
 	QuotesResponse,
+	SearchData,
+	SearchResponse,
 	TopicsSlugResponse,
 	ReactionEntity,
 	ReleasesCurrentResponse,
@@ -24,7 +26,7 @@ const REACTIONS = {
 	recommend: { path: 'recommendation', count: 'recommends', flag: 'recommended' }
 } as const;
 
-const query = (args: FeedArgs) =>
+const query = (args: Record<string, string | number | undefined>) =>
 	new URLSearchParams(
 		Object.entries(args).flatMap(([k, v]) => (v === undefined || v === '' ? [] : [[k, String(v)]]))
 	).toString();
@@ -67,6 +69,11 @@ export const quotesApi = baseApi.injectEndpoints({
 		topic: build.query<TopicsSlugResponse, string>({
 			query: (slug) => `/v1/topics/${slug}`,
 			providesTags: ['Topics']
+		}),
+		/** Search: one tab's results, with the counts for all three. */
+		search: build.query<SearchResponse, SearchData['query']>({
+			query: (args) => `/v1/search?${query(args)}`,
+			providesTags: ['QuoteFeed']
 		}),
 		/** The release the CLI ships; null before the first one. */
 		currentRelease: build.query<ReleasesCurrentResponse | null, void>({
@@ -133,6 +140,7 @@ export const {
 	useReportQuoteMutation,
 	useTopicsQuery,
 	useTopicQuery,
+	useSearchQuery,
 	useCurrentReleaseQuery,
 	useReactMutation
 } = quotesApi;
