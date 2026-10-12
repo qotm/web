@@ -51,3 +51,12 @@ export function queueCards(q: AdminStatsResponse['queues'], now = Date.now()) {
 		}
 	] as const;
 }
+
+/** "3 days ago", "5 hours ago": how long ago something entered a queue. */
+export function ago(since: string, now = Date.now()) {
+	const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+	const m = Math.max(1, Math.round((now - new Date(since).getTime()) / 60_000));
+	if (m < 60) return rtf.format(-m, 'minute');
+	if (m < 1440) return rtf.format(-Math.round(m / 60), 'hour');
+	return rtf.format(-Math.round(m / 1440), 'day');
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { count, oldestNote, queueCards, rate, waited } from './dashboard';
+import { ago, count, oldestNote, queueCards, rate, waited } from './dashboard';
 
 const now = Date.parse('2026-10-12T12:00:00Z');
 
@@ -42,5 +42,11 @@ describe('dashboard', () => {
 			['Open reports', 3, '1 on a curated quote'],
 			['Submissions', 23, '9 originality checks']
 		]);
+	});
+
+	it('says how long ago', () => {
+		expect(ago('2026-10-09T12:00:00Z', now)).toBe('3 days ago');
+		expect(ago('2026-10-12T07:00:00Z', now)).toBe('5 hours ago');
+		expect(ago('2026-10-12T11:59:50Z', now)).toBe('1 minute ago');
 	});
 });

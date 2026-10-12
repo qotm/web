@@ -431,6 +431,56 @@ export type VerificationDecision = {
     note: string;
 };
 
+export type AdminQuoteEntity = {
+    id: string;
+    text: string;
+    type: 'canonical' | 'original' | 'private';
+    status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+    author: QuoteAuthorEntity | null;
+    attribution: string | null;
+    work: string | null;
+    year: number | null;
+    /**
+     * Null: "a former member".
+     */
+    contributor: {
+        handle: string;
+    } | null;
+    topics: Array<QuoteTopicEntity>;
+    counts: {
+        likes: number;
+        favorites: number;
+        recommends: number;
+    };
+    publishedAt: string | null;
+    viewer?: QuoteViewerEntity;
+    context: string | null;
+    sourceUrl: string | null;
+    source: {
+        title: string;
+        year: number | null;
+        kind: 'BOOK' | 'PAPER' | 'MANUSCRIPT' | 'LECTURE' | 'TALK' | 'POST';
+        url: string | null;
+    } | null;
+    verifier: {
+        handle: string;
+    } | null;
+    verifiedAt: string | null;
+    lifecycle: Array<{
+        status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        at: string;
+    }>;
+    releases: Array<string>;
+    history: Array<{
+        status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        at: string;
+        note: string | null;
+        by: {
+            handle: string;
+        } | null;
+    }>;
+};
+
 export type CorrectQuote = {
     text?: string;
     author?: string | null;
@@ -1469,6 +1519,25 @@ export type AdminQuotesIdVerificationResponses = {
 };
 
 export type AdminQuotesIdVerificationResponse = AdminQuotesIdVerificationResponses[keyof AdminQuotesIdVerificationResponses];
+
+export type AdminQuotesIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/quotes/{id}';
+};
+
+export type AdminQuotesIdErrors = {
+    404: unknown;
+};
+
+export type AdminQuotesIdResponses = {
+    200: AdminQuoteEntity;
+};
+
+export type AdminQuotesIdResponse = AdminQuotesIdResponses[keyof AdminQuotesIdResponses];
 
 export type AdminQuotesIdUpdateData = {
     body: CorrectQuote;

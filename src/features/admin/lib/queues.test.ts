@@ -1,5 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { isModerated, moderation, openMatch, submitter } from './queues';
+import type { AdminQuoteEntity } from '@/shared/types';
+import {
+	correctionBody,
+	correctionValues,
+	isModerated,
+	moderation,
+	notesOf,
+	openMatch,
+	submitter,
+	verification
+} from './queues';
+
+const knuth = {
+	id: 'q_5k0q2j',
+	text: 'Premature optimization is the root of all evil.',
+	author: null,
+	attribution: 'Donald E. Knuth',
+	year: 1974,
+	sourceUrl: null,
+	context: null,
+	history: [
+		{ status: 'SUBMITTED', at: '2026-10-01T00:00:00Z', note: null, by: { handle: 'ada' } },
+		{ status: 'NEEDS_EVIDENCE', at: '2026-10-02T00:00:00Z', note: 'Which paper?', by: { handle: 'mireille' } },
+		{ status: 'UNDER_REVIEW', at: '2026-10-03T00:00:00Z', note: 'ACM Computing Surveys 6(4).', by: { handle: 'ada' } }
+	]
+} as unknown as AdminQuoteEntity;
 
 describe('queues', () => {
 	it('shows a match until it is dismissed', () => {
@@ -30,5 +55,40 @@ describe('queues', () => {
 	it('moderates held originals only', () => {
 		expect(isModerated({ type: 'original', status: 'ORIGINALITY_CHECK' })).toBe(true);
 		expect(isModerated({ type: 'canonical', status: 'SUBMITTED' })).toBe(false);
+	});
+
+	it('turns a verification outcome into the API decision; evidence and rejection need a note', () => {
+		expect(verification('VERIFIED', '')).toEqual({ decision: 'verify' });
+		expect(verification('NEEDS_EVIDENCE', ' ')).toBeNull();
+		expect(verification('NEEDS_EVIDENCE', 'Which paper?')).toEqual({
+			decision: 'needs_evidence',
+			note: 'Which paper?'
+		});
+		expect(verification('REJECTED', 'Misattributed.')).toEqual({ decision: 'reject', note: 'Misattributed.' });
+	});
+
+	it('sends only the corrected fields, with the note', () => {
+		const start = correctionValues(knuth);
+		expect(correctionBody(knuth, { ...start, note: 'Checked.' })).toEqual({ note: 'Checked.' });
+		expect(
+			correctionBody(knuth, {
+				...start,
+				text: ' Premature  optimization is the root of all evil (or at least most of it) in programming. ',
+				author: 'knuth',
+				year: '',
+				sourceUrl: 'https://dl.acm.org/doi/10.1145/356635.356640',
+				note: 'Matches the paper.'
+			})
+		).toEqual({
+			text: 'Premature optimization is the root of all evil (or at least most of it) in programming.',
+			author: 'knuth',
+			year: null,
+			sourceUrl: 'https://dl.acm.org/doi/10.1145/356635.356640',
+			note: 'Matches the paper.'
+		});
+	});
+
+	it('lists the notes on a quote, newest first', () => {
+		expect(notesOf(knuth).map((h) => h.note)).toEqual(['ACM Computing Surveys 6(4).', 'Which paper?']);
 	});
 });

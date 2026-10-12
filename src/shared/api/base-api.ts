@@ -35,7 +35,9 @@ export const baseApi = createApi({
 		'AdminStats',
 		'AdminReleases',
 		// The review queues (submissions, verification, curation, reports).
-		'AdminQueue'
+		'AdminQueue',
+		// The taxonomy the console edits.
+		'AdminAuthors'
 	],
 	endpoints: () => ({})
 });

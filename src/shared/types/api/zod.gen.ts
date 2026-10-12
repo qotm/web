@@ -675,6 +675,94 @@ export const zModerationDecision = z.unknown();
 
 export const zVerificationDecision = z.unknown();
 
+export const zAdminQuoteEntity = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: z.enum([
+        'canonical',
+        'original',
+        'private'
+    ]),
+    status: z.enum([
+        'PRIVATE',
+        'SUBMITTED',
+        'CURATION_REVIEW',
+        'CURATED',
+        'DATASET_RELEASE',
+        'UNDER_REVIEW',
+        'VERIFIED',
+        'ORIGINALITY_CHECK',
+        'PUBLISHED',
+        'COMMUNITY_DISCOVERY',
+        'CURATION_CANDIDATE',
+        'NEEDS_EVIDENCE',
+        'DISPUTED',
+        'REJECTED',
+        'WITHDRAWN'
+    ]),
+    author: z.unknown(),
+    attribution: z.unknown(),
+    work: z.unknown(),
+    year: z.unknown(),
+    contributor: z.unknown(),
+    topics: z.array(zQuoteTopicEntity),
+    counts: z.object({
+        likes: z.number().gte(-9007199254740991).lte(9007199254740991),
+        favorites: z.number().gte(-9007199254740991).lte(9007199254740991),
+        recommends: z.number().gte(-9007199254740991).lte(9007199254740991)
+    }),
+    publishedAt: z.unknown(),
+    viewer: zQuoteViewerEntity.optional(),
+    context: z.unknown(),
+    sourceUrl: z.unknown(),
+    source: z.unknown(),
+    verifier: z.unknown(),
+    verifiedAt: z.unknown(),
+    lifecycle: z.array(z.object({
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        at: z.string().datetime()
+    })),
+    releases: z.array(z.string()),
+    history: z.array(z.object({
+        status: z.enum([
+            'PRIVATE',
+            'SUBMITTED',
+            'CURATION_REVIEW',
+            'CURATED',
+            'DATASET_RELEASE',
+            'UNDER_REVIEW',
+            'VERIFIED',
+            'ORIGINALITY_CHECK',
+            'PUBLISHED',
+            'COMMUNITY_DISCOVERY',
+            'CURATION_CANDIDATE',
+            'NEEDS_EVIDENCE',
+            'DISPUTED',
+            'REJECTED',
+            'WITHDRAWN'
+        ]),
+        at: z.string().datetime(),
+        note: z.unknown(),
+        by: z.unknown()
+    }))
+});
+
 export const zCorrectQuote = z.object({
     text: z.string().optional(),
     author: z.unknown().optional(),

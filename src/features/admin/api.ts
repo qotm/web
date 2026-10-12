@@ -1,6 +1,15 @@
 import { baseApi } from '@/shared/api';
 import type {
+	AdminAuthorsData,
+	AdminAuthorsResponse,
 	AdminQueuesOldestResponse,
+	AdminQuotesIdResponse,
+	AdminQuotesIdUpdateData,
+	AdminQuotesIdUpdateResponse,
+	AdminQuotesIdVerificationData,
+	AdminQuotesIdVerificationResponse,
+	AdminVerificationData,
+	AdminVerificationResponse,
 	AdminReleasesData,
 	AdminReleasesPreviewResponse,
 	AdminReleasesResponse,
@@ -53,6 +62,34 @@ export const adminApi = baseApi.injectEndpoints({
 			query: ({ id, body }) => ({ url: `/v1/admin/submissions/${id}/decision`, method: 'POST', body }),
 			invalidatesTags: [...DECIDED]
 		}),
+		/** Canonical quotes waiting for a verifier, longest-waiting first. */
+		adminVerification: build.query<AdminVerificationResponse, AdminVerificationData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/verification', params: params ?? undefined }),
+			providesTags: ['AdminQueue']
+		}),
+		/** A quote in any status, with its history and notes (verifiers and admins). */
+		adminQuote: build.query<AdminQuotesIdResponse, string>({
+			query: (id) => `/v1/admin/quotes/${id}`,
+			providesTags: (_r, _e, id) => [{ type: 'AdminQueue', id }]
+		}),
+		/** Verify, ask for evidence or reject (409: not in verification, author not linked, decided meanwhile). */
+		verifyQuote: build.mutation<
+			AdminQuotesIdVerificationResponse,
+			{ id: string; body: AdminQuotesIdVerificationData['body'] }
+		>({
+			query: ({ id, body }) => ({ url: `/v1/admin/quotes/${id}/verification`, method: 'POST', body }),
+			invalidatesTags: [...DECIDED]
+		}),
+		/** Correct the wording (kept as a Correction), link the author, set the source. */
+		correctQuote: build.mutation<AdminQuotesIdUpdateResponse, { id: string; body: AdminQuotesIdUpdateData['body'] }>({
+			query: ({ id, body }) => ({ url: `/v1/admin/quotes/${id}`, method: 'PATCH', body }),
+			invalidatesTags: ['AdminQueue']
+		}),
+		/** Authors, searched by name (for linking a quote's author). */
+		adminAuthors: build.query<AdminAuthorsResponse, AdminAuthorsData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/authors', params: params ?? undefined }),
+			providesTags: ['AdminAuthors']
+		}),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -68,5 +105,10 @@ export const {
 	useAdminReleasesQuery,
 	useBuildReleasePreviewMutation,
 	useAdminSubmissionsQuery,
-	useModerateSubmissionMutation
+	useModerateSubmissionMutation,
+	useAdminVerificationQuery,
+	useAdminQuoteQuery,
+	useVerifyQuoteMutation,
+	useCorrectQuoteMutation,
+	useAdminAuthorsQuery
 } = adminApi;

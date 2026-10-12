@@ -1,4 +1,11 @@
-import type { ModerationDecision, QueueItemEntity, QuoteEntity } from '@/shared/types';
+import type {
+	AdminQuoteEntity,
+	CorrectQuote,
+	ModerationDecision,
+	QueueItemEntity,
+	QuoteEntity,
+	VerificationDecision
+} from '@/shared/types';
 
 /** The queue item's match in MatchCompare's shape, unless a moderator already answered it. */
 export function openMatch(item: Pick<QueueItemEntity, 'match'>) {
@@ -23,3 +30,48 @@ export function moderation(status: QuoteEntity['status'], note: string): Moderat
 /** Only held originals take a moderator's decision; canonical quotes go to the verifiers. */
 export const isModerated = (item: Pick<QueueItemEntity, 'type' | 'status'>) =>
 	item.type === 'original' && item.status === 'ORIGINALITY_CHECK';
+
+/** ReviewDecision's verification outcome as the API's decision (evidence and rejection need a note). */
+export function verification(status: QuoteEntity['status'], note: string): VerificationDecision | null {
+	const n = note.trim();
+	if (status === 'VERIFIED') return n ? { decision: 'verify', note: n } : { decision: 'verify' };
+	if (status === 'NEEDS_EVIDENCE') return n ? { decision: 'needs_evidence', note: n } : null;
+	if (status === 'REJECTED') return n ? { decision: 'reject', note: n } : null;
+	return null;
+}
+
+export type CorrectionValues = {
+	text: string;
+	author: string;
+	year: string;
+	sourceUrl: string;
+	context: string;
+	note: string;
+};
+
+export const correctionValues = (q: AdminQuoteEntity): CorrectionValues => ({
+	text: q.text,
+	author: q.author?.slug ?? '',
+	year: q.year == null ? '' : String(q.year),
+	sourceUrl: q.sourceUrl ?? '',
+	context: q.context ?? '',
+	note: ''
+});
+
+/** Only what changed, as `PATCH /v1/admin/quotes/:id` takes it; an emptied field unlinks or clears. */
+export function correctionBody(q: AdminQuoteEntity, v: CorrectionValues): CorrectQuote {
+	const was = correctionValues(q);
+	const text = v.text.replace(/\s+/g, ' ').trim();
+	const opt = (s: string) => s.trim() || null;
+	return {
+		...(text !== q.text ? { text } : {}),
+		...(v.author.trim() !== was.author ? { author: opt(v.author) } : {}),
+		...(v.year.trim() !== was.year ? { year: v.year.trim() ? Number(v.year) : null } : {}),
+		...(v.sourceUrl.trim() !== was.sourceUrl ? { sourceUrl: opt(v.sourceUrl) } : {}),
+		...(v.context.trim() !== was.context ? { context: opt(v.context) } : {}),
+		note: v.note.trim()
+	};
+}
+
+/** The notes left on a quote's moves (new evidence, earlier decisions), newest first. */
+export const notesOf = (q: Pick<AdminQuoteEntity, 'history'>) => q.history.filter((h) => h.note).toReversed();
