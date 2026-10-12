@@ -30,8 +30,10 @@ export const baseApi = createApi({
 		'Release',
 		// Public profiles, their contributions and stats.
 		'Profile',
-		// The admin console: the sidebar's queue sizes.
-		'AdminCounts'
+		// The admin console: the sidebar's queue sizes, the dashboard, dataset releases.
+		'AdminCounts',
+		'AdminStats',
+		'AdminReleases'
 	],
 	endpoints: () => ({})
 });

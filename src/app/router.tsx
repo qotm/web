@@ -32,6 +32,9 @@ const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
 const DeviceRoute = named(() => import('@/routes/auth/device'), 'DeviceRoute');
+const AdminDashboardRoute = lazy(() =>
+	import('@/routes/admin/dashboard').then((m) => ({ default: m.AdminDashboardRoute }))
+);
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -103,7 +106,7 @@ export const router = createBrowserRouter([
 			{
 				index: true,
 				handle: { admin: 'dashboard' },
-				element: <AdminIndex dashboard={lazyRoute(<AdminPlaceholderRoute title="Dashboard" />)} />
+				element: <AdminIndex dashboard={lazyRoute(<AdminDashboardRoute />)} />
 			},
 			adminPage('quotes', 'Quotes'),
 			adminPage('submissions', 'Submissions'),
