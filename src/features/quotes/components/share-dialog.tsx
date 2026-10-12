@@ -5,6 +5,26 @@ import { paths } from '@/lib/paths';
 
 type Variant = 'quote' | 'terminal';
 
+/** How often, and how many times, to ask again while the worker renders the image. */
+const RENDER_POLL_MS = 2_500;
+const RENDER_TRIES = 12;
+
+/**
+ * The rendered image, or null if it is still not ready after ~30s. The API
+ * redirects to the render once it exists; until then it answers 200 with a
+ * placeholder (and Retry-After, which a cross-origin fetch cannot read), so
+ * "followed a redirect" is what tells a real image from the stand-in.
+ */
+async function renderedImage(url: string): Promise<Response | null> {
+	for (let i = 0; i < RENDER_TRIES; i++) {
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(String(res.status));
+		if (res.redirected) return res;
+		await new Promise((r) => setTimeout(r, RENDER_POLL_MS));
+	}
+	return null;
+}
+
 type ShareDialogProps = {
 	open: boolean;
 	onClose: () => void;
@@ -31,8 +51,8 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 	const download = async () => {
 		setBusy(true);
 		try {
-			const res = await fetch(`${getApiBaseUrl()}/v1/quotes/${id}/share-image?variant=${variant}`);
-			if (!res.ok) throw new Error(String(res.status));
+			const res = await renderedImage(`${getApiBaseUrl()}/v1/quotes/${id}/share-image?variant=${variant}`);
+			if (!res) return notify('The image is still being made. Try again in a moment.');
 			const url = URL.createObjectURL(await res.blob());
 			const a = Object.assign(document.createElement('a'), { href: url, download: `qotm-${id}-${variant}.png` });
 			a.click();
@@ -57,7 +77,7 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 						Close
 					</Button>
 					<Button variant="outline" disabled={busy} onClick={() => void download()}>
-						{busy ? 'Downloading…' : 'Download image'}
+						{busy ? 'Preparing image…' : 'Download image'}
 					</Button>
 					<Button onClick={() => void copy()}>Copy link</Button>
 				</>

@@ -76,9 +76,30 @@ test.describe('quote page', () => {
 		await expect(dialog.getByRole('tab', { name: 'terminal card' })).toHaveAttribute('aria-selected', 'true');
 		await dialog.getByRole('button', { name: 'Copy link' }).click();
 		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(`${E2E.web}/q/8f2k1c`);
-		const download = page.waitForEvent('download');
+		// The API's placeholder until the worker has rendered the card, then a
+		// redirect to the render (the test stack runs no worker). Playwright does
+		// not intercept a followed redirect, so it lands on a real API URL.
+		let asked = 0;
+		await page.route('**/v1/quotes/q_8f2k1c/share-image?variant=terminal', (route) =>
+			++asked === 1
+				? route.fulfill({
+						status: 200,
+						contentType: 'image/png',
+						headers: { 'Retry-After': '5', 'Access-Control-Allow-Origin': '*' },
+						body: 'placeholder'
+					})
+				: route.fulfill({ status: 302, headers: { Location: `${E2E.api}/health`, 'Access-Control-Allow-Origin': '*' } })
+		);
+		const download = page.waitForEvent('download', { timeout: 15_000 });
 		await dialog.getByRole('button', { name: 'Download image' }).click();
-		expect((await download).suggestedFilename()).toBe('qotm-q_8f2k1c-terminal.png');
+		await expect(dialog.getByRole('button', { name: 'Preparing image…' })).toBeVisible();
+		const file = await download;
+		expect(file.suggestedFilename()).toBe('qotm-q_8f2k1c-terminal.png');
+		const { readFileSync } = await import('node:fs');
+		const saved = readFileSync((await file.path())!, 'utf8');
+		expect(saved).not.toBe('placeholder');
+		expect(saved).toBe(await (await page.request.get(`${E2E.api}/health`)).text());
+		expect(asked).toBe(2);
 		await page.keyboard.press('Escape');
 		await expect(dialog).toHaveCount(0);
 	});
