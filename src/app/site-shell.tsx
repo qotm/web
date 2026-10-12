@@ -10,9 +10,15 @@ import { FOOTER_COLUMNS, SITE_NAV } from './nav';
 const STAFF = ['verifier', 'moderator', 'admin', 'superuser'];
 const isStaff = (role?: string | null) => (role ?? '').split(',').some((r) => STAFF.includes(r.trim()));
 
-/** A route opts into the 1180 width with `handle: { wide: true }`. */
+/**
+ * A route opts into the 1180 width with `handle: { wide: true }` (header and
+ * page, the feeds) or `{ wide: 'page' }` (the page only, as Favorites draws it).
+ */
 function useWide() {
-	return useMatches().some((m) => (m.handle as { wide?: boolean } | undefined)?.wide);
+	const wide = useMatches()
+		.map((m) => (m.handle as { wide?: boolean | 'page' } | undefined)?.wide)
+		.find(Boolean);
+	return { header: wide === true, page: Boolean(wide) };
 }
 
 function AccountMenu() {
@@ -56,7 +62,11 @@ export function SiteShell() {
 	return (
 		<ErrorBoundary>
 			<div className="flex min-h-screen flex-col bg-background">
-				<SiteHeader items={SITE_NAV} wide={wide} menuExtra={[{ id: 'search', label: 'search', to: paths.search() }]}>
+				<SiteHeader
+					items={SITE_NAV}
+					wide={wide.header}
+					menuExtra={[{ id: 'search', label: 'search', to: paths.search() }]}
+				>
 					{isLoading ? null : isAuthenticated ? (
 						<>
 							<SearchField
@@ -81,7 +91,7 @@ export function SiteShell() {
 				</SiteHeader>
 				<main className="flex-1">
 					{/* Content-box, as the kit's .qk-page: 960 (or 1180) of content inside the gutters. */}
-					<div className={cn('mx-auto box-content px-page', wide ? 'max-w-site-wide' : 'max-w-site')}>
+					<div className={cn('mx-auto box-content px-page', wide.page ? 'max-w-site-wide' : 'max-w-site')}>
 						<Outlet />
 					</div>
 				</main>

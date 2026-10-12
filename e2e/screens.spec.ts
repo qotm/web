@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { requestDeviceCode, signIn, test, type USERS } from './fixtures';
+import { E2E, requestDeviceCode, signIn, test, type USERS } from './fixtures';
 
 /**
  * The screenshots each screen ticket attaches to Linear, at 1440 and 760px:
@@ -10,7 +10,7 @@ import { requestDeviceCode, signIn, test, type USERS } from './fixtures';
 type Shot = {
 	name: string;
 	/** The page, or a function that prepares one (a device code) and returns it. */
-	path: string | (() => Promise<string>);
+	path: string | ((page: import('@playwright/test').Page) => Promise<string>);
 	as?: keyof typeof USERS;
 	/** A button to press before the shot (a dialog). */
 	press?: string;
@@ -63,6 +63,17 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'quotes', path: '/@ada', as: 'member' },
 		{ name: 'contributions', path: '/@ada/contributions', as: 'member' }
 	],
+	'QOT-80': [
+		{
+			name: 'favorites',
+			as: 'member',
+			path: async (page) => {
+				for (const id of ['q_8f2k1c', 'q_1t7c4e', 'q_0h5w3q', 'q_3m9d0a', 'q_4r8y1p', 'q_7c1m4t'])
+					await page.request.post(`${E2E.api}/v1/quotes/${id}/favorite`, { headers: { Origin: E2E.web } });
+				return '/favorites';
+			}
+		}
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }
@@ -81,7 +92,7 @@ test.describe('screens', () => {
 				mkdirSync(OUT, { recursive: true });
 				if (shot.as) await signIn(page, shot.as);
 				await page.setViewportSize({ width, height: 900 });
-				await page.goto(typeof shot.path === 'string' ? shot.path : await shot.path());
+				await page.goto(typeof shot.path === 'string' ? shot.path : await shot.path(page));
 				await page.getByRole('banner').waitFor();
 				await page.waitForLoadState('networkidle');
 				await page.evaluate(() => document.fonts.ready);

@@ -25,7 +25,10 @@ test.describe('search', () => {
 		await page.goto('/search?q=dijkstra');
 		await page.getByRole('tab', { name: `authors ${res.counts.authors}` }).click();
 		await expect(page).toHaveURL(/\/search\?q=dijkstra&type=authors$/);
-		await expect(page.getByRole('link', { name: 'Edsger W. Dijkstra' })).toHaveAttribute('href', '/authors/dijkstra');
+		await expect(page.getByRole('tab', { name: /^authors/ })).toHaveAttribute('aria-selected', 'true');
+		// The author card (not a quote card's attribution, which the quotes tab also links).
+		const card = page.locator('[data-slot="card"]').filter({ hasText: 'Author' });
+		await expect(card.getByRole('link', { name: 'Edsger W. Dijkstra' })).toHaveAttribute('href', '/authors/dijkstra');
 		await page.getByRole('tab', { name: /^topics/ }).click();
 		await expect(page.getByText('No topics match “dijkstra”.')).toBeVisible();
 		await expect(page.locator('code', { hasText: 'qotm search "dijkstra"' }).first()).toBeVisible();

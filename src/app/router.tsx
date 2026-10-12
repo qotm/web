@@ -75,7 +75,7 @@ export const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 				children: [
-					{ path: 'favorites', element: lazyRoute(<FavoritesRoute />) },
+					{ path: 'favorites', element: lazyRoute(<FavoritesRoute />), handle: { wide: 'page' } },
 					{ path: 'my-quotes', element: lazyRoute(<MyQuotesRoute />) },
 					{ path: 'settings', element: lazyRoute(<SettingsRoute />) },
 					{ path: 'submit', element: lazyRoute(<SubmitRoute />) },
