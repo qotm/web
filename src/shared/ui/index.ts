@@ -1,5 +1,6 @@
 // @/shared/ui — the UI kit (qotm_kit on shadcn/ui), its theme, and primitives.
 export * from './lib/utils';
+export * from './lib/format';
 export * from './lib/zod-setup';
 
 // Primitives
@@ -55,6 +56,12 @@ export * from './components/people/stats';
 export * from './components/people/author-header';
 export * from './components/people/profile-header';
 export * from './components/people/contribution-row';
+// Admin (qotm_kit)
+export * from './components/admin/data-table';
+export * from './components/admin/stat-card';
+export * from './components/admin/release-summary';
+export * from './components/admin/review-decision';
+export * from './components/admin/match-compare';
 // Terminal (qotm_kit)
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';

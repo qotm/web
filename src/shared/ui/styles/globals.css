@@ -244,6 +244,13 @@
 		line-height: 1.15;
 	}
 
+	/* As the kit: running text keeps to a 60ch measure, a stack gap below. */
+	p {
+		margin: 0 0 var(--spacing-stack);
+		max-width: 60ch;
+		text-wrap: pretty;
+	}
+
 	code,
 	pre,
 	kbd {

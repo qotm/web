@@ -7,6 +7,11 @@ import {
 	Attribution,
 	AuthorHeader,
 	Badge,
+	DataTable,
+	MatchCompare,
+	ReleaseSummary,
+	ReviewDecision,
+	StatCard,
 	ContributionRow,
 	ProfileHeader,
 	ShareCard,
@@ -141,6 +146,35 @@ const PROVENANCE = {
 	ada: detail(SAMPLE.ada)
 };
 
+/** The kit's DataTable rows (an admin queue). */
+type QueueRow = { id: string; text: string; author: string; by: string; status: string; age: string };
+const QUEUE: QueueRow[] = [
+	{
+		id: 'q_6h2w8r',
+		text: 'There are only two hard things in Computer Science…',
+		author: 'Phil Karlton',
+		by: '@ada',
+		status: 'UNDER_REVIEW',
+		age: '2d'
+	},
+	{
+		id: 'q_9b5n2k',
+		text: 'Talk is cheap. Show me the code.',
+		author: 'Linus Torvalds',
+		by: '@mireille',
+		status: 'SUBMITTED',
+		age: '5h'
+	},
+	{
+		id: 'q_2x7v3m',
+		text: 'Make it work, make it right, make it fast.',
+		author: 'Kent Beck',
+		by: '@kofi',
+		status: 'NEEDS_EVIDENCE',
+		age: '6d'
+	}
+];
+
 /** The kit preview's StatusBadge rows: lifecycle, more lifecycle, types and visibility, roles. */
 const STATUS_ROWS = [
 	[
@@ -173,6 +207,7 @@ const Row = ({ children }: { children: ReactNode }) => (
 const WIDTHS: Record<string, number> = {
 	// The kit's .qk-pv is content-box: 680 plus its 24px padding.
 	QuoteCard: 728,
+	ReviewDecision: 608,
 	ContributionRow: 768,
 	Field: 420,
 	Input: 460,
@@ -183,6 +218,74 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	DataTable: (
+		<>
+			<DataTable<QueueRow>
+				selectable
+				label="Verification queue"
+				rowKey={(r) => r.id}
+				columns={[
+					{ key: 'id', label: 'id', mono: true, width: 110 },
+					{ key: 'text', label: 'quote', render: (r) => <span className="font-display font-medium">{r.text}</span> },
+					{ key: 'author', label: 'author' },
+					{ key: 'by', label: 'submitted by', mono: true },
+					{ key: 'status', label: 'state' },
+					{ key: 'age', label: 'waiting', mono: true, align: 'right' }
+				]}
+				rows={QUEUE}
+			/>
+			<Pagination page={1} total={12} />
+		</>
+	),
+	StatCard: (
+		<div className="grid grid-cols-4 gap-grid">
+			<StatCard label="Eligible quotes" value={12631} delta="+81 since v2026.08.2" />
+			<StatCard label="Awaiting verification" value={12} note="oldest 6 days" />
+			<StatCard label="Open reports" value={3} />
+			<StatCard label="Useful contributions / 100 users" value={18} note="last 30 days" />
+		</div>
+	),
+	ReleaseSummary: (
+		<div className="grid grid-cols-2 items-start gap-grid">
+			<ReleaseSummary
+				release={{
+					version: 'v2026.08.3',
+					state: 'PREVIEW',
+					eligible: 12631,
+					added: 81,
+					corrected: 14,
+					withdrawn: 3,
+					sizeBytes: 2936013,
+					sha256: '9f3c2a5b8e0d14c7a6f2e9b3d8c1a5f07e1b',
+					publishedAt: null
+				}}
+			/>
+			<ReleaseSummary
+				release={{
+					version: 'v2026.08.2',
+					state: 'PUBLISHED',
+					eligible: 12553,
+					added: 40,
+					corrected: 6,
+					withdrawn: 1,
+					sizeBytes: null,
+					sha256: null,
+					publishedAt: '2026-08-18T12:00:00.000Z'
+				}}
+			/>
+		</div>
+	),
+	ReviewDecision: <ReviewDecision kind="verification" />,
+	MatchCompare: (
+		<MatchCompare
+			submitted="Simplicity is a prerequisite for reliability."
+			match={{
+				method: 'fuzzy',
+				score: 0.91,
+				match: { id: 'q_8f2k1c', text: 'Simplicity is prerequisite for reliability.', author: 'Edsger W. Dijkstra' }
+			}}
+		/>
+	),
 	ShareCard: (
 		<div className="flex flex-wrap items-start gap-3">
 			<ShareCard

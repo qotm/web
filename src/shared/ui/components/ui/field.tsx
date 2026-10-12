@@ -21,7 +21,7 @@ function Field({ label, hint, error, required, optional, count, htmlFor, classNa
 	return (
 		<div className={cn('flex min-w-0 flex-col gap-2', className)} {...props}>
 			{label ? (
-				<label htmlFor={htmlFor} className="flex items-baseline gap-1.5 text-label text-muted-foreground">
+				<label htmlFor={htmlFor} className="flex items-baseline gap-1.5 text-label leading-[1.6] text-muted-foreground">
 					{label}
 					{required ? <span className="tracking-[0.02em] normal-case text-clay-600">required</span> : null}
 					{optional ? <span className="tracking-[0.02em] normal-case text-stone-600">optional</span> : null}
@@ -30,11 +30,11 @@ function Field({ label, hint, error, required, optional, count, htmlFor, classNa
 			) : null}
 			{children}
 			{error ? (
-				<span role="alert" className="text-meta text-clay-700">
+				<span role="alert" className="text-meta leading-[1.6] text-clay-700">
 					{glyph('×')} {error}
 				</span>
 			) : hint ? (
-				<span className="text-meta text-muted-foreground">{hint}</span>
+				<span className="text-meta leading-[1.6] text-muted-foreground">{hint}</span>
 			) : null}
 		</div>
 	);
