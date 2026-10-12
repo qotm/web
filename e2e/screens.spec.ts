@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { E2E, requestDeviceCode, signIn, test, type USERS } from './fixtures';
+import { E2E, apiAs, requestDeviceCode, signIn, test, type USERS } from './fixtures';
 
 /**
  * The screenshots each screen ticket attaches to Linear, at 1440 and 760px:
@@ -71,6 +71,48 @@ const SHOTS: Record<string, Shot[]> = {
 				for (const id of ['q_8f2k1c', 'q_1t7c4e', 'q_0h5w3q', 'q_3m9d0a', 'q_4r8y1p', 'q_7c1m4t'])
 					await page.request.post(`${E2E.api}/v1/quotes/${id}/favorite`, { headers: { Origin: E2E.web } });
 				return '/favorites';
+			}
+		}
+	],
+	'QOT-81': [
+		{
+			name: 'my-quotes',
+			as: 'member',
+			path: async () => {
+				const member = await apiAs('member');
+				const admin = await apiAs('admin');
+				const post = async (data: object) => (await member.post('/v1/submissions', { data })).json();
+				await post({ type: 'private', text: 'Ship the smallest thing that teaches you something.' });
+				const karlton = await post({
+					type: 'canonical',
+					text: 'There are only two hard things in Computer Science: cache invalidation and naming things, said twice.',
+					attribution: 'Phil Karlton',
+					source: 'Folklore',
+					topics: ['programming']
+				});
+				await admin.post(`/v1/admin/quotes/${karlton.id}/verification`, {
+					data: {
+						decision: 'needs_evidence',
+						note: 'Widely repeated, but I can’t find where Karlton said it. A first-hand account would do.'
+					}
+				});
+				await post({
+					type: 'canonical',
+					text: 'Premature optimization is the root of all evil, at least most of the time.',
+					attribution: 'Donald E. Knuth',
+					source: 'Structured Programming with go to Statements',
+					year: 1974,
+					topics: ['programming']
+				});
+				await post({
+					type: 'original',
+					text: 'A red build is a fact; a green one is a hypothesis.',
+					topics: ['software-engineering'],
+					rights: true
+				});
+				await member.dispose();
+				await admin.dispose();
+				return '/my-quotes';
 			}
 		}
 	],

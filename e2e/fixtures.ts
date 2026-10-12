@@ -37,6 +37,14 @@ export function magicLinkToken(email: string): string {
 	return out.replace(/^magic-link:/, '');
 }
 
+/** An API client signed in as `who` (its own cookies), for setting up state another role creates. */
+export async function apiAs(who: keyof typeof USERS) {
+	const ctx = await request.newContext({ baseURL: E2E.api, extraHTTPHeaders: { Origin: E2E.web } });
+	const res = await ctx.post('/auth/sign-in/email', { data: USERS[who] });
+	expect(res.ok(), await res.text()).toBe(true);
+	return ctx;
+}
+
 /** Runs SQL against the test database (the API's test stack). */
 export function sql(statement: string): string {
 	return execSync(`docker exec qotm-test-database psql -U root -d main -Atc "${statement.replace(/"/g, '\\"')}"`)

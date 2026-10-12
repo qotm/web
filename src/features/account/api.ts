@@ -1,5 +1,15 @@
 import { baseApi } from '@/shared/api';
-import type { MeFavoritesData, MeFavoritesResponse, MeQuotesResponse, MeResponse } from '@/shared/types';
+import type {
+	AddEvidence,
+	EditQuote,
+	MeFavoritesData,
+	MeFavoritesResponse,
+	MeQuotesData,
+	MeQuotesResponse,
+	MeResponse,
+	QuoteEntity,
+	SubmitPrivate
+} from '@/shared/types';
 
 /** The signed-in member: their profile and the counts the header's menu shows. */
 export const accountApi = baseApi.injectEndpoints({
@@ -25,6 +35,34 @@ export const accountApi = baseApi.injectEndpoints({
 				})}`,
 			providesTags: ['MyFavorites']
 		}),
+		/** One page of the member's own quotes (cursor), with the tab counts. */
+		myQuotes: build.query<MeQuotesResponse, NonNullable<MeQuotesData['query']>>({
+			query: ({ tab, cursor, limit }) =>
+				`/v1/me/quotes?${new URLSearchParams({
+					...(tab ? { tab } : {}),
+					...(cursor ? { cursor } : {}),
+					limit: String(limit ?? 10)
+				})}`,
+			providesTags: ['MyQuotes']
+		}),
+		editMyQuote: build.mutation<QuoteEntity, { id: string } & EditQuote>({
+			query: ({ id, ...body }) => ({ url: `/v1/me/quotes/${id}`, method: 'PATCH', body }),
+			invalidatesTags: ['MyQuotes']
+		}),
+		deleteMyQuote: build.mutation<unknown, string>({
+			query: (id) => ({ url: `/v1/me/quotes/${id}`, method: 'DELETE' }),
+			invalidatesTags: ['MyQuotes']
+		}),
+		/** A private quote, submitted as the member's own original. */
+		submitPrivate: build.mutation<QuoteEntity, { id: string } & SubmitPrivate>({
+			query: ({ id, ...body }) => ({ url: `/v1/me/quotes/${id}/submit`, method: 'POST', body }),
+			invalidatesTags: ['MyQuotes', 'QuoteFeed']
+		}),
+		/** Answers a verifier's "needs evidence" with a source. */
+		addEvidence: build.mutation<QuoteEntity, { id: string } & AddEvidence>({
+			query: ({ id, ...body }) => ({ url: `/v1/submissions/${id}/evidence`, method: 'POST', body }),
+			invalidatesTags: ['MyQuotes', 'AdminCounts']
+		}),
 		myFavoritesCount: build.query<number, void>({
 			query: () => '/v1/me/favorites?limit=1',
 			transformResponse: (r: MeFavoritesResponse) => r.total,
@@ -33,4 +71,14 @@ export const accountApi = baseApi.injectEndpoints({
 	})
 });
 
-export const { useMeQuery, useMyQuotesCountQuery, useMyFavoritesCountQuery, useMyFavoritesQuery } = accountApi;
+export const {
+	useMeQuery,
+	useMyQuotesCountQuery,
+	useMyFavoritesCountQuery,
+	useMyFavoritesQuery,
+	useMyQuotesQuery,
+	useEditMyQuoteMutation,
+	useDeleteMyQuoteMutation,
+	useSubmitPrivateMutation,
+	useAddEvidenceMutation
+} = accountApi;
