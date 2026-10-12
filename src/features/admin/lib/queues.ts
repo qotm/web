@@ -5,6 +5,7 @@ import type {
 	ModerationDecision,
 	QueueItemEntity,
 	QuoteEntity,
+	ReportDecision,
 	VerificationDecision
 } from '@/shared/types';
 
@@ -100,5 +101,17 @@ export function curation(status: QuoteEntity['status'], note: string, checklist:
 	if (status === 'CURATED')
 		return allTicked(checklist) ? { decision: 'curate', checklist, ...(n ? { note: n } : {}) } : null;
 	if (status === 'VERIFIED') return n ? { decision: 'keep_out', checklist, note: n } : null;
+	return null;
+}
+
+/**
+ * ReviewDecision's moderation outcome on a report: "Publish" keeps the quote
+ * up and dismisses the report; disputing and withdrawing need a note.
+ */
+export function reportDecision(status: QuoteEntity['status'], note: string): ReportDecision | null {
+	const n = note.trim();
+	if (status === 'PUBLISHED') return n ? { decision: 'dismiss', note: n } : { decision: 'dismiss' };
+	if (status === 'DISPUTED') return n ? { decision: 'mark_disputed', note: n } : null;
+	if (status === 'WITHDRAWN') return n ? { decision: 'withdraw', note: n } : null;
 	return null;
 }

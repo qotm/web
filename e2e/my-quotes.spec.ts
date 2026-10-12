@@ -112,7 +112,8 @@ test.describe('my quotes', () => {
 
 	test('nothing in a tab says so; 760 without sideways scroll', async ({ page }) => {
 		sql(
-			`delete from quotes where contributor_id = ${MEMBER} and status in ('PUBLISHED','COMMUNITY_DISCOVERY','CURATION_CANDIDATE','VERIFIED','CURATED','DATASET_RELEASE')`
+			// Everything the public tab shows (the API's TABS.public): other specs leave quotes in any of these.
+			`delete from quotes where contributor_id = ${MEMBER} and type <> 'PRIVATE' and status not in ('SUBMITTED','UNDER_REVIEW','NEEDS_EVIDENCE','ORIGINALITY_CHECK','PRIVATE','REJECTED','WITHDRAWN')`
 		);
 		await page.goto('/my-quotes?tab=public');
 		await expect(page.getByText('None of your quotes is public yet.')).toBeVisible();

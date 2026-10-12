@@ -132,6 +132,22 @@ const SHOTS: Record<string, Shot[]> = {
 	'QOT-85': [{ name: 'submissions', path: '/admin/submissions?id=q_7w2e9n', as: 'admin' }],
 	'QOT-86': [{ name: 'verification', path: '/admin/verification?id=q_5k0q2j', as: 'verifier' }],
 	'QOT-87': [{ name: 'curation', path: '/admin/curation?id=q_4r8y1p', as: 'admin' }],
+	'QOT-88': [
+		{
+			name: 'reports',
+			as: 'moderator',
+			path: async () => {
+				// A report on a quote that shipped in v2026.08.3, as the artboard shows.
+				const moderator = await apiAs('moderator');
+				const res = await moderator.post('/v1/quotes/q_6f1k9s/reports', {
+					data: { reason: 'attribution', details: 'Usually credited to Kernighan alone; the book has both names.' }
+				});
+				const { id } = await res.json();
+				await moderator.dispose();
+				return `/admin/reports?id=${id}`;
+			}
+		}
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }

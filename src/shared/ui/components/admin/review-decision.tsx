@@ -44,6 +44,8 @@ type ReviewDecisionProps = {
 	noteRequired?: Status[];
 	/** Outcomes not open yet (curating with an unticked checklist). */
 	unavailable?: Status[];
+	/** Other words for an outcome's button (a report's "Publish" keeps the quote up: "Dismiss report"). */
+	labels?: Partial<Record<Status, string>>;
 	className?: string;
 };
 
@@ -55,6 +57,7 @@ function ReviewDecision({
 	busy = false,
 	noteRequired = [],
 	unavailable = [],
+	labels = {},
 	className
 }: ReviewDecisionProps) {
 	const [note, setNote] = React.useState('');
@@ -89,7 +92,7 @@ function ReviewDecision({
 						disabled={busy || unavailable.includes(status) || (noteRequired.includes(status) && !trimmed)}
 						onClick={() => onDecide?.(status, trimmed)}
 					>
-						{label}
+						{labels[status] ?? label}
 					</Button>
 				))}
 			</div>

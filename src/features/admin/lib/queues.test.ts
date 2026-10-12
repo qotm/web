@@ -11,6 +11,7 @@ import {
 	moderation,
 	notesOf,
 	openMatch,
+	reportDecision,
 	submitter,
 	verification
 } from './queues';
@@ -109,5 +110,15 @@ describe('queues', () => {
 			checklist: none,
 			note: 'Too long for a terminal.'
 		});
+	});
+
+	it('turns a report outcome into the API decision', () => {
+		expect(reportDecision('PUBLISHED', '')).toEqual({ decision: 'dismiss' });
+		expect(reportDecision('DISPUTED', '')).toBeNull();
+		expect(reportDecision('DISPUTED', 'Checking the EWD archive.')).toEqual({
+			decision: 'mark_disputed',
+			note: 'Checking the EWD archive.'
+		});
+		expect(reportDecision('WITHDRAWN', 'Misattributed.')).toEqual({ decision: 'withdraw', note: 'Misattributed.' });
 	});
 });

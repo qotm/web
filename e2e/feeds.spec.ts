@@ -19,7 +19,13 @@ test.describe('feeds', () => {
 		await expect(page.getByLabel('Type')).toHaveValue('');
 		await expect(page.getByText('Curated quotes reach every install on the next qotm sync.')).toBeVisible();
 		const all = await api(page, '/v1/quotes?feed=discover&limit=50');
-		await page.getByRole('button', { name: 'load more' }).click();
+		// Other specs publish quotes too: load pages until the feed ends.
+		const more = page.getByRole('button', { name: 'load more' });
+		while ((await cards(page).count()) < all.list.length) {
+			const shown = await cards(page).count();
+			await more.click();
+			await expect(cards(page)).not.toHaveCount(shown);
+		}
 		await expect(cards(page)).toHaveCount(all.list.length);
 		await expect(page.getByRole('button', { name: 'load more' })).toHaveCount(0);
 		// The API's order, page after page.

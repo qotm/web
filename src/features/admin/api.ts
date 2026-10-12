@@ -2,6 +2,10 @@ import { baseApi } from '@/shared/api';
 import type {
 	AdminAuthorsData,
 	AdminCurationData,
+	AdminReportsData,
+	AdminReportsIdDecisionData,
+	AdminReportsIdDecisionResponse,
+	AdminReportsResponse,
 	AdminCurationResponse,
 	AdminQuotesIdCurationData,
 	AdminQuotesIdCurationResponse,
@@ -106,6 +110,19 @@ export const adminApi = baseApi.injectEndpoints({
 				invalidatesTags: [...DECIDED]
 			}
 		),
+		/** Reports for the moderators: open ones oldest first, or resolved ones newest first. */
+		adminReports: build.query<AdminReportsResponse, AdminReportsData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/reports', params: params ?? undefined }),
+			providesTags: ['AdminQueue']
+		}),
+		/** Dismiss, mark the quote disputed, or withdraw it (resolving every open report on it). */
+		decideReport: build.mutation<
+			AdminReportsIdDecisionResponse,
+			{ id: string; body: AdminReportsIdDecisionData['body'] }
+		>({
+			query: ({ id, body }) => ({ url: `/v1/admin/reports/${id}/decision`, method: 'POST', body }),
+			invalidatesTags: [...DECIDED]
+		}),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -128,5 +145,7 @@ export const {
 	useCorrectQuoteMutation,
 	useAdminAuthorsQuery,
 	useAdminCurationQuery,
-	useCurateQuoteMutation
+	useCurateQuoteMutation,
+	useAdminReportsQuery,
+	useDecideReportMutation
 } = adminApi;
