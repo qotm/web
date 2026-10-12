@@ -82,14 +82,23 @@
 	--spacing-header: 64px;
 
 	/* Page widths: the reading column and the app shell with a side column
-	   (`max-w-page`, `max-w-page-wide`), and body copy's measure. */
-	--container-page: 960px;
-	--container-page-wide: 1180px;
+	   (`max-w-site`, `max-w-site-wide`; not `page`, which
+	   is the spacing token `px-page` and would win a bare `max-w-page`), and body copy's measure. */
+	--container-site: 960px;
+	--container-site-wide: 1180px;
 	--container-measure: 60ch;
 
 	/* The kit's one breakpoint: grids collapse and the header nav hides. */
 	--breakpoint-kit: 760px;
 }
+
+/*
+ * The kit's breakpoint is inclusive (`max-width: 760px`): at exactly 760 the
+ * layout is already narrow. Tailwind's `max-kit:` stops at 759.98, so use
+ * `narrow:` / `roomy:` for anything the kit switches at 760.
+ */
+@custom-variant narrow (@media (max-width: 760px));
+@custom-variant roomy (@media (min-width: 760.02px));
 
 /*
  * The kit's text styles (tokens.json "type"), one utility each: family,

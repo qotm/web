@@ -40,7 +40,7 @@ const twMerge = extendTailwindMerge({
 				'sidebar',
 				'header'
 			],
-			container: ['page', 'page-wide', 'measure']
+			container: ['site', 'site-wide', 'measure']
 		}
 	}
 });

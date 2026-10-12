@@ -47,8 +47,8 @@ describe('the qotm theme', () => {
 		'rounded-terminal',
 		'shadow-terminal',
 		'shadow-raised',
-		'max-w-page',
-		'max-w-page-wide',
+		'max-w-site',
+		'max-w-site-wide',
 		'gap-grid',
 		'p-tile',
 		'py-section',
@@ -57,6 +57,15 @@ describe('the qotm theme', () => {
 		'w-sidebar'
 	])('has %s', (utility) => {
 		expect(build([utility])).toContain(`.${utility}`);
+	});
+
+	it('sizes the page containers from the container tokens, not spacing', () => {
+		const css = build(['max-w-site', 'max-w-site-wide', 'px-page']);
+		const rule = (name: string) => css.slice(css.indexOf(`.${name} {`), css.indexOf('}', css.indexOf(`.${name} {`)));
+		expect(rule('max-w-site')).toBe('.max-w-site {\n    max-width: var(--container-site);\n  ');
+		expect(rule('max-w-site-wide')).toContain('max-width: var(--container-site-wide)');
+		expect(css).toContain('--container-site: 960px');
+		expect(rule('px-page')).toContain('var(--spacing-page)');
 	});
 
 	it('gives form controls the darker edge and keeps the hairline elsewhere', () => {

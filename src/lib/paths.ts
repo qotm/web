@@ -72,6 +72,8 @@ export const paths = {
 	myQuotes: '/my-quotes',
 	settings: '/settings',
 	submit: '/submit',
+	terms: '/terms',
+	privacy: '/privacy',
 	admin: ADMIN_BASE
 } as const;
 

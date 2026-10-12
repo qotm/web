@@ -18,7 +18,11 @@ export const baseApi = createApi({
 		// invent `Items` will invalidate each other's caches, silently. Add yours
 		// here rather than locally, and keep them specific.
 		'CurrentUser',
-		'Sessions'
+		'Sessions',
+		// The signed-in member's own records (header counts, settings, lists).
+		'Me',
+		'MyQuotes',
+		'MyFavorites'
 	],
 	endpoints: () => ({})
 });

@@ -6,13 +6,13 @@ import {
 	AppShellSkeleton,
 	ErrorBoundary,
 	Forbidden,
-	MarketingLayout,
 	NotFound,
 	PageSkeleton,
 	RouteFallback
 } from '@/shared/layouts';
 import { ADMIN_BASE } from '@/lib/paths';
 import { ADMIN_NAV_ITEMS } from './nav';
+import { SiteShell } from './site-shell';
 import { LandingRoute } from '@/routes/landing';
 
 /**
@@ -41,24 +41,6 @@ const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
 const AdminHomeRoute = named(() => import('@/routes/admin/home'), 'AdminHomeRoute');
 const KitRoute = named(() => import('@/routes/dev/kit'), 'KitRoute');
 
-/**
- * The site: the community pages, public to everyone, and the account pages,
- * which need a session. One layout for both, so the header and footer stay put
- * when a member moves from a feed to their favorites. (The site header and
- * footer arrive with QOT-69.)
- */
-function SiteShell() {
-	return (
-		<ErrorBoundary>
-			<MarketingLayout>
-				<div className="mx-auto w-full max-w-page-wide px-page py-8">
-					<Outlet />
-				</div>
-			</MarketingLayout>
-		</ErrorBoundary>
-	);
-}
-
 function AdminShell() {
 	const { user } = useAuth();
 	return (
@@ -74,9 +56,10 @@ export const router = createBrowserRouter([
 		children: [
 			// Public: anyone, signed in or not, and indexable.
 			{ index: true, element: <LandingRoute /> },
-			{ path: 'discover', element: lazyRoute(<DiscoverRoute />) },
-			{ path: 'latest', element: lazyRoute(<LatestRoute />) },
-			{ path: 'curated', element: lazyRoute(<CuratedRoute />) },
+			// The feeds and the topic index run at the wide (1180) width.
+			{ path: 'discover', element: lazyRoute(<DiscoverRoute />), handle: { wide: true } },
+			{ path: 'latest', element: lazyRoute(<LatestRoute />), handle: { wide: true } },
+			{ path: 'curated', element: lazyRoute(<CuratedRoute />), handle: { wide: true } },
 			{ path: 'q/:id', element: lazyRoute(<QuoteRoute />) },
 			{ path: 'authors/:slug', element: lazyRoute(<AuthorRoute />) },
 			{ path: 'topics', element: lazyRoute(<TopicRoute />) },

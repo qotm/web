@@ -62,6 +62,9 @@ export * from './components/admin/stat-card';
 export * from './components/admin/release-summary';
 export * from './components/admin/review-decision';
 export * from './components/admin/match-compare';
+// Site chrome (qotm_kit)
+export * from './components/site/site-header';
+export * from './components/site/site-footer';
 // Terminal (qotm_kit)
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';

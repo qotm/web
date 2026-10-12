@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
+import { SITE_NAV } from '@/app/nav';
 import type { QuoteCardEntity, QuoteEntity } from '@/shared/types';
 import {
 	Avatar,
@@ -7,6 +8,8 @@ import {
 	Attribution,
 	AuthorHeader,
 	Badge,
+	SiteFooter,
+	SiteHeader,
 	DataTable,
 	MatchCompare,
 	ReleaseSummary,
@@ -218,6 +221,63 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	SiteHeader: (
+		<div className="-m-6">
+			<SiteHeader items={SITE_NAV} active="discover" wide>
+				<SearchField size="sm" shortcut={null} />
+				<Button variant="outline" size="sm">
+					Submit
+				</Button>
+				<Menu
+					label="Account"
+					trigger={<Avatar handle="ada" />}
+					items={[
+						{ heading: '@ada' },
+						{ id: 'p', label: 'Profile' },
+						{ id: 'q', label: 'My quotes' },
+						{ id: 'f', label: 'Favorites' },
+						{ id: 's', label: 'Settings' },
+						{ divider: true },
+						{ id: 'o', label: 'Sign out' }
+					]}
+				/>
+			</SiteHeader>
+			<div className="h-6" />
+			<SiteHeader items={SITE_NAV} active="">
+				<Button size="sm">Sign in</Button>
+			</SiteHeader>
+		</div>
+	),
+	SiteFooter: (
+		<div className="-m-6">
+			<SiteFooter
+				columns={[
+					{
+						title: 'Read',
+						links: [
+							{ id: 'd', label: 'discover', to: '/discover' },
+							{ id: 'c', label: 'curated', to: '/curated' },
+							{ id: 't', label: 'topics', to: '/topics' }
+						]
+					},
+					{
+						title: 'Contribute',
+						links: [
+							{ id: 's', label: 'submit a quote', to: '/submit' },
+							{ id: 'g', label: 'guidelines', href: '#' }
+						]
+					},
+					{
+						title: 'CLI',
+						links: [
+							{ id: 'i', label: 'install', href: '#' },
+							{ id: 'gh', label: 'github', href: '#' }
+						]
+					}
+				]}
+			/>
+		</div>
+	),
 	DataTable: (
 		<>
 			<DataTable<QueueRow>
