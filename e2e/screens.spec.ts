@@ -44,6 +44,10 @@ const SHOTS: Record<string, Shot[]> = {
 	],
 	'QOT-71': [{ name: 'landing', path: '/' }],
 	'QOT-74': [{ name: 'author', path: '/authors/dijkstra', as: 'member' }],
+	'QOT-75': [
+		{ name: 'topic', path: '/topics/debugging', as: 'member' },
+		{ name: 'topics', path: '/topics', as: 'member' }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }

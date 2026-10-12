@@ -7,6 +7,7 @@ import type {
 	QuotesIdRelatedResponse,
 	QuotesIdResponse,
 	QuotesResponse,
+	TopicsSlugResponse,
 	ReactionEntity,
 	ReleasesCurrentResponse,
 	ReportEntity,
@@ -61,6 +62,10 @@ export const quotesApi = baseApi.injectEndpoints({
 		}),
 		topics: build.query<TopicsResponse, void>({
 			query: () => '/v1/topics',
+			providesTags: ['Topics']
+		}),
+		topic: build.query<TopicsSlugResponse, string>({
+			query: (slug) => `/v1/topics/${slug}`,
 			providesTags: ['Topics']
 		}),
 		/** The release the CLI ships; null before the first one. */
@@ -127,6 +132,7 @@ export const {
 	useAuthorQuery,
 	useReportQuoteMutation,
 	useTopicsQuery,
+	useTopicQuery,
 	useCurrentReleaseQuery,
 	useReactMutation
 } = quotesApi;
