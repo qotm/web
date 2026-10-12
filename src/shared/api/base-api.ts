@@ -23,6 +23,11 @@ export const baseApi = createApi({
 		'Me',
 		'MyQuotes',
 		'MyFavorites',
+		// The public quotes: feeds (every feed, author and topic list) and one quote.
+		'QuoteFeed',
+		'Quote',
+		'Topics',
+		'Release',
 		// The admin console: the sidebar's queue sizes.
 		'AdminCounts'
 	],

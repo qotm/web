@@ -1,11 +1,21 @@
-import { PageMeta } from '@/shared/ui';
+import { PageMeta, Notice } from '@/shared/ui';
+import { FeedLayout } from '@/features/quotes/components/feed';
 
-/** Discover: built in its own ticket; the route exists so the URL space is settled. */
+/** /discover (artboard Discover): a mix, the same order for everyone each day. */
 export function DiscoverRoute() {
 	return (
 		<>
-			<PageMeta title="Discover" />
-			<h1 className="text-h1">Discover.</h1>
+			<PageMeta
+				title="Discover"
+				description="A mix of verified quotes and community originals. Not personalized, not ranked by engagement."
+			/>
+			<FeedLayout
+				feed="discover"
+				eyebrow="Community"
+				title="Discover."
+				intro="A mix of verified quotes and community originals. Not personalized, not ranked by engagement."
+				note={<Notice tone="dark">Curated quotes reach every install on the next qotm sync.</Notice>}
+			/>
 		</>
 	);
 }

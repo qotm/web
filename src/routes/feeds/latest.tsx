@@ -1,11 +1,22 @@
-import { PageMeta } from '@/shared/ui';
+import { Notice, PageMeta } from '@/shared/ui';
+import { FeedLayout } from '@/features/quotes/components/feed';
 
-/** Latest: built in its own ticket; the route exists so the URL space is settled. */
+/** /latest (artboard Latest): newly published, newest first. */
 export function LatestRoute() {
 	return (
 		<>
-			<PageMeta title="Latest" />
-			<h1 className="text-h1">Latest.</h1>
+			<PageMeta title="Latest" description="Newly published quotes on qotm, newest first." />
+			<FeedLayout
+				feed="latest"
+				eyebrow="Community"
+				title="Latest."
+				intro="Newly published quotes, newest first."
+				note={
+					<Notice title="Published isn’t shipped.">
+						A quote here is public on the web. It reaches the CLI only after curation.
+					</Notice>
+				}
+			/>
 		</>
 	);
 }

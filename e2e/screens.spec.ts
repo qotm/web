@@ -29,6 +29,11 @@ const SHOTS: Record<string, Shot[]> = {
 		},
 		{ name: 'device', path: async () => `/device?user_code=${(await requestDeviceCode()).user_code}`, as: 'member' }
 	],
+	'QOT-72': [
+		{ name: 'discover', path: '/discover', as: 'member' },
+		{ name: 'latest', path: '/latest', as: 'member' },
+		{ name: 'curated', path: '/curated', as: 'member' }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }
