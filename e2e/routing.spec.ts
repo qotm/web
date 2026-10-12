@@ -9,7 +9,7 @@ const COMMUNITY = [
 	['/latest', 'Latest.'],
 	['/curated', 'Curated.'],
 	['/q/8f2k1c', 'Quote by Edsger W. Dijkstra'],
-	['/authors/dijkstra', 'Author.'],
+	['/authors/dijkstra', 'Edsger W. Dijkstra'],
 	['/topics', 'Topics.'],
 	['/topics/debugging', 'Topics.'],
 	['/search?q=complexity', 'Search.'],

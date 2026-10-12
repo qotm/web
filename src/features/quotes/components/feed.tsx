@@ -1,56 +1,18 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
-import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
-import { Button, Eyebrow, Field, Pagination, QuoteCard, Select, Tabs, TopicTag } from '@/shared/ui';
+import { Empty } from '@/shared/layouts';
+import { Button, Eyebrow, Field, Select, Tabs, TopicTag } from '@/shared/ui';
 import { paths } from '@/lib/paths';
-import { useQuoteFeedQuery, useTopicsQuery, type FeedArgs } from '../api';
-import { useQuoteActions } from '../use-quote-actions';
+import { useTopicsQuery } from '../api';
+import { QuoteList } from './quote-list';
 
 export type FeedName = 'discover' | 'latest' | 'curated';
 
-const PAGE = 10;
 const TYPES = [
 	{ value: '', label: 'All quotes' },
 	{ value: 'canonical', label: 'Canonical' },
 	{ value: 'original', label: 'Declared originals' }
 ] as const;
-
-/** One page of the feed: the first one's states stand for the whole list. */
-function FeedPage({
-	args,
-	first,
-	last,
-	onMore
-}: {
-	args: FeedArgs;
-	first: boolean;
-	last: boolean;
-	onMore: (cursor: string) => void;
-}) {
-	const { data, isLoading, isFetching, isError, refetch } = useQuoteFeedQuery(args);
-	const act = useQuoteActions();
-	if (isLoading) return first ? <PageSkeleton /> : <Pagination mode="more" loading />;
-	if (isError || !data)
-		return first ? (
-			<StateScreen compact title="The quotes did not load." description="Check your connection and try again.">
-				<Button variant="outline" onClick={() => void refetch()}>
-					Try again
-				</Button>
-			</StateScreen>
-		) : (
-			<Pagination mode="more" onPage={() => void refetch()} />
-		);
-	return (
-		<>
-			{data.list.map((q) => (
-				<QuoteCard key={q.id} quote={q} onAction={act(q.id)} />
-			))}
-			{last && data.nextCursor ? (
-				<Pagination mode="more" loading={isFetching} onPage={() => onMore(data.nextCursor!)} />
-			) : null}
-		</>
-	);
-}
 
 type FeedLayoutProps = {
 	feed: FeedName;
@@ -73,20 +35,7 @@ export function FeedLayout({ feed, eyebrow, title, intro, note }: FeedLayoutProp
 	const [params, setParams] = useSearchParams();
 	const topic = params.get('topic') ?? '';
 	const type = (params.get('type') ?? '') as '' | 'canonical' | 'original';
-	const filters = `${feed}|${topic}|${type}`;
-	// The cursors loaded so far, reset when the filters change.
-	const [pages, setPages] = useState<{ key: string; cursors: (string | undefined)[] }>({
-		key: filters,
-		cursors: [undefined]
-	});
-	const cursors = pages.key === filters ? pages.cursors : [undefined];
 	const { data: topics } = useTopicsQuery();
-	const { data: firstPage } = useQuoteFeedQuery({
-		feed,
-		topic: topic || undefined,
-		type: type || undefined,
-		limit: PAGE
-	});
 
 	const set = (key: string, value: string) => {
 		const next = new URLSearchParams(params);
@@ -109,29 +58,26 @@ export function FeedLayout({ feed, eyebrow, title, intro, note }: FeedLayoutProp
 					items={TABS.map((t) => ({ ...t, to: `${t.to}${params.size ? `?${params}` : ''}` }))}
 					active={feed}
 				/>
-				{firstPage && firstPage.list.length === 0 ? (
-					<Empty
-						title={filtered ? 'No quotes match these filters.' : 'No quotes here yet.'}
-						description={filtered ? 'Try another topic or type.' : undefined}
-						action={
-							filtered ? (
-								<Button variant="outline" size="sm" onClick={() => setParams(new URLSearchParams(), { replace: true })}>
-									Clear filters
-								</Button>
-							) : undefined
-						}
-					/>
-				) : (
-					cursors.map((cursor, i) => (
-						<FeedPage
-							key={cursor ?? 'first'}
-							args={{ feed, topic: topic || undefined, type: type || undefined, limit: PAGE, cursor }}
-							first={i === 0}
-							last={i === cursors.length - 1}
-							onMore={(next) => setPages({ key: filters, cursors: [...cursors, next] })}
+				<QuoteList
+					args={{ feed, topic: topic || undefined, type: type || undefined }}
+					empty={
+						<Empty
+							title={filtered ? 'No quotes match these filters.' : 'No quotes here yet.'}
+							description={filtered ? 'Try another topic or type.' : undefined}
+							action={
+								filtered ? (
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setParams(new URLSearchParams(), { replace: true })}
+									>
+										Clear filters
+									</Button>
+								) : undefined
+							}
 						/>
-					))
-				)}
+					}
+				/>
 			</div>
 			<aside className="flex flex-col gap-card-y">
 				<div>
