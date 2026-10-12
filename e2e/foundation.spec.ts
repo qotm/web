@@ -21,3 +21,20 @@ test.describe('foundation', () => {
 		expect((await res.json()).list.length).toBe(15);
 	});
 });
+
+test.describe('icons', () => {
+	test('every icon and the manifest the page links to loads', async ({ page }) => {
+		await page.goto('/');
+		const hrefs = await page
+			.locator('link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]')
+			.evaluateAll((els) => els.map((el) => (el as HTMLLinkElement).href));
+		expect(hrefs.length).toBeGreaterThanOrEqual(6);
+		for (const href of hrefs) {
+			const res = await page.request.get(href);
+			expect(res.status(), href).toBe(200);
+			expect(res.headers()['content-type'], href).not.toContain('text/html');
+		}
+		const manifest = await (await page.request.get('/site.webmanifest')).json();
+		for (const icon of manifest.icons) expect((await page.request.get(icon.src)).status()).toBe(200);
+	});
+});
