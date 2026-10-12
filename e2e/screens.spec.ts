@@ -59,6 +59,10 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'canonical', path: '/submit', as: 'member' },
 		{ name: 'original', path: '/submit', as: 'member', choose: /My own original/ }
 	],
+	'QOT-79': [
+		{ name: 'quotes', path: '/@ada', as: 'member' },
+		{ name: 'contributions', path: '/@ada/contributions', as: 'member' }
+	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }

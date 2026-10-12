@@ -28,6 +28,8 @@ export const baseApi = createApi({
 		'Quote',
 		'Topics',
 		'Release',
+		// Public profiles, their contributions and stats.
+		'Profile',
 		// The admin console: the sidebar's queue sizes.
 		'AdminCounts'
 	],

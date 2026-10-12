@@ -13,8 +13,8 @@ const COMMUNITY = [
 	['/topics', 'Topics.'],
 	['/topics/debugging', 'Debugging.'],
 	['/search?q=complexity', 'Search.'],
-	['/@ada', '@ada'],
-	['/@ada/contributions', '@ada']
+	['/@ada', 'Ada Mensah'],
+	['/@ada/contributions', 'Ada Mensah']
 ] as const;
 
 const ACCOUNT = ['/favorites', '/my-quotes', '/settings', '/submit'] as const;
