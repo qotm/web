@@ -28,16 +28,22 @@ export function configureRedirects(options: {
 	if (options.defaultRedirect) defaultRedirect = options.defaultRedirect;
 }
 
-/** Validate a redirect target against the trusted-origin allowlist. */
+/**
+ * Validate a redirect target against the trusted-origin allowlist. Always an
+ * absolute URL, fallback included: it becomes better-auth's `callbackURL`, and
+ * the API resolves a relative one against its own origin, so a bare `/` would
+ * land the user on the API after GitHub or a magic link.
+ */
 export function getSafeRedirect(target: string | null | undefined, fallback: string = defaultRedirect): string {
-	if (!target) return fallback;
+	const absolute = (url: string) => new URL(url, window.location.origin).toString();
+	if (!target) return absolute(fallback);
 	try {
 		const url = new URL(target, window.location.origin);
 		if (trustedOrigins.includes(url.origin)) return url.toString();
 	} catch {
 		/* not a valid URL — fall through to fallback */
 	}
-	return fallback;
+	return absolute(fallback);
 }
 
 /**

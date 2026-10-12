@@ -114,4 +114,21 @@ test.describe('device approval', () => {
 		await expect(page).toHaveURL(new RegExp(`user_code=${user_code}`));
 		await expect(page.getByRole('button', { name: 'Approve this device' })).toBeVisible();
 	});
+
+	test('GitHub comes back to the app, not the API, even from a bare /login', async ({ page }) => {
+		for (const [path, back] of [
+			['/login', `${E2E.web}/`],
+			['/login?redirect=%2Fsettings', `${E2E.web}/settings`]
+		]) {
+			await page.goto(path);
+			// Stop at the API: the test needs only what the app asks for.
+			await page.route('**/auth/sign-in/social', (route) =>
+				route.fulfill({ json: { url: `${E2E.web}/`, redirect: false } })
+			);
+			const asked = page.waitForRequest('**/auth/sign-in/social');
+			await page.getByRole('button', { name: 'Continue with GitHub' }).click();
+			expect((await asked).postDataJSON()).toMatchObject({ provider: 'github', callbackURL: back });
+			await page.unroute('**/auth/sign-in/social');
+		}
+	});
 });
