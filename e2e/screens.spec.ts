@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { E2E, apiAs, requestDeviceCode, signIn, test, type USERS } from './fixtures';
+import { E2E, apiAs, loginDevice, requestDeviceCode, signIn, sql, test, type USERS } from './fixtures';
 
 /**
  * The screenshots each screen ticket attaches to Linear, at 1440 and 760px:
@@ -113,6 +113,18 @@ const SHOTS: Record<string, Shot[]> = {
 				await member.dispose();
 				await admin.dispose();
 				return '/my-quotes';
+			}
+		}
+	],
+	'QOT-82': [
+		{
+			name: 'settings',
+			as: 'member',
+			path: async () => {
+				sql(`DELETE FROM devices WHERE user_id = (SELECT id FROM "user" WHERE email = 'test.user@example.com')`);
+				await loginDevice('member', 'ada-mbp');
+				await loginDevice('member', 'thinkpad-x1');
+				return '/settings';
 			}
 		}
 	],

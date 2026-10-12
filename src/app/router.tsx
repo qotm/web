@@ -77,7 +77,7 @@ export const router = createBrowserRouter([
 				children: [
 					{ path: 'favorites', element: lazyRoute(<FavoritesRoute />), handle: { wide: 'page' } },
 					{ path: 'my-quotes', element: lazyRoute(<MyQuotesRoute />) },
-					{ path: 'settings', element: lazyRoute(<SettingsRoute />) },
+					{ path: 'settings', element: lazyRoute(<SettingsRoute />), handle: { wide: 'page' } },
 					{ path: 'submit', element: lazyRoute(<SubmitRoute />) },
 					// `qotm login` opens /device?user_code=: approving needs a session.
 					{ path: 'device', element: lazyRoute(<DeviceRoute />) }

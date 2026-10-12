@@ -1,6 +1,9 @@
 import { baseApi } from '@/shared/api';
 import type {
 	AddEvidence,
+	DeleteMe,
+	DeviceListEntity,
+	UpdateMe,
 	EditQuote,
 	MeFavoritesData,
 	MeFavoritesResponse,
@@ -34,6 +37,23 @@ export const accountApi = baseApi.injectEndpoints({
 					limit: String(limit ?? 20)
 				})}`,
 			providesTags: ['MyFavorites']
+		}),
+		updateMe: build.mutation<MeResponse, UpdateMe>({
+			query: (body) => ({ url: '/v1/me', method: 'PATCH', body }),
+			invalidatesTags: ['Me', 'Profile']
+		}),
+		/** Confirmed by typing the handle; the session ends with the account. */
+		deleteMe: build.mutation<unknown, DeleteMe>({
+			query: (body) => ({ url: '/v1/me', method: 'DELETE', body })
+		}),
+		/** The terminals signed in with `qotm login`. */
+		devices: build.query<DeviceListEntity, void>({
+			query: () => '/v1/me/devices',
+			providesTags: ['Sessions']
+		}),
+		revokeDevice: build.mutation<unknown, string>({
+			query: (id) => ({ url: `/v1/me/devices/${id}`, method: 'DELETE' }),
+			invalidatesTags: ['Sessions']
 		}),
 		/** One page of the member's own quotes (cursor), with the tab counts. */
 		myQuotes: build.query<MeQuotesResponse, NonNullable<MeQuotesData['query']>>({
@@ -80,5 +100,9 @@ export const {
 	useEditMyQuoteMutation,
 	useDeleteMyQuoteMutation,
 	useSubmitPrivateMutation,
-	useAddEvidenceMutation
+	useAddEvidenceMutation,
+	useUpdateMeMutation,
+	useDeleteMeMutation,
+	useDevicesQuery,
+	useRevokeDeviceMutation
 } = accountApi;

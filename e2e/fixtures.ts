@@ -70,3 +70,42 @@ export async function followMagicLink(page: Page, email: string, callbackURL: st
 
 export const test = base;
 export { expect, E2E };
+
+/** A full `qotm login` for `who`: device code, approval, token, then the terminal registers as `label`. */
+export async function loginDevice(who: keyof typeof USERS, label: string) {
+	const code = await requestDeviceCode();
+	const user = await apiAs(who);
+	await user.get(`/auth/device?user_code=${code.user_code}`);
+	expect((await user.post('/auth/device/approve', { data: { userCode: code.user_code } })).ok()).toBe(true);
+	await user.dispose();
+	sql(`UPDATE device_code SET last_polled_at = now() - interval '1 minute' WHERE device_code = '${code.device_code}'`);
+	const cli = await request.newContext({ baseURL: E2E.api });
+	const token = await cli.post('/auth/device/token', {
+		data: {
+			grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+			device_code: code.device_code,
+			client_id: 'qotm-cli'
+		}
+	});
+	expect(token.ok(), await token.text()).toBe(true);
+	const { access_token } = await token.json();
+	const reg = await cli.post('/v1/me/devices', {
+		headers: { Authorization: `Bearer ${access_token}`, 'X-Qotm-Dataset': 'v2026.08.3' },
+		data: { label }
+	});
+	expect(reg.ok(), await reg.text()).toBe(true);
+	await cli.dispose();
+}
+
+/** Signs `page` in as a brand-new member through a magic link (the account is created on first sign-in). */
+export async function signUp(page: Page, email: string) {
+	const res = await page.request.post(`${E2E.api}/auth/sign-in/magic-link`, {
+		data: { email, callbackURL: E2E.web },
+		headers: { Origin: E2E.web }
+	});
+	expect(res.ok(), await res.text()).toBe(true);
+	const verify = await page.request.get(`${E2E.api}/auth/magic-link/verify?token=${magicLinkToken(email)}`, {
+		maxRedirects: 0
+	});
+	expect(verify.status()).toBeLessThan(400);
+}
