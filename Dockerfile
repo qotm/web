@@ -1,6 +1,10 @@
-# Static build of the app, served by nginx.
+# The built app, served by a small Node server (server/) that also writes each
+# quote, author and topic page's title, description, canonical URL and
+# og:image into index.html for crawlers, and serves sitemap.xml and robots.txt.
 #
 #   docker build --build-arg VITE_APP_API_URL=https://api.example.com -t app .
+#   docker run -e API_URL=http://api:3000 -e PUBLIC_API_URL=https://api.example.com \
+#     -e SITE_URL=https://example.com -p 8080:8080 app
 #
 # IMPORTANT: Vite inlines `VITE_*` values into the JS bundle at BUILD time, so a
 # built image is pinned to one environment. These are build args, not runtime
@@ -51,10 +55,28 @@ RUN test -n "$VITE_APP_API_URL" || (echo "ERROR: --build-arg VITE_APP_API_URL is
 RUN yarn build
 
 # ---------- runtime ----------
-FROM nginx:stable-alpine AS runtime
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+# No dependencies: the server is node:http, and Node runs its TypeScript
+# directly (type stripping). It imports two plain modules from src/ (the URL
+# map and the brand), so the routes, private prefixes and titles stay one
+# definition shared with the app.
+FROM node:24-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production \
+	PORT=8080 \
+	DIST=/app/dist
 
-EXPOSE 80
+COPY package.json ./
+COPY server ./server
+COPY src/lib/paths.ts ./src/lib/paths.ts
+COPY src/shared/ui/meta/brand.ts ./src/shared/ui/meta/brand.ts
+COPY --from=build /app/dist ./dist
+
+# Runtime configuration (unlike the VITE_* values above, these are read at start):
+#   API_URL          where the server reaches the API (required)
+#   PUBLIC_API_URL   the API as crawlers reach it, for og:image (defaults to API_URL)
+#   SITE_URL         this site's public origin (required)
+USER node
+EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
-	CMD wget -qO- http://127.0.0.1/healthz || exit 1
+	CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1
+CMD ["node", "server/index.ts"]

@@ -6,3 +6,4 @@ yarn.lock
 src/shared/types/api
 e2e/kit/
 *.tmp.mjs
+e2e/.dist/

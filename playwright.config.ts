@@ -11,11 +11,16 @@ import { defineConfig, devices } from '@playwright/test';
 export const E2E = {
 	apiPort: 5160,
 	webPort: 5162,
+	/** The production build behind the web image's server (`server/`), for the SEO checks. */
+	sitePort: 5163,
 	get api() {
 		return `http://localhost:${this.apiPort}`;
 	},
 	get web() {
 		return `http://localhost:${this.webPort}`;
+	},
+	get site() {
+		return `http://localhost:${this.sitePort}`;
 	}
 };
 
@@ -66,6 +71,20 @@ export default defineConfig({
 			env: {
 				PORT: String(E2E.webPort),
 				VITE_APP_API_URL: E2E.api
+			}
+		},
+		{
+			// What the web image runs: `vite build`, then server/index.ts serving it.
+			command: 'yarn vite build --outDir e2e/.dist --emptyOutDir --logLevel warn && node server/index.ts',
+			url: `${E2E.site}/healthz`,
+			reuseExistingServer: false,
+			timeout: 180_000,
+			env: {
+				VITE_APP_API_URL: E2E.api,
+				DIST: 'e2e/.dist',
+				API_URL: E2E.api,
+				SITE_URL: E2E.site,
+				PORT: String(E2E.sitePort)
 			}
 		}
 	]

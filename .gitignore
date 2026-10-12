@@ -40,3 +40,6 @@ e2e/.screenshots/
 
 # Local helpers (screenshot composer)
 *.tmp.mjs
+
+# The production build the SEO checks serve (playwright.config.ts).
+e2e/.dist/

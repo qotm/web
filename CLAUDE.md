@@ -15,12 +15,14 @@ yarn build               # typecheck + vite build (what CI runs, with lint and f
 yarn test                # Vitest + Testing Library: src/**/*.test.{ts,tsx}, jsdom
 yarn test:e2e            # Playwright: e2e/*.spec.ts in Chromium
 yarn gen                 # regenerate API types from the running API's OpenAPI document
+DIST=dist API_URL=… SITE_URL=… node server/index.ts   # what the image runs (after yarn build)
 ```
 
 **The browser suite** (`playwright.config.ts`) starts its own API from the
 backend's compiled build (`backend/apps/api/dist`, kept current by the dev
 API's watch) with `.env.test`, on port 5160, and a web dev server pointed at it
-on 5162, so the dev API (5060) and web (5062) keep running.
+on 5162, so the dev API (5060) and web (5062) keep running. It also builds
+the app into `e2e/.dist` and runs `server/` on 5163 for the SEO checks.
 `e2e/global-setup.ts` resets the test database with the backend's
 `yarn test:db:seed:e2e` (test users and the design's sample content). Sign in
 with `signIn(page, 'member' | 'admin')` from `e2e/fixtures.ts` (password
@@ -41,6 +43,14 @@ backend's e2e suite: both use the test database.
   `api/` (`baseApi`, base query, uploads), `auth/` (session, guards,
   redirects), `layouts/` (shells, state screens), `hooks/`, `types/`
   (generated API types).
+- `server/`: the web image's Node server (no dependencies; Node runs the
+  TypeScript directly). It serves `dist/`, writes the title, description,
+  canonical URL and Open Graph tags into index.html for `/q/:id`,
+  `/authors/:slug` and `/topics/:slug` from the API, and serves
+  `sitemap.xml`, `robots.txt` and `/healthz`. It imports `src/lib/paths.ts`
+  and `src/shared/ui/meta/brand.ts` at runtime, so keep those two free of
+  imports; the Dockerfile copies them. Runtime env: `API_URL`, `PUBLIC_API_URL`
+  (og:image), `SITE_URL`, `PORT`, `DIST`.
 - Imports use `@/` for `src/` (`@/shared/ui`, `@/routes/settings`).
 
 ## Rules
