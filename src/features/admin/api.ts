@@ -1,5 +1,9 @@
 import { baseApi } from '@/shared/api';
 import type {
+	AdminUsersData,
+	AdminUsersIdRoleData,
+	AdminUsersIdRoleResponse,
+	AdminUsersResponse,
 	AdminAuthorsCreateData,
 	AdminAuthorsCreateResponse,
 	AdminAuthorsIdData,
@@ -155,6 +159,16 @@ export const adminApi = baseApi.injectEndpoints({
 			query: ({ id, body }) => ({ url: `/v1/admin/topics/${id}`, method: 'PATCH', body }),
 			invalidatesTags: ['AdminTopics', 'Topics']
 		}),
+		/** Members and staff, by handle, name or email and by role. */
+		adminUsers: build.query<AdminUsersResponse, AdminUsersData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/users', params: params ?? undefined }),
+			providesTags: ['AdminUsers']
+		}),
+		/** Assign a role (409: the superuser's, or demoting the last admin). */
+		setUserRole: build.mutation<AdminUsersIdRoleResponse, { id: string; role: AdminUsersIdRoleData['body']['role'] }>({
+			query: ({ id, role }) => ({ url: `/v1/admin/users/${id}/role`, method: 'PATCH', body: { role } }),
+			invalidatesTags: ['AdminUsers']
+		}),
 		/** Verified quotes and community candidates waiting for a curator, with their signals. */
 		adminCuration: build.query<AdminCurationResponse, AdminCurationData['query'] | void>({
 			query: (params) => ({ url: '/v1/admin/curation', params: params ?? undefined }),
@@ -238,5 +252,7 @@ export const {
 	useUpdateSourceMutation,
 	useAdminTopicsQuery,
 	useCreateTopicMutation,
-	useUpdateTopicMutation
+	useUpdateTopicMutation,
+	useAdminUsersQuery,
+	useSetUserRoleMutation
 } = adminApi;

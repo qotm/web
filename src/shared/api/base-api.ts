@@ -39,7 +39,8 @@ export const baseApi = createApi({
 		// The taxonomy the console edits.
 		'AdminAuthors',
 		'AdminSources',
-		'AdminTopics'
+		'AdminTopics',
+		'AdminUsers'
 	],
 	endpoints: () => ({})
 });
