@@ -1,6 +1,7 @@
 import type {
 	AdminQuoteEntity,
 	CorrectQuote,
+	CurationDecision,
 	ModerationDecision,
 	QueueItemEntity,
 	QuoteEntity,
@@ -75,3 +76,29 @@ export function correctionBody(q: AdminQuoteEntity, v: CorrectionValues): Correc
 
 /** The notes left on a quote's moves (new evidence, earlier decisions), newest first. */
 export const notesOf = (q: Pick<AdminQuoteEntity, 'history'>) => q.history.filter((h) => h.note).toReversed();
+
+export type Checklist = CurationDecision['checklist'];
+
+/** The curation checklist (BUILD-PLAN §5), in the API's order and words. */
+export const CHECKLIST: [keyof Checklist, string][] = [
+	['on_topic', 'About programming, technology or engineering'],
+	['stands_alone', 'Useful on its own, without context'],
+	['accurate', 'Accurate, with provenance or a declared original'],
+	['concise', 'Concise enough for a terminal'],
+	['not_duplicate', 'Not a duplicate'],
+	['lasting', 'Will still read well in five years'],
+	['no_open_reports', 'No open reports or moderation issues']
+];
+
+export const emptyChecklist = (): Checklist => Object.fromEntries(CHECKLIST.map(([k]) => [k, false])) as Checklist;
+
+export const allTicked = (c: Checklist) => CHECKLIST.every(([k]) => c[k]);
+
+/** ReviewDecision's curation outcome as the API's decision: curating needs every box, keeping out a note. */
+export function curation(status: QuoteEntity['status'], note: string, checklist: Checklist): CurationDecision | null {
+	const n = note.trim();
+	if (status === 'CURATED')
+		return allTicked(checklist) ? { decision: 'curate', checklist, ...(n ? { note: n } : {}) } : null;
+	if (status === 'VERIFIED') return n ? { decision: 'keep_out', checklist, note: n } : null;
+	return null;
+}

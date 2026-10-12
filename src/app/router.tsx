@@ -41,6 +41,9 @@ const AdminSubmissionsRoute = lazy(() =>
 const AdminVerificationRoute = lazy(() =>
 	import('@/routes/admin/verification').then((m) => ({ default: m.AdminVerificationRoute }))
 );
+const AdminCurationRoute = lazy(() =>
+	import('@/routes/admin/curation').then((m) => ({ default: m.AdminCurationRoute }))
+);
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -117,7 +120,7 @@ export const router = createBrowserRouter([
 			adminPage('quotes', 'Quotes'),
 			adminPage('submissions', 'Submissions', <AdminSubmissionsRoute />),
 			adminPage('verification', 'Verification queue', <AdminVerificationRoute />),
-			adminPage('curation', 'Curation queue'),
+			adminPage('curation', 'Curation queue', <AdminCurationRoute />),
 			adminPage('reports', 'Reports'),
 			adminPage('authors', 'Authors'),
 			adminPage('sources', 'Sources'),

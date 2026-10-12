@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { AdminQuoteEntity } from '@/shared/types';
 import {
+	CHECKLIST,
+	allTicked,
+	curation,
+	emptyChecklist,
 	correctionBody,
 	correctionValues,
 	isModerated,
@@ -90,5 +94,20 @@ describe('queues', () => {
 
 	it('lists the notes on a quote, newest first', () => {
 		expect(notesOf(knuth).map((h) => h.note)).toEqual(['ACM Computing Surveys 6(4).', 'Which paper?']);
+	});
+
+	it('curates only with every box ticked; keeping out needs a note', () => {
+		const none = emptyChecklist();
+		const all = Object.fromEntries(CHECKLIST.map(([k]) => [k, true])) as typeof none;
+		expect(CHECKLIST).toHaveLength(7);
+		expect(allTicked(none)).toBe(false);
+		expect(curation('CURATED', '', none)).toBeNull();
+		expect(curation('CURATED', ' ', all)).toEqual({ decision: 'curate', checklist: all });
+		expect(curation('VERIFIED', '', none)).toBeNull();
+		expect(curation('VERIFIED', 'Too long for a terminal.', none)).toEqual({
+			decision: 'keep_out',
+			checklist: none,
+			note: 'Too long for a terminal.'
+		});
 	});
 });

@@ -1,6 +1,10 @@
 import { baseApi } from '@/shared/api';
 import type {
 	AdminAuthorsData,
+	AdminCurationData,
+	AdminCurationResponse,
+	AdminQuotesIdCurationData,
+	AdminQuotesIdCurationResponse,
 	AdminAuthorsResponse,
 	AdminQueuesOldestResponse,
 	AdminQuotesIdResponse,
@@ -90,6 +94,18 @@ export const adminApi = baseApi.injectEndpoints({
 			query: (params) => ({ url: '/v1/admin/authors', params: params ?? undefined }),
 			providesTags: ['AdminAuthors']
 		}),
+		/** Verified quotes and community candidates waiting for a curator, with their signals. */
+		adminCuration: build.query<AdminCurationResponse, AdminCurationData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/curation', params: params ?? undefined }),
+			providesTags: ['AdminQueue']
+		}),
+		/** Curate (every checklist item ticked, no open report) or keep it out of the dataset (with a note). */
+		curateQuote: build.mutation<AdminQuotesIdCurationResponse, { id: string; body: AdminQuotesIdCurationData['body'] }>(
+			{
+				query: ({ id, body }) => ({ url: `/v1/admin/quotes/${id}/curation`, method: 'POST', body }),
+				invalidatesTags: [...DECIDED]
+			}
+		),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -110,5 +126,7 @@ export const {
 	useAdminQuoteQuery,
 	useVerifyQuoteMutation,
 	useCorrectQuoteMutation,
-	useAdminAuthorsQuery
+	useAdminAuthorsQuery,
+	useAdminCurationQuery,
+	useCurateQuoteMutation
 } = adminApi;

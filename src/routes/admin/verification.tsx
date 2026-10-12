@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Form, Formik } from 'formik';
-import { useSearchParams } from 'react-router';
 import {
 	useAdminAuthorsQuery,
 	useAdminQuoteQuery,
@@ -9,6 +8,7 @@ import {
 	useVerifyQuoteMutation
 } from '@/features/admin/api';
 import { ago, waited } from '@/features/admin/lib/dashboard';
+import { useQueueParams } from '@/features/admin/lib/use-queue-params';
 import {
 	correctionBody,
 	correctionValues,
@@ -259,21 +259,10 @@ function Selected({ item }: { item: QueueItemEntity }) {
  * link its author, and the verification decision.
  */
 export function AdminVerificationRoute() {
-	const [params, setParams] = useSearchParams();
-	const page = Math.max(1, Number(params.get('page')) || 1);
+	const { page, pick, select, goTo } = useQueueParams();
 	const { data, isLoading, isError, refetch } = useAdminVerificationQuery({ page, limit: PAGE_SIZE });
-	const set = (next: Record<string, string | null>) =>
-		setParams(
-			(p) => {
-				for (const [k, v] of Object.entries(next))
-					if (v === null) p.delete(k);
-					else p.set(k, v);
-				return p;
-			},
-			{ replace: true }
-		);
 	const list = data?.list ?? [];
-	const selected = list.find((q) => q.id === params.get('id')) ?? list[0];
+	const selected = pick(list);
 
 	return (
 		<div className="flex flex-col gap-card-y">
@@ -301,7 +290,7 @@ export function AdminVerificationRoute() {
 						label="Verification queue"
 						rows={list}
 						rowKey={(q) => q.id}
-						onRowClick={(q) => set({ id: q.id })}
+						onRowClick={(q) => select(q.id)}
 						rowLabel={(q) => `Review ${q.id}${q.id === selected?.id ? ' (selected)' : ''}`}
 						columns={[
 							{ key: 'id', label: 'id', mono: true },
@@ -321,12 +310,7 @@ export function AdminVerificationRoute() {
 						]}
 					/>
 					{data.lastPage > 1 ? (
-						<Pagination
-							page={page}
-							pageSize={data.pageSize}
-							total={data.total}
-							onPage={(p) => set({ page: String(p), id: null })}
-						/>
+						<Pagination page={page} pageSize={data.pageSize} total={data.total} onPage={goTo} />
 					) : null}
 					{selected ? <Selected item={selected} /> : null}
 				</>

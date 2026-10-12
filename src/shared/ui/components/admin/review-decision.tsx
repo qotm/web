@@ -42,6 +42,8 @@ type ReviewDecisionProps = {
 	busy?: boolean;
 	/** Outcomes that need a note before they can be chosen. */
 	noteRequired?: Status[];
+	/** Outcomes not open yet (curating with an unticked checklist). */
+	unavailable?: Status[];
 	className?: string;
 };
 
@@ -52,6 +54,7 @@ function ReviewDecision({
 	onDecide,
 	busy = false,
 	noteRequired = [],
+	unavailable = [],
 	className
 }: ReviewDecisionProps) {
 	const [note, setNote] = React.useState('');
@@ -83,7 +86,7 @@ function ReviewDecision({
 					<Button
 						key={status}
 						variant={variant}
-						disabled={busy || (noteRequired.includes(status) && !trimmed)}
+						disabled={busy || unavailable.includes(status) || (noteRequired.includes(status) && !trimmed)}
 						onClick={() => onDecide?.(status, trimmed)}
 					>
 						{label}
