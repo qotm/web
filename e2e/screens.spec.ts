@@ -1,19 +1,33 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-import { signIn, test, type USERS } from './fixtures';
+import { requestDeviceCode, signIn, test, type USERS } from './fixtures';
 
 /**
  * The screenshots each screen ticket attaches to Linear, at 1440 and 760px:
  * `SCREENS=QOT-69 yarn test:e2e e2e/screens.spec.ts`. Off in the normal run.
  * Saved to e2e/.screenshots/screens/<ticket>-<name>-<width>.png.
  */
-type Shot = { name: string; path: string; as?: keyof typeof USERS; full?: boolean; clip?: 'header' | 'footer' };
+type Shot = {
+	name: string;
+	/** The page, or a function that prepares one (a device code) and returns it. */
+	path: string | (() => Promise<string>);
+	as?: keyof typeof USERS;
+};
 
 const SHOTS: Record<string, Shot[]> = {
 	'QOT-69': [
 		{ name: 'signed-out', path: '/' },
 		{ name: 'signed-in', path: '/discover', as: 'member' },
 		{ name: 'admin-menu', path: '/topics/debugging', as: 'admin' }
+	],
+	'QOT-77': [
+		{ name: 'login', path: '/login' },
+		{
+			name: 'login-for-terminal',
+			path: async () =>
+				`/login?redirect=${encodeURIComponent(`/device?user_code=${(await requestDeviceCode()).user_code}`)}`
+		},
+		{ name: 'device', path: async () => `/device?user_code=${(await requestDeviceCode()).user_code}`, as: 'member' }
 	],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
@@ -33,7 +47,7 @@ test.describe('screens', () => {
 				mkdirSync(OUT, { recursive: true });
 				if (shot.as) await signIn(page, shot.as);
 				await page.setViewportSize({ width, height: 900 });
-				await page.goto(shot.path);
+				await page.goto(typeof shot.path === 'string' ? shot.path : await shot.path());
 				await page.getByRole('banner').waitFor();
 				await page.waitForLoadState('networkidle');
 				await page.evaluate(() => document.fonts.ready);

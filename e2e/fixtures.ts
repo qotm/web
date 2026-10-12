@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { test as base, expect, type Page } from '@playwright/test';
+import { test as base, expect, request, type Page } from '@playwright/test';
 import { E2E } from '../playwright.config';
 
 /** Accounts seeded by the backend's `test:db:seed:e2e`. */
@@ -35,6 +35,23 @@ export function magicLinkToken(email: string): string {
 		.trim();
 	if (!out) throw new Error(`No magic link for ${email}`);
 	return out.replace(/^magic-link:/, '');
+}
+
+/** Runs SQL against the test database (the API's test stack). */
+export function sql(statement: string): string {
+	return execSync(`docker exec qotm-test-database psql -U root -d main -Atc "${statement.replace(/"/g, '\\"')}"`)
+		.toString()
+		.trim();
+}
+
+/** What `qotm login` does first: asks the API for a device code (as the CLI: no cookies, no Origin). */
+export async function requestDeviceCode(): Promise<{ user_code: string; device_code: string }> {
+	const cli = await request.newContext();
+	const res = await cli.post(`${E2E.api}/auth/device/code`, { data: { client_id: 'qotm-cli' } });
+	expect(res.ok(), await res.text()).toBe(true);
+	const body = await res.json();
+	await cli.dispose();
+	return body;
 }
 
 /** Opens the link the email would carry: the API signs in and redirects to `callbackURL`. */

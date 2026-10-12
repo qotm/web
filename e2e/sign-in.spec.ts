@@ -12,6 +12,8 @@ test.describe('no passwords', () => {
 		await page.goto('/login');
 		await expect(page.getByLabel('Email')).toBeVisible();
 		await expect(page.locator('input[type="password"]')).toHaveCount(0);
-		await expect(page.getByText(/password/i)).toHaveCount(0);
+		// The notice may say the terminal never asks for one; nothing asks for one here.
+		await expect(page.getByLabel(/password/i)).toHaveCount(0);
+		await expect(page.getByRole('link', { name: /password/i })).toHaveCount(0);
 	});
 });

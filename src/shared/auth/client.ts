@@ -1,11 +1,12 @@
 import { createAuthClient } from 'better-auth/react';
-import { adminClient, magicLinkClient } from 'better-auth/client/plugins';
+import { adminClient, deviceAuthorizationClient, magicLinkClient } from 'better-auth/client/plugins';
 
 function makeClient(baseURL: string) {
 	// Sign-in is by magic link or OAuth only; there are no passwords
 	// (BUILD-PLAN §9). The admin plugin adds `authClient.admin.*`; the backend
-	// enforces the caller's role on every one.
-	return createAuthClient({ baseURL, plugins: [magicLinkClient(), adminClient()] });
+	// enforces the caller's role on every one. The device plugin approves a
+	// terminal's `qotm login` (`authClient.device.*`).
+	return createAuthClient({ baseURL, plugins: [magicLinkClient(), adminClient(), deviceAuthorizationClient()] });
 }
 
 let client: ReturnType<typeof makeClient> | null = null;

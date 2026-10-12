@@ -1,5 +1,4 @@
 // @/shared/layouts — shared layouts and state components.
-export { AuthLayout } from './auth-layout';
 export { Loading } from './states/loading';
 export { AppShellSkeleton } from './states/app-shell-skeleton';
 export { RouteFallback } from './states/route-fallback';

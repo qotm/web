@@ -31,6 +31,7 @@ const SubmitRoute = named(() => import('@/routes/submit'), 'SubmitRoute');
 const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
+const DeviceRoute = named(() => import('@/routes/auth/device'), 'DeviceRoute');
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -64,6 +65,8 @@ export const router = createBrowserRouter([
 			{ path: 'search', element: lazyRoute(<SearchRoute />) },
 			{ path: 'terms', element: lazyRoute(<TermsRoute />) },
 			{ path: 'privacy', element: lazyRoute(<PrivacyRoute />) },
+			// Sign-in: an email link or OAuth, never a password. Flat paths.
+			{ path: 'login', element: lazyRoute(<LoginRoute />) },
 			// The account pages: a session, or /login?redirect= and back.
 			{
 				element: (
@@ -75,7 +78,9 @@ export const router = createBrowserRouter([
 					{ path: 'favorites', element: lazyRoute(<FavoritesRoute />) },
 					{ path: 'my-quotes', element: lazyRoute(<MyQuotesRoute />) },
 					{ path: 'settings', element: lazyRoute(<SettingsRoute />) },
-					{ path: 'submit', element: lazyRoute(<SubmitRoute />) }
+					{ path: 'submit', element: lazyRoute(<SubmitRoute />) },
+					// `qotm login` opens /device?user_code=: approving needs a session.
+					{ path: 'device', element: lazyRoute(<DeviceRoute />) }
 				]
 			},
 			// `/@ada`: the profile checks for the `@` (a segment cannot carry a
@@ -84,8 +89,6 @@ export const router = createBrowserRouter([
 			{ path: ':handle/:tab', element: lazyRoute(<ProfileRoute />) }
 		]
 	},
-	// Sign-in: an email link or OAuth, never a password. Flat on purpose.
-	{ path: '/login', element: lazyRoute(<LoginRoute />) },
 	{
 		path: ADMIN_BASE,
 		// The role gate is UI, not security: every endpoint behind it enforces

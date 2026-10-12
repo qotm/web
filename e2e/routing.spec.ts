@@ -36,7 +36,7 @@ test.describe('public-first routing', () => {
 			await expect(robots(page)).toHaveAttribute('content', /noindex/);
 
 			await page.getByLabel('Email').fill('test.user@example.com');
-			await page.getByRole('button', { name: 'Send sign-in link' }).click();
+			await page.getByRole('button', { name: 'Email me a sign-in link' }).click();
 			await expect(page.getByText('Check your email.')).toBeVisible();
 			await followMagicLink(page, 'test.user@example.com', `${E2E.web}${path}`);
 			await expect(page).toHaveURL(path);
