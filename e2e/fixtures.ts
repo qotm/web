@@ -5,7 +5,9 @@ import { E2E } from '../playwright.config';
 /** Accounts seeded by the backend's `test:db:seed:e2e`. */
 export const USERS = {
 	member: { email: 'test.user@example.com', password: 'secret' },
-	admin: { email: 'test.admin@example.com', password: 'secret' }
+	admin: { email: 'test.admin@example.com', password: 'secret' },
+	verifier: { email: 'test.verifier@example.com', password: 'secret' },
+	moderator: { email: 'test.moderator@example.com', password: 'secret' }
 } as const;
 
 /**

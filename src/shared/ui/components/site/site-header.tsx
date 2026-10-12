@@ -16,6 +16,8 @@ type SiteHeaderProps = {
 	children?: React.ReactNode;
 	/** Extra items for the narrow-screen menu, after the nav (search, the install command). */
 	menuExtra?: { id: string; label: string; to: string }[];
+	/** Fold the nav into a menu at 760 (the default); off where other navigation covers it (the console's sidebar). */
+	collapse?: boolean;
 	className?: string;
 };
 
@@ -27,7 +29,15 @@ const navLink =
  * underlined in clay) and the right-hand actions. At 760px and below the nav
  * folds into a menu, as the kit hides it there.
  */
-function SiteHeader({ items, active, wide = false, children, menuExtra = [], className }: SiteHeaderProps) {
+function SiteHeader({
+	items,
+	active,
+	wide = false,
+	children,
+	menuExtra = [],
+	collapse = true,
+	className
+}: SiteHeaderProps) {
 	return (
 		<header className={cn('border-b border-border bg-background', className)}>
 			<div
@@ -55,17 +65,19 @@ function SiteHeader({ items, active, wide = false, children, menuExtra = [], cla
 				</nav>
 				<div className="ml-auto flex items-center gap-3">
 					{children}
-					<div className="roomy:hidden">
-						<Menu
-							label="Menu"
-							trigger={
-								<span className="inline-flex h-control-sm items-center gap-1.5 rounded-control border border-border px-3 font-mono text-[13px] text-ink">
-									menu <span aria-hidden="true">{glyph('⌄')}</span>
-								</span>
-							}
-							items={[...items, ...menuExtra].map((it) => ({ id: it.id, label: it.label, to: it.to }))}
-						/>
-					</div>
+					{collapse ? (
+						<div className="roomy:hidden">
+							<Menu
+								label="Menu"
+								trigger={
+									<span className="inline-flex h-control-sm items-center gap-1.5 rounded-control border border-border px-3 font-mono text-[13px] text-ink">
+										menu <span aria-hidden="true">{glyph('⌄')}</span>
+									</span>
+								}
+								items={[...items, ...menuExtra].map((it) => ({ id: it.id, label: it.label, to: it.to }))}
+							/>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</header>

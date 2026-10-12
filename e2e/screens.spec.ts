@@ -14,6 +14,10 @@ const SHOTS: Record<string, Shot[]> = {
 		{ name: 'signed-out', path: '/' },
 		{ name: 'signed-in', path: '/discover', as: 'member' },
 		{ name: 'admin-menu', path: '/topics/debugging', as: 'admin' }
+	],
+	'QOT-70': [
+		{ name: 'admin', path: '/admin', as: 'admin' },
+		{ name: 'verifier', path: '/admin', as: 'verifier' }
 	]
 };
 
@@ -30,7 +34,8 @@ test.describe('screens', () => {
 				if (shot.as) await signIn(page, shot.as);
 				await page.setViewportSize({ width, height: 900 });
 				await page.goto(shot.path);
-				await page.getByRole('contentinfo').waitFor();
+				await page.getByRole('banner').waitFor();
+				await page.waitForLoadState('networkidle');
 				await page.evaluate(() => document.fonts.ready);
 				if (shot.name === 'admin-menu') {
 					const trigger = page.getByRole('button', { name: width > 760 ? 'Account' : 'Menu' });

@@ -77,5 +77,21 @@ export const paths = {
 	admin: ADMIN_BASE
 } as const;
 
+/** The console's pages (artboards Admin*), under `ADMIN_BASE`. */
+export const adminPaths = {
+	dashboard: ADMIN_BASE,
+	quotes: `${ADMIN_BASE}/quotes`,
+	submissions: `${ADMIN_BASE}/submissions`,
+	verification: `${ADMIN_BASE}/verification`,
+	curation: `${ADMIN_BASE}/curation`,
+	reports: `${ADMIN_BASE}/reports`,
+	authors: `${ADMIN_BASE}/authors`,
+	sources: `${ADMIN_BASE}/sources`,
+	topics: `${ADMIN_BASE}/topics`,
+	users: `${ADMIN_BASE}/users`,
+	releases: `${ADMIN_BASE}/releases`,
+	audit: `${ADMIN_BASE}/audit`
+} as const;
+
 /** Routes that must never be indexed: the account pages and the console. */
 export const PRIVATE_PREFIXES = ['/favorites', '/my-quotes', '/settings', '/submit', '/login', '/device', ADMIN_BASE];

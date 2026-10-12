@@ -22,7 +22,9 @@ export const baseApi = createApi({
 		// The signed-in member's own records (header counts, settings, lists).
 		'Me',
 		'MyQuotes',
-		'MyFavorites'
+		'MyFavorites',
+		// The admin console: the sidebar's queue sizes.
+		'AdminCounts'
 	],
 	endpoints: () => ({})
 });

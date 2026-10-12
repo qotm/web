@@ -1,29 +1,12 @@
-import { Home } from 'lucide-react';
-import { ShieldCheck } from 'lucide-react';
-import type { NavItem } from '@/shared/layouts';
 import type { FooterColumn, SiteNavItem } from '@/shared/ui';
-import { appPath, paths } from '@/lib/paths';
-import { ADMIN_BASE } from '@/lib/paths';
+import type { QueueCountsEntity } from '@/shared/types';
+import { adminPaths, paths } from '@/lib/paths';
 
 /**
- * Drives the app shell's navigation. Keep it in step with `router.tsx` — the
- * shell derives the sidebar from this list, not from the router, so a route
- * added in one place and not the other is simply unreachable or dead.
- *
- * Paths come from `appPath` rather than being written out, because the app's
- * mount point moves when the marketing site is included. `icon` is a rendered
- * element, not a component reference.
+ * The site's and the console's navigation. Keep them in step with
+ * `router.tsx`: a route added in one place and not the other is unreachable
+ * or dead.
  */
-/**
- * The console's own nav. Separate from `NAV_ITEMS` on purpose: the admin section
- * is a different branch of the router behind a different guard, and mixing an
- * admin link into the member sidebar would render it for members too — a link
- * that 403s is a worse answer than no link.
- */
-export const ADMIN_NAV_ITEMS: NavItem[] = [
-	{ to: ADMIN_BASE, label: 'Overview', icon: <ShieldCheck className="size-4" />, end: true },
-	{ to: appPath(), label: 'View site', icon: <Home className="size-4" /> }
-];
 
 /** The site header's primary nav (artboard Header). */
 export const SITE_NAV: SiteNavItem[] = [
@@ -61,3 +44,80 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 		]
 	}
 ];
+
+/** The roles the console admits at all (any staff role). */
+export const STAFF_ROLES = ['verifier', 'moderator', 'admin', 'superuser'];
+
+export type AdminPage = keyof typeof adminPaths;
+
+/**
+ * Who may open each console page: the API's permissions (backend
+ * lib/access.ts) for the endpoints the page calls. Verifiers verify;
+ * moderators handle submissions and reports; admins do everything else.
+ * The superuser holds every permission. The sidebar shows a role only its
+ * pages: a link that 403s is a worse answer than no link.
+ */
+export const ADMIN_ACCESS: Record<AdminPage, string[]> = {
+	dashboard: ['admin', 'superuser'],
+	quotes: ['admin', 'superuser'],
+	submissions: ['moderator', 'admin', 'superuser'],
+	verification: ['verifier', 'admin', 'superuser'],
+	curation: ['admin', 'superuser'],
+	reports: ['moderator', 'admin', 'superuser'],
+	authors: ['admin', 'superuser'],
+	sources: ['admin', 'superuser'],
+	topics: ['admin', 'superuser'],
+	users: ['admin', 'superuser'],
+	releases: ['admin', 'superuser'],
+	audit: ['admin', 'superuser']
+};
+
+type AdminNavItem = {
+	id: AdminPage;
+	label: string;
+	/** The queue whose size the item shows (`/v1/admin/stats/counts`). */
+	count?: keyof QueueCountsEntity;
+	/** A queue a person must answer: its count is marked while anything waits. */
+	attention?: boolean;
+};
+
+/** The console's sidebar (artboard AdminNav). */
+export const ADMIN_SECTIONS: { title?: string; items: AdminNavItem[] }[] = [
+	{ items: [{ id: 'dashboard', label: 'Dashboard' }] },
+	{
+		title: 'Content',
+		items: [
+			{ id: 'quotes', label: 'Quotes' },
+			{ id: 'submissions', label: 'Submissions', count: 'submissions' },
+			{ id: 'verification', label: 'Verification queue', count: 'verification', attention: true },
+			{ id: 'curation', label: 'Curation queue', count: 'curation' },
+			{ id: 'reports', label: 'Reports', count: 'reports', attention: true }
+		]
+	},
+	{
+		title: 'Taxonomy',
+		items: [
+			{ id: 'authors', label: 'Authors' },
+			{ id: 'sources', label: 'Sources' },
+			{ id: 'topics', label: 'Topics' }
+		]
+	},
+	{ title: 'People', items: [{ id: 'users', label: 'Users' }] },
+	{
+		title: 'System',
+		items: [
+			{ id: 'releases', label: 'Dataset releases' },
+			{ id: 'audit', label: 'Audit logs' }
+		]
+	}
+];
+
+/** The roles in a session's comma-separated role string. */
+export const rolesOf = (role?: string | null) =>
+	(role ?? '')
+		.split(',')
+		.map((r) => r.trim())
+		.filter(Boolean);
+
+export const canOpen = (page: AdminPage, role?: string | null) =>
+	rolesOf(role).some((r) => ADMIN_ACCESS[page].includes(r));

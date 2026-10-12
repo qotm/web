@@ -1,17 +1,10 @@
 import { Suspense, lazy, type ReactNode } from 'react';
 import { Outlet, createBrowserRouter } from 'react-router';
-import { ProtectedRoute, RoleRoute, signOut, useAuth } from '@/shared/auth';
-import {
-	AppShell,
-	AppShellSkeleton,
-	ErrorBoundary,
-	Forbidden,
-	NotFound,
-	PageSkeleton,
-	RouteFallback
-} from '@/shared/layouts';
-import { ADMIN_BASE } from '@/lib/paths';
-import { ADMIN_NAV_ITEMS } from './nav';
+import { ProtectedRoute, RoleRoute } from '@/shared/auth';
+import { AppShellSkeleton, Forbidden, NotFound, PageSkeleton, RouteFallback } from '@/shared/layouts';
+import { ADMIN_BASE, adminPaths } from '@/lib/paths';
+import { ADMIN_ACCESS, STAFF_ROLES, type AdminPage } from './nav';
+import { AdminIndex, AdminShell } from './admin-shell';
 import { SiteShell } from './site-shell';
 import { LandingRoute } from '@/routes/landing';
 
@@ -38,17 +31,21 @@ const SubmitRoute = named(() => import('@/routes/submit'), 'SubmitRoute');
 const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
-const AdminHomeRoute = named(() => import('@/routes/admin/home'), 'AdminHomeRoute');
+const AdminPlaceholderRoute = lazy(() =>
+	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
+);
 const KitRoute = named(() => import('@/routes/dev/kit'), 'KitRoute');
 
-function AdminShell() {
-	const { user } = useAuth();
-	return (
-		<ErrorBoundary>
-			<AppShell nav={ADMIN_NAV_ITEMS} user={user ?? {}} onSignOut={() => void signOut()} />
-		</ErrorBoundary>
-	);
-}
+/** A console page behind its own role gate (the API enforces the same). */
+const adminPage = (page: AdminPage, title: string, element?: ReactNode) => ({
+	path: adminPaths[page].slice(ADMIN_BASE.length + 1),
+	handle: { admin: page },
+	element: (
+		<RoleRoute allow={ADMIN_ACCESS[page]} fallback={<PageSkeleton />} forbidden={<Forbidden homeHref={ADMIN_BASE} />}>
+			{lazyRoute(element ?? <AdminPlaceholderRoute title={title} />)}
+		</RoleRoute>
+	)
+});
 
 export const router = createBrowserRouter([
 	{
@@ -95,15 +92,28 @@ export const router = createBrowserRouter([
 		// the same roles server-side. Staff with any review role see the console;
 		// each page narrows it further (QOT-70).
 		element: (
-			<RoleRoute
-				allow={['verifier', 'moderator', 'admin', 'superuser']}
-				fallback={<AppShellSkeleton />}
-				forbidden={<Forbidden />}
-			>
+			<RoleRoute allow={STAFF_ROLES} fallback={<AppShellSkeleton />} forbidden={<Forbidden />}>
 				<AdminShell />
 			</RoleRoute>
 		),
-		children: [{ index: true, element: lazyRoute(<AdminHomeRoute />) }]
+		children: [
+			{
+				index: true,
+				handle: { admin: 'dashboard' },
+				element: <AdminIndex dashboard={lazyRoute(<AdminPlaceholderRoute title="Dashboard" />)} />
+			},
+			adminPage('quotes', 'Quotes'),
+			adminPage('submissions', 'Submissions'),
+			adminPage('verification', 'Verification queue'),
+			adminPage('curation', 'Curation queue'),
+			adminPage('reports', 'Reports'),
+			adminPage('authors', 'Authors'),
+			adminPage('sources', 'Sources'),
+			adminPage('topics', 'Topics'),
+			adminPage('users', 'Users'),
+			adminPage('releases', 'Dataset releases'),
+			adminPage('audit', 'Audit logs')
+		]
 	},
 	// Dev only: the kit gallery the component tests compare with qotm_kit.
 	...(import.meta.env.DEV ? [{ path: '/_kit', element: lazyRoute(<KitRoute />) }] : []),
