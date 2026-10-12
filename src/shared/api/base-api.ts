@@ -33,7 +33,9 @@ export const baseApi = createApi({
 		// The admin console: the sidebar's queue sizes, the dashboard, dataset releases.
 		'AdminCounts',
 		'AdminStats',
-		'AdminReleases'
+		'AdminReleases',
+		// The review queues (submissions, verification, curation, reports).
+		'AdminQueue'
 	],
 	endpoints: () => ({})
 });

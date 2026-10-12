@@ -2,11 +2,12 @@ import type { MatchEntity } from '@/shared/types';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
 
-const METHODS = { exact: 'normalized exact match', fuzzy: 'fuzzy text match' } as const;
+const METHODS = { exact: 'normalized exact match', fuzzy: 'fuzzy text match', author: 'same author' } as const;
 
 type MatchCompareProps = {
 	submitted: string;
-	match: MatchEntity;
+	/** A match as the public quote page has it, or as the review queues do (which also match by author). */
+	match: Omit<MatchEntity, 'method'> & { method: keyof typeof METHODS };
 	onDismiss?: () => void;
 	onMarkDuplicate?: () => void;
 	busy?: boolean;

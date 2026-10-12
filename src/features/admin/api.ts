@@ -5,8 +5,15 @@ import type {
 	AdminReleasesPreviewResponse,
 	AdminReleasesResponse,
 	AdminStatsCountsResponse,
-	AdminStatsResponse
+	AdminStatsResponse,
+	AdminSubmissionsData,
+	AdminSubmissionsIdDecisionData,
+	AdminSubmissionsIdDecisionResponse,
+	AdminSubmissionsResponse
 } from '@/shared/types';
+
+/** A decision moves an item out of its queue: refresh the queues, the sidebar and the dashboard. */
+const DECIDED = ['AdminQueue', 'AdminCounts', 'AdminStats'] as const;
 
 /** Refetch the sidebar's queue sizes this often (the API caches them for 30s). */
 export const COUNTS_POLL_MS = 30_000;
@@ -33,6 +40,19 @@ export const adminApi = baseApi.injectEndpoints({
 			query: (params) => ({ url: '/v1/admin/releases', params: params ?? undefined }),
 			providesTags: ['AdminReleases']
 		}),
+		/** Originals the originality check held, and canonical quotes nobody has picked up. */
+		adminSubmissions: build.query<AdminSubmissionsResponse, AdminSubmissionsData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/submissions', params: params ?? undefined }),
+			providesTags: ['AdminQueue']
+		}),
+		/** A moderator's publish / mark disputed / withdraw on a held original (409 once decided). */
+		moderateSubmission: build.mutation<
+			AdminSubmissionsIdDecisionResponse,
+			{ id: string; body: AdminSubmissionsIdDecisionData['body'] }
+		>({
+			query: ({ id, body }) => ({ url: `/v1/admin/submissions/${id}/decision`, method: 'POST', body }),
+			invalidatesTags: [...DECIDED]
+		}),
 		/** Queues a preview build of the release in progress (409 while one runs). */
 		buildReleasePreview: build.mutation<AdminReleasesPreviewResponse, void>({
 			query: () => ({ url: '/v1/admin/releases/preview', method: 'POST' }),
@@ -46,5 +66,7 @@ export const {
 	useAdminStatsQuery,
 	useOldestInQueuesQuery,
 	useAdminReleasesQuery,
-	useBuildReleasePreviewMutation
+	useBuildReleasePreviewMutation,
+	useAdminSubmissionsQuery,
+	useModerateSubmissionMutation
 } = adminApi;

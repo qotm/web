@@ -129,6 +129,7 @@ const SHOTS: Record<string, Shot[]> = {
 		}
 	],
 	'QOT-83': [{ name: 'dashboard', path: '/admin', as: 'admin' }],
+	'QOT-85': [{ name: 'submissions', path: '/admin/submissions?id=q_7w2e9n', as: 'admin' }],
 	'QOT-70': [
 		{ name: 'admin', path: '/admin', as: 'admin' },
 		{ name: 'verifier', path: '/admin', as: 'verifier' }

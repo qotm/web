@@ -35,6 +35,9 @@ const DeviceRoute = named(() => import('@/routes/auth/device'), 'DeviceRoute');
 const AdminDashboardRoute = lazy(() =>
 	import('@/routes/admin/dashboard').then((m) => ({ default: m.AdminDashboardRoute }))
 );
+const AdminSubmissionsRoute = lazy(() =>
+	import('@/routes/admin/submissions').then((m) => ({ default: m.AdminSubmissionsRoute }))
+);
 const AdminPlaceholderRoute = lazy(() =>
 	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
 );
@@ -109,7 +112,7 @@ export const router = createBrowserRouter([
 				element: <AdminIndex dashboard={lazyRoute(<AdminDashboardRoute />)} />
 			},
 			adminPage('quotes', 'Quotes'),
-			adminPage('submissions', 'Submissions'),
+			adminPage('submissions', 'Submissions', <AdminSubmissionsRoute />),
 			adminPage('verification', 'Verification queue'),
 			adminPage('curation', 'Curation queue'),
 			adminPage('reports', 'Reports'),
