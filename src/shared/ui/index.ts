@@ -41,6 +41,11 @@ export * from './components/ui/tabs';
 export * from './components/ui/pagination';
 export * from './components/ui/breadcrumbs';
 export * from './components/ui/side-nav';
+// Quotes (qotm_kit)
+export * from './components/quote/quote-block';
+export * from './components/quote/attribution';
+export * from './components/quote/action-bar';
+export * from './components/quote/quote-card';
 // Terminal (qotm_kit)
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';

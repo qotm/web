@@ -1,8 +1,13 @@
 import type { ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
+import type { QuoteCardEntity } from '@/shared/types';
 import {
 	Avatar,
+	ActionBar,
+	Attribution,
 	Badge,
+	QuoteBlock,
+	QuoteCard,
 	CommandBlock,
 	Cursor,
 	InstallPill,
@@ -59,6 +64,53 @@ const TOPICS = [
 	'creativity'
 ];
 
+/** The kit's QuoteCard sample data, as the API returns it. */
+const quote = (q: Partial<QuoteCardEntity> & Pick<QuoteCardEntity, 'id' | 'text'>): QuoteCardEntity => ({
+	type: 'canonical',
+	status: 'PUBLISHED',
+	author: null,
+	attribution: null,
+	work: null,
+	year: null,
+	contributor: null,
+	topics: [],
+	counts: { likes: 0, favorites: 0, recommends: 0 },
+	publishedAt: null,
+	...q
+});
+const t = (name: string) => ({ slug: name.replace(/\s+/g, '-'), name });
+const SAMPLE = {
+	dijkstra: quote({
+		id: 'q_8f2k1c',
+		text: 'Simplicity is prerequisite for reliability.',
+		author: { slug: 'dijkstra', name: 'Edsger W. Dijkstra' },
+		work: 'EWD 498',
+		year: 1975,
+		status: 'CURATED',
+		topics: [t('simplicity'), t('software design')],
+		contributor: { handle: 'kofi' },
+		counts: { likes: 412, favorites: 188, recommends: 0 }
+	}),
+	ada: quote({
+		id: 'q_4r8y1p',
+		text: 'A green build is a hypothesis, not a proof.',
+		type: 'original',
+		topics: [t('software engineering')],
+		contributor: { handle: 'ada' },
+		counts: { likes: 58, favorites: 21, recommends: 14 },
+		viewer: { liked: false, favorited: false, recommended: true }
+	}),
+	karlton: quote({
+		id: 'q_6h2w8r',
+		text: 'There are only two hard things in Computer Science: cache invalidation and naming things.',
+		author: { slug: 'karlton', name: 'Phil Karlton' },
+		status: 'NEEDS_EVIDENCE',
+		topics: [t('programming')],
+		contributor: { handle: 'ada' },
+		counts: { likes: 540, favorites: 76, recommends: 0 }
+	})
+};
+
 /** The kit preview's StatusBadge rows: lifecycle, more lifecycle, types and visibility, roles. */
 const STATUS_ROWS = [
 	[
@@ -89,6 +141,8 @@ const Row = ({ children }: { children: ReactNode }) => (
 
 /** The kit preview's own max width, where it sets one. */
 const WIDTHS: Record<string, number> = {
+	// The kit's .qk-pv is content-box: 680 plus its 24px padding.
+	QuoteCard: 728,
 	Field: 420,
 	Input: 460,
 	Textarea: 560,
@@ -98,6 +152,50 @@ const WIDTHS: Record<string, number> = {
 };
 
 const KIT_SECTIONS: Record<string, ReactNode> = {
+	QuoteBlock: (
+		<>
+			<QuoteBlock
+				quote="Simplicity is prerequisite for reliability."
+				author="Edsger W. Dijkstra"
+				cite="EWD 498, 1975"
+			/>
+			<QuoteBlock size="sm" quote="Talk is cheap. Show me the code." author="Linus Torvalds" />
+		</>
+	),
+	QuoteCard: (
+		<>
+			<QuoteCard quote={SAMPLE.dijkstra} />
+			<QuoteCard quote={SAMPLE.ada} />
+			<QuoteCard quote={SAMPLE.karlton} variant="compact" />
+		</>
+	),
+	Attribution: (
+		<>
+			<Attribution author="Edsger W. Dijkstra" authorSlug="dijkstra" work="EWD 498" year={1975} contributor="kofi" />
+			<Attribution type="original" contributor="ada" />
+			<Attribution type="private" />
+			<div className="rounded-field bg-dark p-4">
+				<Attribution
+					onDark
+					author="Brian W. Kernighan"
+					work="The Elements of Programming Style"
+					year={1978}
+					contributor="kofi"
+				/>
+			</div>
+		</>
+	),
+	ActionBar: (
+		<>
+			<ActionBar counts={{ likes: 412, favorites: 188, recommends: 14 }} state={{ favorited: true }} />
+			<ActionBar
+				size="sm"
+				actions={['like', 'favorite', 'share']}
+				counts={{ likes: 268, favorites: 120 }}
+				state={{ liked: true }}
+			/>
+		</>
+	),
 	Terminal: (
 		<Terminal title="~/projects">
 			<div>

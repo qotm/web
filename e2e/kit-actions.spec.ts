@@ -84,7 +84,8 @@ test.describe('kit: actions', () => {
 	test('disabled buttons cannot be pressed; an icon button names itself', async ({ page }) => {
 		await page.goto('/_kit');
 		await expect(page.locator('[data-probe="disabled"]').first()).toBeDisabled();
-		await expect(page.getByRole('button', { name: 'Favorited' })).toHaveAttribute('aria-pressed', 'true');
-		await expect(page.getByRole('button', { name: 'Share' })).toHaveAttribute('title', 'Share');
+		const icons = page.locator('[data-kit="IconButton"]');
+		await expect(icons.getByRole('button', { name: 'Favorited' })).toHaveAttribute('aria-pressed', 'true');
+		await expect(icons.getByRole('button', { name: 'Share', exact: true })).toHaveAttribute('title', 'Share');
 	});
 });
