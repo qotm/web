@@ -40,7 +40,8 @@ export const baseApi = createApi({
 		'AdminAuthors',
 		'AdminSources',
 		'AdminTopics',
-		'AdminUsers'
+		'AdminUsers',
+		'AdminAudit'
 	],
 	endpoints: () => ({})
 });

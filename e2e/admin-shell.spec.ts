@@ -51,7 +51,7 @@ test.describe('admin shell', () => {
 		await sidebar(page).getByRole('link', { name: 'Audit logs' }).click();
 		await expect(page).toHaveURL(/\/admin\/audit$/);
 		await expect(sidebar(page).getByRole('link', { name: 'Audit logs' })).toHaveAttribute('aria-current', 'page');
-		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Audit logs.');
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Audit log.');
 	});
 
 	test('a verifier sees only the verification queue, and lands on it', async ({ page }) => {

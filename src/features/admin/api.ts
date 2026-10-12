@@ -1,5 +1,8 @@
 import { baseApi } from '@/shared/api';
 import type {
+	AdminAuditActionsResponse,
+	AdminAuditData,
+	AdminAuditResponse,
 	AdminUsersData,
 	AdminUsersIdRoleData,
 	AdminUsersIdRoleResponse,
@@ -169,6 +172,15 @@ export const adminApi = baseApi.injectEndpoints({
 			query: ({ id, role }) => ({ url: `/v1/admin/users/${id}/role`, method: 'PATCH', body: { role } }),
 			invalidatesTags: ['AdminUsers']
 		}),
+		/** The audit log, newest first, searched (actor, action, target, note) and filtered by action. */
+		adminAudit: build.query<AdminAuditResponse, AdminAuditData['query'] | void>({
+			query: (params) => ({ url: '/v1/admin/audit', params: params ?? undefined }),
+			providesTags: ['AdminAudit']
+		}),
+		/** Every action the log records, with its label, for the filter. */
+		auditActions: build.query<AdminAuditActionsResponse, void>({
+			query: () => '/v1/admin/audit/actions'
+		}),
 		/** Verified quotes and community candidates waiting for a curator, with their signals. */
 		adminCuration: build.query<AdminCurationResponse, AdminCurationData['query'] | void>({
 			query: (params) => ({ url: '/v1/admin/curation', params: params ?? undefined }),
@@ -254,5 +266,7 @@ export const {
 	useCreateTopicMutation,
 	useUpdateTopicMutation,
 	useAdminUsersQuery,
-	useSetUserRoleMutation
+	useSetUserRoleMutation,
+	useAdminAuditQuery,
+	useAuditActionsQuery
 } = adminApi;

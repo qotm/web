@@ -53,18 +53,16 @@ const AdminAuthorsRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) 
 const AdminSourcesRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) => ({ default: m.AdminSourcesRoute })));
 const AdminTopicsRoute = lazy(() => import('@/routes/admin/taxonomy').then((m) => ({ default: m.AdminTopicsRoute })));
 const AdminUsersRoute = lazy(() => import('@/routes/admin/users').then((m) => ({ default: m.AdminUsersRoute })));
-const AdminPlaceholderRoute = lazy(() =>
-	import('@/routes/admin/placeholder').then((m) => ({ default: m.AdminPlaceholderRoute }))
-);
+const AdminAuditRoute = lazy(() => import('@/routes/admin/audit').then((m) => ({ default: m.AdminAuditRoute })));
 const KitRoute = named(() => import('@/routes/dev/kit'), 'KitRoute');
 
 /** A console page behind its own role gate (the API enforces the same). */
-const adminPage = (page: AdminPage, title: string, element?: ReactNode) => ({
+const adminPage = (page: AdminPage, element: ReactNode) => ({
 	path: adminPaths[page].slice(ADMIN_BASE.length + 1),
 	handle: { admin: page },
 	element: (
 		<RoleRoute allow={ADMIN_ACCESS[page]} fallback={<PageSkeleton />} forbidden={<Forbidden homeHref={ADMIN_BASE} />}>
-			{lazyRoute(element ?? <AdminPlaceholderRoute title={title} />)}
+			{lazyRoute(element)}
 		</RoleRoute>
 	)
 });
@@ -126,17 +124,17 @@ export const router = createBrowserRouter([
 				handle: { admin: 'dashboard' },
 				element: <AdminIndex dashboard={lazyRoute(<AdminDashboardRoute />)} />
 			},
-			adminPage('quotes', 'Quotes', <AdminQuotesRoute />),
-			adminPage('submissions', 'Submissions', <AdminSubmissionsRoute />),
-			adminPage('verification', 'Verification queue', <AdminVerificationRoute />),
-			adminPage('curation', 'Curation queue', <AdminCurationRoute />),
-			adminPage('reports', 'Reports', <AdminReportsRoute />),
-			adminPage('authors', 'Authors', <AdminAuthorsRoute />),
-			adminPage('sources', 'Sources', <AdminSourcesRoute />),
-			adminPage('topics', 'Topics', <AdminTopicsRoute />),
-			adminPage('users', 'Users', <AdminUsersRoute />),
-			adminPage('releases', 'Dataset releases', <AdminReleasesRoute />),
-			adminPage('audit', 'Audit logs')
+			adminPage('quotes', <AdminQuotesRoute />),
+			adminPage('submissions', <AdminSubmissionsRoute />),
+			adminPage('verification', <AdminVerificationRoute />),
+			adminPage('curation', <AdminCurationRoute />),
+			adminPage('reports', <AdminReportsRoute />),
+			adminPage('authors', <AdminAuthorsRoute />),
+			adminPage('sources', <AdminSourcesRoute />),
+			adminPage('topics', <AdminTopicsRoute />),
+			adminPage('users', <AdminUsersRoute />),
+			adminPage('releases', <AdminReleasesRoute />),
+			adminPage('audit', <AdminAuditRoute />)
 		]
 	},
 	// Dev only: the kit gallery the component tests compare with qotm_kit.
