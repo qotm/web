@@ -25,7 +25,11 @@ import { useQuoteActions } from '@/features/quotes/use-quote-actions';
 
 const section = 'border-t border-border py-section';
 
-/** The hero's terminal: a real curated quote, as `qotm` prints it. */
+/**
+ * The hero's terminal: a real curated quote, drawn as `qotm` draws it by
+ * default (the CLI's pull quote, cli/src/render.ts): clay marks hanging left
+ * of a balanced column, then the credit and the quote's id.
+ */
 function TerminalDemo({ text, author, id }: { text?: string; author?: string; id?: string }) {
 	return (
 		<Terminal title="~">
@@ -33,14 +37,20 @@ function TerminalDemo({ text, author, id }: { text?: string; author?: string; id
 				<Prompt /> qotm
 			</div>
 			{text ? (
-				<>
-					<div className="mt-stack mb-1.5 text-quote-sm font-semibold">{text}</div>
-					<div className="text-dark-muted">
-						<Prompt>—</Prompt>
-						{'  '}
-						{author}
+				<div className="mt-[1.5em] flex gap-[2ch] pl-[2ch]">
+					<span aria-hidden="true" className="w-[5ch] shrink-0 whitespace-pre text-dark-accent">
+						{'▄▄ ▄▄\n▀█ ▀█'}
+					</span>
+					<div className="min-w-0 max-w-[60ch]">
+						<div className="font-semibold text-balance">{text}</div>
+						<div className="mt-[1.5em] whitespace-pre-wrap text-dark-muted">
+							<span className="text-dark-accent">—</span>
+							{'  '}
+							{author}
+							{id ? <span>{`  ·  ${paths.quote(id).slice(1)}`}</span> : null}
+						</div>
 					</div>
-				</>
+				</div>
 			) : (
 				<div className="mt-stack mb-1.5">
 					<Skeleton lines={2} />
