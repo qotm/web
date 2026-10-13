@@ -10,7 +10,7 @@ test.describe('kit: admin', () => {
 			page,
 			'DataTable',
 			[
-				['.qk-table-wrap', 'css::scope > div:first-child'],
+				['.qk-table-wrap', 'css:[data-table-box]'],
 				['.qk-table', 'css:table'],
 				['.qk-table th:nth-child(2)', 'css:th:nth-child(2)'],
 				['.qk-table th.qk-table__sel', 'css:th:first-child'],

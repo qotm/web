@@ -21,7 +21,7 @@ type SideNavProps = Omit<React.ComponentProps<'nav'>, 'onSelect'> & {
 };
 
 const itemClasses =
-	'flex w-full items-center justify-between gap-2 rounded-control border-0 bg-transparent px-3 py-[7px] text-left font-sans text-[15px]/[1.6] text-ink no-underline transition-colors duration-[180ms] hover:bg-card hover:text-ink aria-[current=page]:bg-card aria-[current=page]:font-medium aria-[current=page]:shadow-[inset_0_0_0_1px_var(--color-border)]';
+	'flex w-full items-center justify-between gap-2 rounded-control border-0 bg-transparent px-3 py-[7px] pointer-coarse:py-2.5 text-left font-sans text-[15px]/[1.6] text-ink no-underline transition-colors duration-[180ms] hover:bg-card hover:text-ink aria-[current=page]:bg-card aria-[current=page]:font-medium aria-[current=page]:shadow-[inset_0_0_0_1px_var(--color-border)]';
 
 /** qotm_kit SideNav: the admin console's grouped navigation, with counts and attention markers. */
 function SideNav({ sections, active, onSelect, className, ...props }: SideNavProps) {

@@ -3,7 +3,7 @@ import { COUNTS_POLL_MS, useAdminCountsQuery } from '@/features/admin/api';
 import { useMeQuery } from '@/features/account/api';
 import { useAuth } from '@/shared/auth';
 import { ErrorBoundary } from '@/shared/layouts';
-import { Avatar, SideNav, SiteHeader, StatusBadge, TextLink, cn } from '@/shared/ui';
+import { Avatar, ConsoleMenu, SideNav, SiteHeader, StatusBadge, TextLink, cn } from '@/shared/ui';
 import { ADMIN_BASE, adminPaths, paths } from '@/lib/paths';
 import { ADMIN_SECTIONS, canOpen, rolesOf, type AdminPage } from './nav';
 
@@ -26,7 +26,8 @@ function shownRole(role?: string | null) {
 /**
  * The console: the admin header (view site, the role badge, the avatar) over
  * the sidebar and the page, at 1180. The sidebar lists only the pages the
- * role may open, with live queue sizes. Under 760 the sidebar sits above.
+ * role may open, with live queue sizes. Under 1024 it folds into the Console
+ * menu, a bar above the page, so a tablet's page gets the full width.
  */
 export function AdminShell() {
 	const { user } = useAuth();
@@ -53,11 +54,11 @@ export function AdminShell() {
 		<ErrorBoundary>
 			<div className="flex min-h-screen flex-col bg-background">
 				<SiteHeader items={[{ id: 'admin', label: 'admin', to: ADMIN_BASE }]} active="" wide collapse={false}>
-					<TextLink to={paths.home} variant="quiet" mono>
+					<TextLink to={paths.home} variant="quiet" mono className="tap whitespace-nowrap">
 						view site
 					</TextLink>
 					<StatusBadge status={shownRole(role)} />
-					<Link to={me ? paths.profile(me.handle) : paths.home} aria-label="Your profile" className="border-0">
+					<Link to={me ? paths.profile(me.handle) : paths.home} aria-label="Your profile" className="tap border-0">
 						<Avatar name={me?.name ?? user?.name} handle={me?.handle} src={me?.image ?? user?.image} />
 					</Link>
 				</SiteHeader>
@@ -65,10 +66,12 @@ export function AdminShell() {
 					<div
 						className={cn(
 							'mx-auto box-content grid max-w-site-wide grid-cols-[240px_minmax(0,1fr)] gap-10 px-page pt-page pb-14',
-							'narrow:grid-cols-1 narrow:gap-card-y'
+							'max-lg:grid-cols-1 max-lg:gap-card-y'
 						)}
 					>
-						<SideNav aria-label="Console" sections={sections} active={active} className="narrow:w-full" />
+						<SideNav aria-label="Console" sections={sections} active={active} className="max-lg:hidden" />
+						{/* Under 1024 (a tablet or a phone) the sidebar is one bar that opens the console's sections. */}
+						<ConsoleMenu sections={sections} active={active} className="lg:hidden" />
 						<main className="min-w-0">
 							<Outlet />
 						</main>

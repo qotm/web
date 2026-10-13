@@ -87,6 +87,18 @@ backend's e2e suite: both use the test database.
   only through `src/lib/env.ts`.
 - **`PageMeta` on every screen** (`title` is the page's own segment; the brand
   is appended). Admin and error pages pass `robots="noindex"`.
+- **Phones and tablets.** No screen may scroll sideways at 360px
+  (`e2e/responsive.spec.ts` checks one screen per ticket at 360 and 768).
+  Small controls carry the `tap` utility (globals.css: a 44px hit area on
+  touch screens, no visual change); fields are 44px and 16px text on touch
+  (`pointer-coarse:`), so iOS does not zoom. Components that must reflow by
+  their own width use container queries (`@container`, `@min-[480px]:`):
+  DataTable rows become cards under 480px, LifecycleSteps goes compact under
+  560px. The admin sidebar is the Console menu under 1024px. The patterns are
+  on the canvas's Mobile page. `AUDIT=1 yarn test:e2e e2e/mobile-audit.spec.ts`
+  screenshots every screen at 390/360/768 and lists overflow, small tap
+  targets and tiny text (e2e/.screenshots/audit/report.json); the screen list
+  is e2e/shots.ts.
 - `brand.ts` and `theme-colors.ts` stay free of React and `import.meta.env`:
   `vite.config.ts` imports them.
 

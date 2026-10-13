@@ -58,6 +58,7 @@ export * from './components/people/profile-header';
 export * from './components/people/contribution-row';
 // Admin (qotm_kit)
 export * from './components/admin/data-table';
+export * from './components/admin/console-menu';
 export * from './components/admin/stat-card';
 export * from './components/admin/release-summary';
 export * from './components/admin/review-decision';

@@ -20,13 +20,14 @@ const columns = [
 describe('DataTable', () => {
 	it('renders status as a badge and numbers with separators', () => {
 		render(<DataTable columns={columns} rows={rows} rowKey={(r) => r.id} />);
-		expect(screen.getByText('submitted')).toHaveAttribute('data-status', 'SUBMITTED');
-		expect(screen.getByText('1,200')).toBeInTheDocument();
+		const table = within(screen.getByRole('table'));
+		expect(table.getByText('submitted')).toHaveAttribute('data-status', 'SUBMITTED');
+		expect(table.getByText('1,200')).toBeInTheDocument();
 	});
 
 	it('shows the empty line across every column', () => {
 		render(<DataTable columns={columns} rows={[]} rowKey={(r: Row) => r.id} selectable empty="Nothing waiting." />);
-		expect(screen.getByText('Nothing waiting.')).toHaveAttribute('colspan', '4');
+		expect(within(screen.getByRole('table')).getByText('Nothing waiting.')).toHaveAttribute('colspan', '4');
 	});
 
 	it('selects rows and all, reporting the keys, and a checkbox does not open the row', () => {
@@ -42,10 +43,11 @@ describe('DataTable', () => {
 				onRowClick={onRowClick}
 			/>
 		);
-		fireEvent.click(screen.getByRole('checkbox', { name: 'Select q_2' }));
+		const table = within(screen.getByRole('table'));
+		fireEvent.click(table.getByRole('checkbox', { name: 'Select q_2' }));
 		expect(onSelect).toHaveBeenLastCalledWith(['q_2']);
 		expect(onRowClick).not.toHaveBeenCalled();
-		const all = screen.getByRole('checkbox', { name: 'Select all' }) as HTMLInputElement;
+		const all = table.getByRole('checkbox', { name: 'Select all' }) as HTMLInputElement;
 		expect(all.indeterminate).toBe(true);
 		fireEvent.click(all);
 		expect(onSelect).toHaveBeenLastCalledWith(['q_1', 'q_2']);
@@ -71,6 +73,37 @@ describe('DataTable', () => {
 		fireEvent.keyDown(row, { key: ' ' });
 		fireEvent.keyDown(row, { key: 'a' });
 		expect(onRowClick).toHaveBeenCalledTimes(3);
+	});
+});
+
+describe('DataTable as cards (a phone)', () => {
+	it('puts the id, state and end on top, the main column as the title and the rest as meta', () => {
+		render(<DataTable columns={columns} rows={rows} rowKey={(r) => r.id} />);
+		const card = within(screen.getAllByRole('listitem')[0]!);
+		expect(card.getByText('q_1')).toBeInTheDocument();
+		expect(card.getByText('submitted')).toHaveAttribute('data-status', 'SUBMITTED');
+	});
+
+	it('opens a card like a row, and selects with its own checkbox', () => {
+		const onRowClick = vi.fn();
+		const onSelect = vi.fn();
+		render(
+			<DataTable
+				columns={columns}
+				rows={rows}
+				rowKey={(r) => r.id}
+				selectable
+				onSelect={onSelect}
+				onRowClick={onRowClick}
+				rowLabel={(r) => `Open ${r.id}`}
+			/>
+		);
+		const card = screen.getByRole('listitem', { name: 'Open q_2' });
+		fireEvent.keyDown(card, { key: 'Enter' });
+		expect(onRowClick).toHaveBeenCalledTimes(1);
+		fireEvent.click(within(card).getByRole('checkbox', { name: 'Select q_2' }));
+		expect(onSelect).toHaveBeenLastCalledWith(['q_2']);
+		expect(onRowClick).toHaveBeenCalledTimes(1);
 	});
 });
 

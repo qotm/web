@@ -44,7 +44,7 @@ function ReleaseSummary({ release: r, onBuildPreview, onPublish, busy = false, c
 				className
 			)}
 		>
-			<div className="flex items-start justify-between">
+			<div className="flex flex-wrap items-start justify-between gap-2">
 				<div>
 					<Eyebrow className="mb-1.5">Dataset release</Eyebrow>
 					<h3 className="m-0 font-mono text-[22px]/[1.15] font-medium tracking-normal">{version}</h3>

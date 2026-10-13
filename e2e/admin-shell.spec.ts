@@ -71,15 +71,29 @@ test.describe('admin shell', () => {
 		await expect(sidebar(page).getByRole('link')).toHaveText([/Submissions/, /Reports/]);
 	});
 
-	test('under 760 the sidebar sits above the page, without sideways scroll', async ({ page }) => {
+	test('under 760 the sidebar folds into the Console menu above the page', async ({ page }) => {
 		await signIn(page, 'admin');
-		await page.setViewportSize({ width: 760, height: 900 });
-		await page.goto('/admin');
-		const nav = await sidebar(page).boundingBox();
+		await page.setViewportSize({ width: 390, height: 844 });
+		await page.goto('/admin/verification');
+		const bar = page.getByRole('button', { name: /Console\s*Verification queue/ });
+		const box = await bar.boundingBox();
 		const main = await page.getByRole('main').boundingBox();
-		expect(main!.y).toBeGreaterThan(nav!.y + nav!.height - 1);
-		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(760);
-		// The sidebar is the navigation here: no folded header menu.
+		expect(main!.y).toBeGreaterThan(box!.y + box!.height - 1);
+		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+		await expect(bar).toHaveAttribute('aria-expanded', 'false');
+		await bar.click();
+		await expect(bar).toHaveAttribute('aria-expanded', 'true');
+		await expect(sidebar(page).getByRole('link', { name: /Verification queue/ })).toHaveAttribute(
+			'aria-current',
+			'page'
+		);
+		await page.keyboard.press('Escape');
+		await expect(bar).toHaveAttribute('aria-expanded', 'false');
+		await bar.click();
+		await sidebar(page).getByRole('link', { name: 'Users' }).click();
+		await expect(page).toHaveURL(/\/admin\/users$/);
+		await expect(page.getByRole('button', { name: /Console\s*Users/ })).toHaveAttribute('aria-expanded', 'false');
+		// The Console menu is the navigation here: no folded header menu.
 		await expect(page.getByRole('button', { name: 'Menu' })).toHaveCount(0);
 	});
 });
