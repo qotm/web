@@ -6,6 +6,8 @@ import type {
 	TopicEntity
 } from '../src/shared/types/api/types.gen.ts';
 import { paths } from '../src/lib/paths.ts';
+import type { LegalBlock, LegalDoc } from '../src/features/legal/documents.ts';
+import { inline } from '../src/features/legal/inline.ts';
 
 /**
  * Plain HTML for `#root`: what a page says, for crawlers that do not run the
@@ -99,4 +101,31 @@ export function topicIndexBody(description: string, topics: TopicEntity[]): stri
 
 export function profileBody(p: ProfileEntity): string {
 	return page(`<h1>${e(p.name || `@${p.handle}`)}</h1><p>@${e(p.handle)}</p>${p.bio ? `<p>${e(p.bio)}</p>` : ''}`);
+}
+
+const rich = (source: string) =>
+	inline(source)
+		.map((p) =>
+			'strong' in p
+				? `<b>${e(p.strong)}</b>`
+				: 'code' in p
+					? `<code>${e(p.code)}</code>`
+					: 'link' in p
+						? a(p.href, p.link)
+						: e(p.text)
+		)
+		.join('');
+
+const block = (b: LegalBlock) =>
+	typeof b === 'string' ? `<p>${rich(b)}</p>` : `<ul>${b.list.map((item) => `<li>${rich(item)}</li>`).join('')}</ul>`;
+
+/** A legal document in full: the terms and the privacy policy are pages worth reading without the app. */
+export function legalBody(doc: LegalDoc): string {
+	return page(
+		`<h1>${e(doc.title)}</h1><p>Last updated ${e(doc.updated)}</p>` +
+			`<h2>The short version</h2><ul>${doc.summary.map((s) => `<li>${rich(s)}</li>`).join('')}</ul>` +
+			doc.sections
+				.map((s) => `<section id="${e(s.id)}"><h2>${e(s.heading)}</h2>${s.blocks.map(block).join('')}</section>`)
+				.join('')
+	);
 }

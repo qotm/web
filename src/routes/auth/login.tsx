@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Form, Formik } from 'formik';
-import { Navigate, useSearchParams } from 'react-router';
+import { Link, Navigate, useSearchParams } from 'react-router';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { getSafeRedirect, useAuth } from '@/shared/auth';
 import { Button, Card, Divider, FormField, Logo, Notice, PageMeta, socialMark } from '@/shared/ui';
 import { DeviceCode, SignInAside } from '@/features/auth/components/sign-in-aside';
 import { linkError, sendMagicLink, signInWithProvider, type SocialProvider } from '@/features/auth/lib/auth-actions';
 import { magicLinkSchema } from '@/features/auth/lib/schemas';
+import { paths } from '@/lib/paths';
 
 const PROVIDERS: { id: SocialProvider; label: string }[] = [
 	{ id: 'google', label: 'Google' },
@@ -128,7 +129,15 @@ export function LoginRoute() {
 						</Formik>
 					)}
 					<p className="m-0 font-mono text-[13px] text-muted-foreground">
-						New here? The same link creates your account.
+						New here? The same link creates your account. By signing in you agree to the{' '}
+						<Link to={paths.terms} className="text-foreground underline underline-offset-2">
+							terms
+						</Link>{' '}
+						and the{' '}
+						<Link to={paths.privacy} className="text-foreground underline underline-offset-2">
+							privacy policy
+						</Link>
+						.
 					</p>
 				</div>
 			</Card>

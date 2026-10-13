@@ -32,7 +32,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 		links: [
 			{ id: 'sub', label: 'submit a quote', to: paths.submit },
 			// No guidelines page in the plan: the terms carry the contribution rules.
-			{ id: 'g', label: 'guidelines', to: paths.terms },
+			{ id: 'g', label: 'guidelines', to: `${paths.terms}#submitting` },
 			{ id: 'r', label: 'dataset releases', to: paths.curated }
 		]
 	},

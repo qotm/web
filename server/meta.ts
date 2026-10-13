@@ -9,7 +9,8 @@ import { paths } from '../src/lib/paths.ts';
 import { BRAND } from '../src/shared/ui/meta/brand.ts';
 import { NOT_INDEXED } from '../src/shared/ui/meta/indexing.ts';
 import { author as authorLd, breadcrumbs, quotation, website, type JsonLd } from './jsonld.ts';
-import { authorBody, feedBody, homeBody, profileBody, quoteBody, topicBody } from './prerender.ts';
+import { PRIVACY, TERMS } from '../src/features/legal/documents.ts';
+import { authorBody, feedBody, homeBody, legalBody, profileBody, quoteBody, topicBody } from './prerender.ts';
 
 /**
  * The tags a crawler needs for one page: crawlers and link unfurlers do not
@@ -152,11 +153,13 @@ const STATIC: Record<string, { title: string; exact?: boolean; description: stri
 		description: "The topics qotm's quotes are filed under, each with its own feed."
 	},
 	[paths.search()]: { title: 'Search', description: 'Search qotm’s quotes, authors and topics.', noindex: true },
-	[paths.terms]: { title: 'Terms of Service', description: 'The terms for using qotm.' },
-	[paths.privacy]: { title: 'Privacy Policy', description: 'What qotm stores about you, and why.' }
+	[paths.terms]: { title: TERMS.title, description: TERMS.description },
+	[paths.privacy]: { title: PRIVACY.title, description: PRIVACY.description }
 };
 
 export const STATIC_PATHS = Object.keys(STATIC);
+
+const LEGAL: Record<string, typeof TERMS> = { [TERMS.path]: TERMS, [PRIVACY.path]: PRIVACY };
 
 /**
  * A page that is not about one record. The home page and the feeds list
@@ -175,7 +178,13 @@ export function staticTags(path: string, site: Site, quotes: QuoteCardEntity[] =
 		image: siteCard(site),
 		noindex: page.noindex,
 		jsonLd: home ? website(site.origin) : undefined,
-		body: home ? homeBody(quotes) : quotes.length ? feedBody(page.title, page.description, quotes) : undefined
+		body: home
+			? homeBody(quotes)
+			: LEGAL[path]
+				? legalBody(LEGAL[path])
+				: quotes.length
+					? feedBody(page.title, page.description, quotes)
+					: undefined
 	};
 }
 

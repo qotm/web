@@ -104,7 +104,20 @@ export function SiteShell() {
 						<Outlet />
 					</div>
 				</main>
-				<SiteFooter columns={FOOTER_COLUMNS} />
+				<SiteFooter
+					columns={FOOTER_COLUMNS}
+					note={
+						<span className="flex flex-wrap gap-x-4 gap-y-1">
+							<span>MIT · github.com/wesscoby/qotm</span>
+							<Link to={paths.terms} className="tap text-muted-foreground no-underline hover:text-clay-600">
+								terms
+							</Link>
+							<Link to={paths.privacy} className="tap text-muted-foreground no-underline hover:text-clay-600">
+								privacy
+							</Link>
+						</span>
+					}
+				/>
 			</div>
 		</ErrorBoundary>
 	);

@@ -130,6 +130,10 @@ describe('page tags', () => {
 			image: { url: 'https://qotm.site/og.png' }
 		});
 		expect(staticTags('/latest', SITE)?.title).toBe('Latest · qotm');
+		const terms = staticTags('/terms', SITE)!;
+		expect(terms.title).toBe('Terms of Service · qotm');
+		expect(terms.body).toContain('<section id="your-content"><h2>Who owns what you submit</h2>');
+		expect(staticTags('/privacy', SITE)?.body).toContain('<a href="mailto:privacy@qotm.dev">privacy@qotm.dev</a>');
 		expect(staticTags('/search', SITE)?.noindex).toBe(true);
 		expect(staticTags('/settings', SITE)).toBeNull();
 	});

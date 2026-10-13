@@ -55,8 +55,10 @@ backend's e2e suite: both use the test database.
   from `/v1/sitemap`), the RSS feeds `/feed.xml` and `/curated.xml`,
   `robots.txt`, the IndexNow key and `/healthz`. Quotes under review or
   disputed are `noindex` (`src/shared/ui/meta/indexing.ts`). It imports
-  `src/lib/paths.ts` and `src/shared/ui/meta/{brand,indexing}.ts` at
-  runtime, so keep those free of imports; the Dockerfile copies them.
+  `src/lib/paths.ts`, `src/shared/ui/meta/{brand,indexing}.ts` and
+  `src/features/legal/{documents,inline}.ts` (the terms and privacy policy,
+  sent to crawlers in full) at runtime, so keep those free of imports; the
+  Dockerfile copies them.
   Runtime env: `API_URL`, `SITE_URL`, `INDEXNOW_KEY` (optional), `PORT`,
   `DIST`. `yarn dev` (Vite) does not run it.
 - Imports use `@/` for `src/` (`@/shared/ui`, `@/routes/settings`).
