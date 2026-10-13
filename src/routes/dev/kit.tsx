@@ -734,7 +734,7 @@ const KIT_SECTIONS: Record<string, ReactNode> = {
 			</TextLink>{' '}
 			·{' '}
 			<TextLink data-probe="quiet-mono" href="#" variant="quiet" mono>
-				github.com/wesscoby/qotm
+				github.com/qotm
 			</TextLink>
 		</p>
 	),

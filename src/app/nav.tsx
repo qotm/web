@@ -40,7 +40,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 		title: 'CLI',
 		links: [
 			{ id: 'i', label: 'npm i -g qotm', to: '/' },
-			{ id: 'gh', label: 'github', href: 'https://github.com/wesscoby/qotm' }
+			{ id: 'gh', label: 'github', href: 'https://github.com/qotm' }
 		]
 	}
 ];

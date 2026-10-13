@@ -13,11 +13,16 @@ test.describe('site shell', () => {
 		const footer = page.getByRole('contentinfo');
 		for (const title of ['Read', 'Contribute', 'CLI'])
 			await expect(footer.getByText(title, { exact: true })).toBeVisible();
-		await expect(footer.getByRole('link', { name: 'github' })).toHaveAttribute(
+		await expect(footer.getByRole('link', { name: 'github', exact: true })).toHaveAttribute(
 			'href',
-			'https://github.com/wesscoby/qotm'
+			'https://github.com/qotm'
 		);
-		await expect(footer).toContainText('MIT · github.com/wesscoby/qotm');
+		await expect(footer).toContainText('MIT · github.com/qotm');
+		await expect(footer.getByRole('link', { name: 'github.com/qotm' })).toHaveAttribute(
+			'href',
+			'https://github.com/qotm'
+		);
+		await expect(footer.getByRole('link', { name: 'privacy' })).toHaveAttribute('href', '/privacy');
 	});
 
 	test('marks the current section in the nav', async ({ page }) => {

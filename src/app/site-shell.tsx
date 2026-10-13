@@ -108,7 +108,16 @@ export function SiteShell() {
 					columns={FOOTER_COLUMNS}
 					note={
 						<span className="flex flex-wrap gap-x-4 gap-y-1">
-							<span>MIT · github.com/wesscoby/qotm</span>
+							<span>
+								MIT ·{' '}
+								<a
+									href="https://github.com/qotm"
+									rel="noopener noreferrer"
+									className="tap text-muted-foreground no-underline hover:text-clay-600"
+								>
+									github.com/qotm
+								</a>
+							</span>
 							<Link to={paths.terms} className="tap text-muted-foreground no-underline hover:text-clay-600">
 								terms
 							</Link>

@@ -21,7 +21,7 @@ const linkClasses =
 function SiteFooter({
 	columns,
 	tagline = 'A thought between commands.',
-	note = 'MIT · github.com/wesscoby/qotm',
+	note = 'MIT · github.com/qotm',
 	wide = false,
 	className
 }: SiteFooterProps) {
