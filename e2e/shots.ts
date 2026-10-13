@@ -1,0 +1,165 @@
+import { E2E, apiAs, loginDevice, requestDeviceCode, sql, type USERS } from './fixtures';
+
+/**
+ * Every screen worth a screenshot, by the ticket that built it: the screens
+ * spec (Linear attachments) and the mobile audit both walk this list.
+ */
+export type Shot = {
+	name: string;
+	/** The page, or a function that prepares one (a device code) and returns it. */
+	path: string | ((page: import('@playwright/test').Page) => Promise<string>);
+	as?: keyof typeof USERS;
+	/** A button to press before the shot (a dialog). */
+	press?: string;
+	/** A radio to choose before the shot. */
+	choose?: RegExp;
+};
+
+export const SHOTS: Record<string, Shot[]> = {
+	'QOT-69': [
+		{ name: 'signed-out', path: '/' },
+		{ name: 'signed-in', path: '/discover', as: 'member' },
+		{ name: 'admin-menu', path: '/topics/debugging', as: 'admin' }
+	],
+	'QOT-77': [
+		{ name: 'login', path: '/login' },
+		{
+			name: 'login-for-terminal',
+			path: async () =>
+				`/login?redirect=${encodeURIComponent(`/device?user_code=${(await requestDeviceCode()).user_code}`)}`
+		},
+		{ name: 'device', path: async () => `/device?user_code=${(await requestDeviceCode()).user_code}`, as: 'member' }
+	],
+	'QOT-72': [
+		{ name: 'discover', path: '/discover', as: 'member' },
+		{ name: 'latest', path: '/latest', as: 'member' },
+		{ name: 'curated', path: '/curated', as: 'member' }
+	],
+	'QOT-73': [
+		{ name: 'canonical', path: '/q/8f2k1c', as: 'member' },
+		{ name: 'original', path: '/q/4r8y1p', as: 'member' },
+		{ name: 'share', path: '/q/8f2k1c', as: 'member', press: 'Share this quote' },
+		{ name: 'report', path: '/q/8f2k1c', as: 'member', press: 'report' }
+	],
+	'QOT-71': [{ name: 'landing', path: '/' }],
+	'QOT-74': [{ name: 'author', path: '/authors/dijkstra', as: 'member' }],
+	'QOT-75': [
+		{ name: 'topic', path: '/topics/debugging', as: 'member' },
+		{ name: 'topics', path: '/topics', as: 'member' }
+	],
+	'QOT-76': [
+		{ name: 'quotes', path: '/search?q=complexity', as: 'member' },
+		{ name: 'authors', path: '/search?q=dijkstra&type=authors', as: 'member' },
+		{ name: 'empty', path: '/search?q=dijkstra&type=topics', as: 'member' }
+	],
+	'QOT-78': [
+		{ name: 'canonical', path: '/submit', as: 'member' },
+		{ name: 'original', path: '/submit', as: 'member', choose: /My own original/ }
+	],
+	'QOT-79': [
+		{ name: 'quotes', path: '/@ada', as: 'member' },
+		{ name: 'contributions', path: '/@ada/contributions', as: 'member' }
+	],
+	'QOT-80': [
+		{
+			name: 'favorites',
+			as: 'member',
+			path: async (page) => {
+				for (const id of ['q_8f2k1c', 'q_1t7c4e', 'q_0h5w3q', 'q_3m9d0a', 'q_4r8y1p', 'q_7c1m4t'])
+					await page.request.post(`${E2E.api}/v1/quotes/${id}/favorite`, { headers: { Origin: E2E.web } });
+				return '/favorites';
+			}
+		}
+	],
+	'QOT-81': [
+		{
+			name: 'my-quotes',
+			as: 'member',
+			path: async () => {
+				const member = await apiAs('member');
+				const admin = await apiAs('admin');
+				const post = async (data: object) => (await member.post('/v1/submissions', { data })).json();
+				await post({ type: 'private', text: 'Ship the smallest thing that teaches you something.' });
+				const karlton = await post({
+					type: 'canonical',
+					text: 'There are only two hard things in Computer Science: cache invalidation and naming things, said twice.',
+					attribution: 'Phil Karlton',
+					source: 'Folklore',
+					topics: ['programming']
+				});
+				await admin.post(`/v1/admin/quotes/${karlton.id}/verification`, {
+					data: {
+						decision: 'needs_evidence',
+						note: 'Widely repeated, but I can’t find where Karlton said it. A first-hand account would do.'
+					}
+				});
+				await post({
+					type: 'canonical',
+					text: 'Premature optimization is the root of all evil, at least most of the time.',
+					attribution: 'Donald E. Knuth',
+					source: 'Structured Programming with go to Statements',
+					year: 1974,
+					topics: ['programming']
+				});
+				await post({
+					type: 'original',
+					text: 'A red build is a fact; a green one is a hypothesis.',
+					topics: ['software-engineering'],
+					rights: true
+				});
+				await member.dispose();
+				await admin.dispose();
+				return '/my-quotes';
+			}
+		}
+	],
+	'QOT-82': [
+		{
+			name: 'settings',
+			as: 'member',
+			path: async () => {
+				sql(`DELETE FROM devices WHERE user_id = (SELECT id FROM "user" WHERE email = 'test.user@example.com')`);
+				await loginDevice('member', 'ada-mbp');
+				await loginDevice('member', 'thinkpad-x1');
+				return '/settings';
+			}
+		}
+	],
+	'QOT-83': [{ name: 'dashboard', path: '/admin', as: 'admin' }],
+	'QOT-85': [{ name: 'submissions', path: '/admin/submissions?id=q_7w2e9n', as: 'admin' }],
+	'QOT-86': [{ name: 'verification', path: '/admin/verification?id=q_5k0q2j', as: 'verifier' }],
+	'QOT-87': [{ name: 'curation', path: '/admin/curation?id=q_4r8y1p', as: 'admin' }],
+	'QOT-88': [
+		{
+			name: 'reports',
+			as: 'moderator',
+			path: async () => {
+				// A report on a quote that shipped in v2026.08.3, as the artboard shows.
+				const moderator = await apiAs('moderator');
+				const res = await moderator.post('/v1/quotes/q_6f1k9s/reports', {
+					data: { reason: 'attribution', details: 'Usually credited to Kernighan alone; the book has both names.' }
+				});
+				const { id } = await res.json();
+				await moderator.dispose();
+				return `/admin/reports?id=${id}`;
+			}
+		}
+	],
+	'QOT-91': [
+		{ name: 'releases', path: '/admin/releases', as: 'admin' },
+		{ name: 'publish', path: '/admin/releases', as: 'admin', press: 'Publish' }
+	],
+	'QOT-84': [{ name: 'quotes', path: '/admin/quotes', as: 'admin' }],
+	'QOT-89': [
+		{ name: 'authors', path: '/admin/authors', as: 'admin' },
+		{ name: 'sources', path: '/admin/sources', as: 'admin' },
+		{ name: 'topics', path: '/admin/topics', as: 'admin' },
+		{ name: 'add-author', path: '/admin/authors', as: 'admin', press: 'Add author' }
+	],
+	'QOT-90': [{ name: 'users', path: '/admin/users', as: 'admin' }],
+	'QOT-92': [{ name: 'audit', path: '/admin/audit', as: 'admin' }],
+	'QOT-70': [
+		{ name: 'admin', path: '/admin', as: 'admin' },
+		{ name: 'verifier', path: '/admin', as: 'verifier' }
+	]
+};
