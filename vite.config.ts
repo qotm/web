@@ -2,8 +2,8 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
-import { BRAND } from './src/shared/ui/meta/brand';
-import { THEME_COLOR } from './src/shared/ui/theme/theme-colors';
+import { BRAND } from './src/shared/ui/meta/brand.ts';
+import { THEME_COLOR } from './src/shared/ui/theme/theme-colors.ts';
 
 /**
  * Opens the connection to the API origin while the HTML is still parsing.
