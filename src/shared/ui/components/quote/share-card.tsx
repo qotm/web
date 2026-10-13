@@ -8,6 +8,38 @@ const H = 630;
 /** The worker's floor (apps/worker share-images): below this a quote is not a card. */
 const MIN_FONT = 24;
 
+/**
+ * The CLI's marks, "▄▄ ▄▄" over "▀█ ▀█", drawn on their 5×2 cell grid (each
+ * cell two half-rows): the worker's PNG draws the same, since no bundled face
+ * has the block glyphs.
+ */
+const MARK_CELLS = [
+	[0, 1],
+	[1, 1],
+	[3, 1],
+	[4, 1],
+	[0, 2],
+	[1, 2],
+	[3, 2],
+	[4, 2],
+	[1, 3],
+	[4, 3]
+] as const;
+function Marks() {
+	return (
+		<svg
+			viewBox="0 0 5 4"
+			preserveAspectRatio="none"
+			className="block h-[2.9em] w-[3em] shrink-0 text-dark-accent"
+			fill="currentColor"
+		>
+			{MARK_CELLS.map(([x, y]) => (
+				<rect key={`${x}${y}`} x={x} y={y} width={1.02} height={1.02} />
+			))}
+		</svg>
+	);
+}
+
 type ShareCardProps = {
 	quote: string;
 	author: string;
@@ -28,7 +60,20 @@ type ShareCardProps = {
  */
 function ShareCard({ quote, author, variant = 'quote', id, width = 600, className }: ShareCardProps) {
 	const scale = width / W;
-	const start = quote.length <= 60 ? 60 : quote.length <= 100 ? 50 : 42;
+	// The terminal card sets its whole body at one size, as a terminal does.
+	const start =
+		variant === 'terminal'
+			? quote.length <= 60
+				? 42
+				: quote.length <= 120
+					? 36
+					: 30
+			: quote.length <= 60
+				? 60
+				: quote.length <= 100
+					? 50
+					: 42;
+	const floor = variant === 'terminal' ? 20 : MIN_FONT;
 	const [size, setSize] = React.useState(start);
 	const card = React.useRef<HTMLDivElement>(null);
 	// Fit again once the display face has loaded: the fallback measures differently.
@@ -57,16 +102,16 @@ function ShareCard({ quote, author, variant = 'quote', id, width = 600, classNam
 				? bottom('[data-share="by"]') <=
 					unscale(root.querySelector('[data-share="foot"]')!.getBoundingClientRect().top) - 24
 				: bottom('[data-share="cmd"]') <= H - 24;
-		while (!fits() && n > MIN_FONT) {
+		while (!fits() && n > floor) {
 			n -= 2;
 			q.style.fontSize = `${n}px`;
 		}
 		// Leaves the size it measured inline; the state carries it into React's render.
 		setSize(n);
-	}, [quote, author, variant, start, scale, fonts]);
+	}, [quote, author, variant, start, floor, scale, fonts]);
 
 	const terminal = variant === 'terminal';
-	const by = (
+	const by = terminal ? null : (
 		<div
 			data-share="by"
 			className={cn('font-mono text-[26px]', terminal ? 'mt-0 mb-[68px] text-stone-400' : 'mt-9 text-stone-600')}
@@ -74,7 +119,7 @@ function ShareCard({ quote, author, variant = 'quote', id, width = 600, classNam
 			<span className={cn('mr-[18px]', terminal ? 'text-dark-accent' : 'text-clay-500')}>—</span> {author}
 		</div>
 	);
-	const text = (
+	const text = terminal ? null : (
 		<div
 			data-share="quote"
 			className={cn(
@@ -111,15 +156,25 @@ function ShareCard({ quote, author, variant = 'quote', id, width = 600, classNam
 								<i key={i} className="block size-[22px] rounded-[50%] bg-stone-600" />
 							))}
 						</div>
-						<div className="px-[72px] py-[60px] font-mono">
-							<div data-share="cmd" className="text-[36px]">
+						{/* The CLI's default pull quote (cli/src/render.ts), at one size throughout. */}
+						<div data-share="quote" className="px-[72px] pt-[44px] font-mono leading-[1.45]" style={{ fontSize: size }}>
+							<div>
 								<span className="text-dark-accent">~ &gt;</span> qotm
 							</div>
-							{text}
-							{by}
-							<div data-share="cmd" className="text-[36px]">
+							<div className="mt-[1.45em] flex gap-[2ch] pl-[2ch]">
+								<Marks />
+								<div className="min-w-0">
+									<div className="font-bold text-balance">{quote}</div>
+									<div data-share="by" className="mt-[1.45em] whitespace-pre-wrap text-stone-400">
+										<span className="text-dark-accent">—</span>
+										{`  ${author}`}
+										{id ? <span className="text-stone-600">{`  ·  q/${id.replace(/^q_/, '')}`}</span> : null}
+									</div>
+								</div>
+							</div>
+							<div data-share="cmd" className="mt-[1.45em]">
 								<span className="text-dark-accent">~ &gt;</span>{' '}
-								<span className="ml-[50px] inline-block h-11 w-6 bg-dark-foreground align-[-8px]" />
+								<span className="inline-block h-[1.1em] w-[0.6em] translate-y-[0.2em] bg-dark-foreground" />
 							</div>
 						</div>
 					</>

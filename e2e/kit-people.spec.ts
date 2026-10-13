@@ -5,7 +5,10 @@ const TEXT = [...VISUAL, 'line-height', 'text-transform', 'margin-top', 'padding
 
 /** QOT-67: ShareCard, AuthorHeader, ProfileHeader and ContributionRow against qotm_kit. */
 test.describe('kit: people and sharing', () => {
-	test('ShareCard matches the kit, quote and terminal, at the same scale and fit', async ({ page }) => {
+	// The terminal card left the kit on 2026-10-13: it is the CLI's pull quote
+	// now (cli/src/render.ts), checked in its own test below; only its window
+	// (the ink ground and the bar) still matches the kit.
+	test('ShareCard matches the kit: the quote card, and the terminal card’s window', async ({ page }) => {
 		const quote = 'css:[role="img"]:nth-child(1)';
 		const term = 'css:[role="img"]:nth-child(2)';
 		await expectMatchesKit(
@@ -18,19 +21,9 @@ test.describe('kit: people and sharing', () => {
 				['.qk-share--quote .qk-share__by', `${quote} [data-share="by"]`],
 				['.qk-share__foot', `${quote} [data-share="foot"]`],
 				['.qk-share--terminal', `${term} > div`],
-				['.qk-share__bar', `${term} > div > div:first-child`],
-				['.qk-share--terminal .qk-share__by', `${term} [data-share="by"]`],
-				['.qk-share__cmd', `${term} [data-share="cmd"]`]
+				['.qk-share__bar', `${term} > div > div:first-child`]
 			],
 			[...TEXT, 'transform']
-		);
-		// The terminal quote's size is the worker's fit (next test), so its
-		// size and height differ from the unfitted preview; the rest matches.
-		await expectMatchesKit(
-			page,
-			'ShareCard',
-			[['.qk-share--terminal .qk-share__quote', `${term} [data-share="quote"]`]],
-			TEXT.filter((p) => !['font-size', 'height', 'line-height'].includes(p))
 		);
 		// The quote card's clay edge (16px at full size).
 		const card = page.locator('[role="img"]').first().locator('> div');
@@ -67,7 +60,27 @@ test.describe('kit: people and sharing', () => {
 		const sizes = await ours
 			.locator('[data-share="quote"]')
 			.evaluateAll((els) => els.map((el) => parseFloat(getComputedStyle(el).fontSize)));
-		expect(sizes).toEqual(worker);
+		// The quote card only: the terminal card is no longer the kit's.
+		expect(sizes[0]).toEqual(worker[0]);
+	});
+
+	test('the terminal card is the CLI’s pull quote: prompt, marks, the column, the credit, a cursor', async ({
+		page
+	}) => {
+		await page.goto('/_kit?only=ShareCard');
+		const card = page.locator('[role="img"]').nth(1);
+		const body = card.locator('[data-share="quote"]');
+		await expect(body).toContainText('~ > qotm');
+		await expect(body.locator('svg rect')).toHaveCount(10);
+		await expect(body.locator('[data-share="by"]')).toContainText('—  Edsger W. Dijkstra');
+		// One size throughout, as a terminal: 42px for a short quote, less if it must.
+		await expect(body).toHaveCSS('font-family', /JetBrains Mono/);
+		const size = await body.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+		expect(size).toBeLessThanOrEqual(42);
+		expect(size).toBeGreaterThanOrEqual(20);
+		const cmd = (await body.locator('[data-share="cmd"]').boundingBox())!;
+		const frame = (await card.boundingBox())!;
+		expect(cmd.y + cmd.height).toBeLessThanOrEqual(frame.y + frame.height);
 	});
 
 	test('ShareCard steps a long quote down until it fits, as the worker does', async ({ page }) => {
