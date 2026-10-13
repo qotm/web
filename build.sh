@@ -15,8 +15,8 @@ set -eu
 
 ENV_NAME="${1:-dev}"
 TAG="${2:-latest}"
-REGISTRY="${REGISTRY:-registry.example.com/qotm-web}"
-IMAGE="${IMAGE:-web}"
+REGISTRY="${REGISTRY:-aurostack.dev/qotm}"
+IMAGE="${IMAGE:-qotm-web}"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 
 case "$ENV_NAME" in
