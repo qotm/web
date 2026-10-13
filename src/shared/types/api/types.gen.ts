@@ -231,6 +231,21 @@ export type RelatedQuotesEntity = {
     list: Array<QuoteCardEntity>;
 };
 
+export type SitemapEntity = {
+    quotes: Array<{
+        id: string;
+        updatedAt: string;
+    }>;
+    authors: Array<{
+        slug: string;
+        updatedAt: string;
+    }>;
+    topics: Array<{
+        slug: string;
+        updatedAt: string;
+    }>;
+};
+
 export type SubmitQuote = {
     type: 'canonical';
     text: string;
@@ -658,6 +673,7 @@ export type AuthorEntity = {
     bornYear: number | null;
     diedYear: number | null;
     description: string | null;
+    wikidataId: string | null;
     line: string;
     topics: Array<{
         slug: string;
@@ -1276,6 +1292,19 @@ export type QuotesIdRelatedResponses = {
 
 export type QuotesIdRelatedResponse = QuotesIdRelatedResponses[keyof QuotesIdRelatedResponses];
 
+export type SitemapData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/sitemap';
+};
+
+export type SitemapResponses = {
+    200: SitemapEntity;
+};
+
+export type SitemapResponse = SitemapResponses[keyof SitemapResponses];
+
 export type SubmissionsCreateData = {
     body: SubmitQuote;
     path?: never;
@@ -1685,12 +1714,85 @@ export type QuotesIdOgPngErrors = {
 
 export type QuotesIdOgPngResponses = {
     /**
-     * A placeholder; a render is queued
+     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
      */
     200: Blob | File;
 };
 
 export type QuotesIdOgPngResponse = QuotesIdOgPngResponses[keyof QuotesIdOgPngResponses];
+
+export type AuthorsSlugOgPngData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/authors/{slug}/og.png';
+};
+
+export type AuthorsSlugOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type AuthorsSlugOgPngResponses = {
+    /**
+     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     */
+    200: Blob | File;
+};
+
+export type AuthorsSlugOgPngResponse = AuthorsSlugOgPngResponses[keyof AuthorsSlugOgPngResponses];
+
+export type TopicsSlugOgPngData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/topics/{slug}/og.png';
+};
+
+export type TopicsSlugOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type TopicsSlugOgPngResponses = {
+    /**
+     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     */
+    200: Blob | File;
+};
+
+export type TopicsSlugOgPngResponse = TopicsSlugOgPngResponses[keyof TopicsSlugOgPngResponses];
+
+export type OgPngData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/og.png';
+};
+
+export type OgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type OgPngResponses = {
+    /**
+     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     */
+    200: Blob | File;
+};
+
+export type OgPngResponse = OgPngResponses[keyof OgPngResponses];
 
 export type QuotesIdReportsData = {
     body: CreateReport;

@@ -394,6 +394,21 @@ export const zRelatedQuotesEntity = z.object({
     list: z.array(zQuoteCardEntity)
 });
 
+export const zSitemapEntity = z.object({
+    quotes: z.array(z.object({
+        id: z.string(),
+        updatedAt: z.string().datetime()
+    })),
+    authors: z.array(z.object({
+        slug: z.string(),
+        updatedAt: z.string().datetime()
+    })),
+    topics: z.array(z.object({
+        slug: z.string(),
+        updatedAt: z.string().datetime()
+    }))
+});
+
 export const zSubmitQuote = z.unknown();
 
 export const zAddEvidence = z.object({
@@ -1012,6 +1027,7 @@ export const zAuthorEntity = z.object({
     bornYear: z.unknown(),
     diedYear: z.unknown(),
     description: z.unknown(),
+    wikidataId: z.unknown(),
     line: z.string(),
     topics: z.array(z.object({
         slug: z.string(),

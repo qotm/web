@@ -44,13 +44,21 @@ backend's e2e suite: both use the test database.
   redirects), `layouts/` (shells, state screens), `hooks/`, `types/`
   (generated API types).
 - `server/`: the web image's Node server (no dependencies; Node runs the
-  TypeScript directly). It serves `dist/`, writes the title, description,
-  canonical URL and Open Graph tags into index.html for `/q/:id`,
-  `/authors/:slug` and `/topics/:slug` from the API, and serves
-  `sitemap.xml`, `robots.txt` and `/healthz`. It imports `src/lib/paths.ts`
-  and `src/shared/ui/meta/brand.ts` at runtime, so keep those two free of
-  imports; the Dockerfile copies them. Runtime env: `API_URL`, `PUBLIC_API_URL`
-  (og:image), `SITE_URL`, `PORT`, `DIST`.
+  TypeScript directly), which production runs. For every public page (a
+  quote, author, topic, profile, home, the feeds, topics, search, legal) it
+  writes the title, description, canonical URL, Open Graph / Twitter tags,
+  schema.org JSON-LD (`jsonld.ts`) and plain HTML for crawlers into `#root`
+  (`prerender.ts`; `createRoot` replaces it) from the API. It serves the
+  og:images on this origin (`/q/:id/og.png`, `/authors/:slug/og.png`,
+  `/topics/:slug/og.png`, `/og.png`, streamed from the API, which waits for
+  the render), `/sitemap.xml` (an index of `/sitemaps/{pages,quotes,authors,topics}.xml`
+  from `/v1/sitemap`), the RSS feeds `/feed.xml` and `/curated.xml`,
+  `robots.txt`, the IndexNow key and `/healthz`. Quotes under review or
+  disputed are `noindex` (`src/shared/ui/meta/indexing.ts`). It imports
+  `src/lib/paths.ts` and `src/shared/ui/meta/{brand,indexing}.ts` at
+  runtime, so keep those free of imports; the Dockerfile copies them.
+  Runtime env: `API_URL`, `SITE_URL`, `INDEXNOW_KEY` (optional), `PORT`,
+  `DIST`. `yarn dev` (Vite) does not run it.
 - Imports use `@/` for `src/` (`@/shared/ui`, `@/routes/settings`).
 
 ## Rules

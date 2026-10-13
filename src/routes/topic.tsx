@@ -31,10 +31,7 @@ function TopicIndex() {
 	const { data, isLoading, isError, refetch } = useTopicsQuery();
 	return (
 		<>
-			<PageMeta
-				title="Topics"
-				description="The fifteen topics qotm's quotes are filed under, each with its own feed."
-			/>
+			<PageMeta title="Topics" description="The topics qotm's quotes are filed under, each with its own feed." />
 			<header className="pt-page pb-2">
 				<Eyebrow>Topics</Eyebrow>
 				<h1 className="m-0 mb-2.5 text-h1">Topics.</h1>
@@ -113,7 +110,7 @@ export function TopicRoute() {
 			<>
 				<PageMeta
 					title={title(topic.name)}
-					description={`Programming quotes on ${topic.name}, each with its source: ${n(topic.counts.quotes)} on qotm, ${n(topic.counts.curated)} in the CLI dataset.`}
+					description={`Quotes on ${topic.name}, each with its source: ${n(topic.counts.quotes)} on qotm, ${n(topic.counts.curated)} in the CLI dataset.`}
 					canonical={`${window.location.origin}${paths.topic(topic.slug)}`}
 				/>
 				<header className="flex flex-wrap items-end justify-between gap-page pt-page pb-2 narrow:flex-col narrow:items-stretch">

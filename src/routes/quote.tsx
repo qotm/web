@@ -25,6 +25,7 @@ import {
 	type QuoteAction
 } from '@/shared/ui';
 import { paths } from '@/lib/paths';
+import { NOT_INDEXED } from '@/shared/ui/meta/indexing';
 import { useAuthorQuery, useQuoteQuery, useRelatedQuotesQuery } from '@/features/quotes/api';
 import { ReportDialog } from '@/features/quotes/components/report-dialog';
 import { ShareDialog } from '@/features/quotes/components/share-dialog';
@@ -168,7 +169,7 @@ export function QuoteRoute() {
 					original ? `“${q.text}” Declared original on qotm.` : `“${q.text}” — ${name}. Source and provenance on qotm.`
 				}
 				canonical={`${window.location.origin}${paths.quote(q.id)}`}
-				robots={withdrawn ? 'noindex' : undefined}
+				robots={withdrawn || NOT_INDEXED.includes(q.status) ? 'noindex' : undefined}
 			/>
 			{/* The quote itself is the page's subject; a heading names it for assistive tech. */}
 			<h1 className="sr-only">

@@ -2,28 +2,64 @@ import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extname, join, normalize, sep } from 'node:path';
 import { createGzip } from 'node:zlib';
-import type { AuthorEntity, QuoteEntity, TopicEntity } from '../src/shared/types/api/types.gen.ts';
-import { PRIVATE_PREFIXES } from '../src/lib/paths.ts';
-import { authorTags, inject, noindex, quoteTags, topicTags, type PageTags } from './meta.ts';
-import { httpGet, type HttpGet } from './http-get.ts';
-import { collectUrls, robotsTxt, sitemapXml } from './sitemap.ts';
+import type {
+	AuthorEntity,
+	ProfileEntity,
+	QuoteEntity,
+	QuoteFeedEntity,
+	TopicEntity,
+	TopicListEntity
+} from '../src/shared/types/api/types.gen.ts';
+import { PRIVATE_PREFIXES, paths } from '../src/lib/paths.ts';
+import { FEEDS, rssXml, type FeedPath } from './feed.ts';
+import { httpGet, httpGetBytes, type HttpGet, type HttpGetBytes } from './http-get.ts';
+import {
+	authorTags,
+	inject,
+	noindex,
+	profileTags,
+	quoteTags,
+	staticTags,
+	topicTags,
+	type PageTags,
+	type Site
+} from './meta.ts';
+import { topicIndexBody } from './prerender.ts';
+import {
+	SITEMAP_PARTS,
+	collectUrls,
+	robotsTxt,
+	sitemapIndexXml,
+	sitemapXml,
+	type SitemapPart,
+	type SitemapUrl
+} from './sitemap.ts';
 
 export type ServerConfig = {
 	/** The built app (`vite build`'s outDir). */
 	dist: string;
 	/** Where this server reaches the API (an internal address in production). */
 	api: string;
-	/** The API as the public reaches it: og:image URLs point here. */
-	publicApi: string;
-	/** This site's public origin, for canonical URLs, the sitemap and robots.txt. */
+	/** This site's public origin, for canonical URLs, og:images, the sitemap and robots.txt. */
 	site: string;
+	/** IndexNow's key: served at /<key>.txt so search engines trust the API's pings. */
+	indexNowKey?: string;
 	/** How long a page waits for the API before it is sent without its tags. */
 	timeoutMs?: number;
 	/** How long the sitemap and fetched tags are reused. */
 	cacheMs?: number;
 	/** The API client (tests pass their own). */
 	get?: HttpGet;
+	/** The og:image client: the API's image routes and the bucket they redirect to. */
+	getBytes?: HttpGetBytes;
 };
+
+/** The API waits up to 8s for a render before it answers with a fallback. */
+const OG_TIMEOUT_MS = 12_000;
+/** A rendered card never changes for its revision; the route may move to a new one. */
+const OG_RENDER_CACHE = 'public, max-age=86400, stale-while-revalidate=604800';
+/** How many quotes a crawlable page lists. */
+const LISTED = 20;
 
 class NotFound extends Error {}
 
@@ -83,18 +119,22 @@ function memo<T>(ms: number, max = 500) {
 }
 
 /**
- * The web image's server: the built SPA, with per-page title, description,
- * canonical URL and Open Graph / Twitter tags written into index.html for
- * /q/:id, /authors/:slug and /topics/:slug (crawlers and link unfurlers do
- * not run the app), plus /sitemap.xml, /robots.txt and /healthz.
+ * The web image's server: the built SPA, with each public page's title,
+ * description, canonical URL, Open Graph / Twitter tags, JSON-LD and plain
+ * HTML for crawlers written into index.html (crawlers and link unfurlers do
+ * not run the app); the og:images on this origin; /sitemap.xml and its
+ * parts, /robots.txt, the RSS feeds and /healthz.
  */
 export function createHandler(config: ServerConfig) {
-	const { dist, api, publicApi, site } = config;
+	const { dist, api, site: origin } = config;
+	const site: Site = { origin };
 	const timeoutMs = config.timeoutMs ?? 1500;
 	const request = config.get ?? httpGet;
+	const bytes = config.getBytes ?? httpGetBytes;
 	const index = readFileSync(join(dist, 'index.html'), 'utf8');
 	const tagsCache = memo<PageTags | null>(config.cacheMs ?? 60_000);
-	const sitemapCache = memo<string>(config.cacheMs ?? 3_600_000, 1);
+	const sitemapCache = memo<Record<SitemapPart, SitemapUrl[]>>(config.cacheMs ?? 3_600_000, 1);
+	const feedCache = memo<string>(config.cacheMs ?? 600_000, 4);
 
 	async function get<T>(path: string): Promise<T> {
 		const res = await request(`${api}${path}`, timeoutMs);
@@ -103,24 +143,64 @@ export function createHandler(config: ServerConfig) {
 		return JSON.parse(res.body) as T;
 	}
 
-	/** The tags for a path, null when it is not one of the three; NotFound when the API has no such page. */
-	function tagsFor(path: string): Promise<PageTags | null> | null {
+	/** A feed's first page; an empty list if the API fails, so a page's tags never depend on it. */
+	const firstQuotes = (query: string) =>
+		get<QuoteFeedEntity>(`/v1/quotes?${query}&limit=${LISTED}`).then(
+			(f) => f.list,
+			() => []
+		);
+
+	/** The tags for a path, null when it has none; NotFound when the API has no such page. */
+	function tagsFor(path: string, search: URLSearchParams): Promise<PageTags | null> | null {
 		let m = /^\/q\/([a-z0-9]{3,32})$/i.exec(path);
 		if (m) {
 			const id = `q_${m[1]}`;
-			return tagsCache(path, async () => quoteTags(await get<QuoteEntity>(`/v1/quotes/${id}`), site, publicApi));
+			return tagsCache(path, async () => quoteTags(await get<QuoteEntity>(`/v1/quotes/${id}`), site));
 		}
 		m = /^\/authors\/([a-z0-9-]{1,80})$/.exec(path);
 		if (m) {
 			const slug = m[1];
-			return tagsCache(path, async () => authorTags(await get<AuthorEntity>(`/v1/authors/${slug}`), site));
+			return tagsCache(path, async () => {
+				const [author, quotes] = await Promise.all([
+					get<AuthorEntity>(`/v1/authors/${slug}`),
+					firstQuotes(`author=${slug}`)
+				]);
+				return authorTags(author, quotes, site);
+			});
 		}
 		m = /^\/topics\/([a-z0-9-]{1,60})$/.exec(path);
 		if (m) {
 			const slug = m[1];
-			return tagsCache(path, async () => topicTags(await get<TopicEntity>(`/v1/topics/${slug}`), site));
+			return tagsCache(path, async () => {
+				const [topic, quotes] = await Promise.all([
+					get<TopicEntity>(`/v1/topics/${slug}`),
+					firstQuotes(`topic=${slug}`)
+				]);
+				return topicTags(topic, quotes, site);
+			});
 		}
-		return null;
+		m = /^\/@([a-z0-9_]{1,30})(?:\/(?:quotes|contributions))?$/i.exec(path);
+		if (m) {
+			const handle = m[1];
+			return tagsCache(`/@${handle}`, async () => profileTags(await get<ProfileEntity>(`/v1/users/${handle}`), site));
+		}
+		if (path === paths.home || path === paths.latest || path === paths.discover || path === paths.curated) {
+			const feed = path === paths.home ? 'latest' : path.slice(1);
+			return tagsCache(path, async () => staticTags(path, site, await firstQuotes(`feed=${feed}`)));
+		}
+		if (path === paths.topics) {
+			return tagsCache(path, async () => {
+				const tags = staticTags(path, site)!;
+				const topics = await get<TopicListEntity>('/v1/topics').then(
+					(t) => t.list,
+					() => []
+				);
+				return { ...tags, body: topicIndexBody(tags.description, topics) };
+			});
+		}
+		const tags = staticTags(path, site);
+		if (tags && path === paths.search() && search.get('q')) return Promise.resolve({ ...tags, noindex: true });
+		return tags ? Promise.resolve(tags) : null;
 	}
 
 	function send(
@@ -147,6 +227,50 @@ export function createHandler(config: ServerConfig) {
 		}
 		res.setHeader('Content-Length', Buffer.byteLength(body));
 		res.end(req.method === 'HEAD' ? undefined : body);
+	}
+
+	function redirect(res: ServerResponse, location: string) {
+		res.statusCode = 301;
+		res.setHeader('Location', location);
+		res.setHeader('Cache-Control', 'public, max-age=86400');
+		res.end();
+	}
+
+	/**
+	 * An og:image on this origin, from the API's route for it. The API waits
+	 * for the render; a rendered card (X-Og-Image: render) is cached for a
+	 * day, a fallback never, so the next unfurl gets the card.
+	 */
+	async function og(req: IncomingMessage, res: ServerResponse, apiPath: string) {
+		try {
+			const r = await bytes(`${api}${apiPath}`, OG_TIMEOUT_MS);
+			if (r.status === 404) return send(req, res, 404, TYPES['.txt'], 'Not found\n', 'no-store');
+			const rendered = r.headers['x-og-image'] === 'render';
+			let png = r.body;
+			if (r.status >= 300 && r.status < 400 && r.headers.location) {
+				const image = await bytes(new URL(r.headers.location, api).href, OG_TIMEOUT_MS);
+				if (image.status !== 200) throw new Error(`image ${image.status}`);
+				png = image.body;
+			} else if (r.status !== 200) {
+				throw new Error(`${apiPath}: ${r.status}`);
+			}
+			return send(req, res, 200, TYPES['.png'], png, rendered ? OG_RENDER_CACHE : 'no-store');
+		} catch (err) {
+			console.error(JSON.stringify({ level: 'warn', msg: 'og image unavailable', path: apiPath, err: String(err) }));
+			return send(req, res, 502, TYPES['.txt'], 'The image is unavailable; try again shortly.\n', 'no-store');
+		}
+	}
+
+	/** The og:image route on the API for one of this site's og:image paths, or null. */
+	function ogRoute(path: string): string | null {
+		if (path === '/og.png') return '/v1/og.png';
+		let m = /^\/q\/([a-z0-9]{3,32})\/og\.png$/i.exec(path);
+		if (m) return `/v1/quotes/q_${m[1]}/og.png`;
+		m = /^\/authors\/([a-z0-9-]{1,80})\/og\.png$/.exec(path);
+		if (m) return `/v1/authors/${m[1]}/og.png`;
+		m = /^\/topics\/([a-z0-9-]{1,60})\/og\.png$/.exec(path);
+		if (m) return `/v1/topics/${m[1]}/og.png`;
+		return null;
 	}
 
 	function sendFile(req: IncomingMessage, res: ServerResponse, path: string, file: string) {
@@ -179,6 +303,8 @@ export function createHandler(config: ServerConfig) {
 		return existsSync(file) && statSync(file).isFile() ? file : null;
 	}
 
+	const sitemap = () => sitemapCache('sitemap', () => collectUrls(get, origin));
+
 	return async function handle(req: IncomingMessage, res: ServerResponse) {
 		const url = new URL(req.url ?? '/', 'http://localhost');
 		let path: string;
@@ -193,14 +319,42 @@ export function createHandler(config: ServerConfig) {
 		}
 
 		if (path === '/healthz') return send(req, res, 200, TYPES['.txt'], 'ok\n', 'no-store');
-		if (path === '/robots.txt') return send(req, res, 200, TYPES['.txt'], robotsTxt(site), 'public, max-age=3600');
-		if (path === '/sitemap.xml') {
+		if (path === '/robots.txt') return send(req, res, 200, TYPES['.txt'], robotsTxt(origin), 'public, max-age=3600');
+		if (config.indexNowKey && path === `/${config.indexNowKey}.txt`) {
+			return send(req, res, 200, TYPES['.txt'], config.indexNowKey, 'public, max-age=86400');
+		}
+		// The API's public ids carry a `q_` the site's URLs leave out.
+		const prefixed = /^\/q\/q_([a-z0-9]{3,32})(\/og\.png)?$/i.exec(path);
+		if (prefixed) return redirect(res, `/q/${prefixed[1]}${prefixed[2] ?? ''}${url.search}`);
+
+		const image = ogRoute(path);
+		if (image) return og(req, res, image);
+
+		const part = /^\/sitemaps\/([a-z]+)\.xml$/.exec(path)?.[1];
+		if (path === '/sitemap.xml' || part) {
+			if (part && !SITEMAP_PARTS.includes(part as SitemapPart)) {
+				return send(req, res, 404, TYPES['.txt'], 'Not found\n', 'no-store');
+			}
 			try {
-				const xml = await sitemapCache('sitemap', async () => sitemapXml(await collectUrls(get, site)));
-				return send(req, res, 200, TYPES['.xml'], xml, 'public, max-age=3600');
+				const urls = await sitemap();
+				const body = part ? sitemapXml(urls[part as SitemapPart]) : sitemapIndexXml(origin, urls);
+				return send(req, res, 200, TYPES['.xml'], body, 'public, max-age=3600');
 			} catch (err) {
 				console.error(JSON.stringify({ level: 'error', msg: 'sitemap failed', err: String(err) }));
 				return send(req, res, 503, TYPES['.txt'], 'The sitemap is unavailable; try again shortly.\n', 'no-store');
+			}
+		}
+		if (path in FEEDS) {
+			const feed = path as FeedPath;
+			try {
+				const body = await feedCache(feed, async () => {
+					const page = await get<QuoteFeedEntity>(`/v1/quotes?feed=${FEEDS[feed].feed}&limit=50`);
+					return rssXml(feed, origin, page.list);
+				});
+				return send(req, res, 200, 'application/rss+xml; charset=utf-8', body, 'public, max-age=600');
+			} catch (err) {
+				console.error(JSON.stringify({ level: 'error', msg: 'feed failed', path, err: String(err) }));
+				return send(req, res, 503, TYPES['.txt'], 'The feed is unavailable; try again shortly.\n', 'no-store');
 			}
 		}
 
@@ -214,7 +368,7 @@ export function createHandler(config: ServerConfig) {
 			res.setHeader('X-Robots-Tag', 'noindex');
 			return send(req, res, 200, TYPES['.html'], noindex(index), page);
 		}
-		const pending = tagsFor(path);
+		const pending = tagsFor(path, url.searchParams);
 		if (!pending) return send(req, res, 200, TYPES['.html'], index, page);
 		try {
 			const tags = await pending;

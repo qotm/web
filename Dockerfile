@@ -1,10 +1,9 @@
 # The built app, served by a small Node server (server/) that also writes each
-# quote, author and topic page's title, description, canonical URL and
-# og:image into index.html for crawlers, and serves sitemap.xml and robots.txt.
+# public page's tags, JSON-LD and plain HTML into index.html for crawlers, and
+# serves the og:images, sitemap, RSS feeds and robots.txt.
 #
 #   docker build --build-arg VITE_APP_API_URL=https://api.example.com -t app .
-#   docker run -e API_URL=http://api:3000 -e PUBLIC_API_URL=https://api.example.com \
-#     -e SITE_URL=https://example.com -p 8080:8080 app
+#   docker run -e API_URL=http://api:3000 -e SITE_URL=https://example.com -p 8080:8080 app
 #
 # IMPORTANT: Vite inlines `VITE_*` values into the JS bundle at BUILD time, so a
 # built image is pinned to one environment. These are build args, not runtime
@@ -69,12 +68,14 @@ COPY package.json ./
 COPY server ./server
 COPY src/lib/paths.ts ./src/lib/paths.ts
 COPY src/shared/ui/meta/brand.ts ./src/shared/ui/meta/brand.ts
+COPY src/shared/ui/meta/indexing.ts ./src/shared/ui/meta/indexing.ts
 COPY --from=build /app/dist ./dist
 
 # Runtime configuration (unlike the VITE_* values above, these are read at start):
-#   API_URL          where the server reaches the API (required)
-#   PUBLIC_API_URL   the API as crawlers reach it, for og:image (defaults to API_URL)
+#   API_URL          where the server reaches the API (required); og:images are
+#                    streamed from it, so crawlers only ever see SITE_URL
 #   SITE_URL         this site's public origin (required)
+#   INDEXNOW_KEY     IndexNow's key, served at /<key>.txt (optional; the API pings)
 USER node
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \

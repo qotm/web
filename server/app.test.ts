@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createHandler } from './app.ts';
-import type { HttpGet } from './http-get.ts';
+import type { HttpGet, HttpGetBytes } from './http-get.ts';
 
 const INDEX = `<!doctype html><html><head><meta name="description" content="base" /><title>qotm</title></head><body><div id="root"></div></body></html>`;
 
@@ -17,20 +17,81 @@ const API: Record<string, unknown> = {
 		type: 'canonical',
 		status: 'CURATED',
 		author: { slug: 'knuth', name: 'Donald E. Knuth' },
-		attribution: null
+		attribution: null,
+		contributor: null,
+		work: null,
+		year: null,
+		context: null,
+		sourceUrl: null,
+		source: null,
+		topics: [],
+		publishedAt: '2026-09-24T09:30:00.000Z'
 	},
-	'/v1/authors/knuth': { slug: 'knuth', name: 'Donald E. Knuth', line: '1938–' },
+	'/v1/quotes/q_rev1ew': {
+		id: 'q_rev1ew',
+		text: 'Still being checked.',
+		type: 'canonical',
+		status: 'UNDER_REVIEW',
+		author: null,
+		attribution: 'Someone',
+		contributor: null,
+		topics: [],
+		publishedAt: null
+	},
+	'/v1/authors/knuth': { slug: 'knuth', name: 'Donald E. Knuth', line: '1938–', topics: [], wikidataId: 'Q17457' },
+	'/v1/quotes?author=knuth&limit=20': {
+		list: [
+			{
+				id: 'q_5k0q2j',
+				text: 'Premature optimization is the root of all evil.',
+				type: 'canonical',
+				author: { slug: 'knuth', name: 'Donald E. Knuth' },
+				topics: []
+			}
+		],
+		nextCursor: null
+	},
+	'/v1/users/ada': { handle: 'ada', name: 'Ada', bio: 'Reads Knuth.' },
 	'/v1/topics/debugging': {
 		slug: 'debugging',
 		name: 'debugging',
 		description: null,
 		counts: { quotes: 3, curated: 1 }
 	},
-	'/v1/topics': { list: [{ slug: 'debugging' }] },
+	'/v1/topics': { list: [{ slug: 'debugging', name: 'debugging', counts: { quotes: 3, curated: 1 } }] },
 	'/v1/quotes?feed=latest&limit=50': {
-		list: [{ id: 'q_5k0q2j', publishedAt: null, author: { slug: 'knuth' } }],
+		list: [
+			{
+				id: 'q_5k0q2j',
+				text: 'Premature optimization is the root of all evil.',
+				type: 'canonical',
+				author: { slug: 'knuth', name: 'Donald E. Knuth' },
+				work: null,
+				year: null,
+				topics: [{ slug: 'debugging', name: 'debugging' }],
+				publishedAt: '2026-09-24T09:30:00.000Z'
+			}
+		],
 		nextCursor: null
+	},
+	'/v1/sitemap': {
+		quotes: [{ id: 'q_5k0q2j', updatedAt: '2026-09-24T09:30:00.000Z' }],
+		authors: [{ slug: 'knuth', updatedAt: '2026-09-01T00:00:00.000Z' }],
+		topics: [{ slug: 'debugging', updatedAt: '2026-08-01T00:00:00.000Z' }]
 	}
+};
+
+const RENDER = Buffer.from('rendered png');
+const FALLBACK = Buffer.from('fallback png');
+/** The API's og:image routes, and the bucket a render redirects to. */
+const IMAGES: Record<string, { status: number; headers: Record<string, string>; body: Buffer }> = {
+	'http://api.internal/v1/quotes/q_5k0q2j/og.png': {
+		status: 302,
+		headers: { 'x-og-image': 'render', location: 'https://media.example/og/q.png' },
+		body: Buffer.alloc(0)
+	},
+	'https://media.example/og/q.png': { status: 200, headers: {}, body: RENDER },
+	'http://api.internal/v1/og.png': { status: 200, headers: { 'x-og-image': 'fallback' }, body: FALLBACK }
 };
 
 let base: string;
@@ -51,12 +112,14 @@ beforeAll(async () => {
 		const path = url.replace('http://api.internal', '');
 		return path in API ? { status: 200, body: JSON.stringify(API[path]) } : { status: 404, body: '{}' };
 	};
+	const getBytes: HttpGetBytes = async (url) => IMAGES[url] ?? { status: 404, headers: {}, body: Buffer.from('{}') };
 	const handler = createHandler({
 		dist,
 		api: 'http://api.internal',
-		publicApi: 'https://api.qotm.site',
 		site: 'https://qotm.site',
+		indexNowKey: 'abc123key',
 		get,
+		getBytes,
 		cacheMs: 0
 	});
 	server = createServer((req, res) => void handler(req, res));
@@ -73,13 +136,76 @@ describe('web server', () => {
 		expect(res.headers.get('cache-control')).toBe('no-cache, must-revalidate');
 		const html = await res.text();
 		expect(html).toContain('<title>Premature optimization is the root of all evil. · qotm</title>');
-		expect(html).toContain('<meta property="og:image" content="https://api.qotm.site/v1/quotes/q_5k0q2j/og.png" />');
+		expect(html).toContain('<meta property="og:image" content="https://qotm.site/q/5k0q2j/og.png" />');
 		expect(html).toContain('<link rel="canonical" href="https://qotm.site/q/5k0q2j" />');
-		expect(html).toContain('<div id="root"></div>');
+		expect(html).toContain('"@type":"Quotation"');
+		// The quote itself, for crawlers that do not run the app.
+		expect(html).toContain('<div id="root"><main data-prerender');
+		expect(html).toContain('<blockquote><p>Premature optimization is the root of all evil.</p></blockquote>');
+	});
+
+	it('keeps a quote under review out of search engines, but shareable', async () => {
+		const res = await fetch(`${base}/q/rev1ew`);
+		expect(res.status).toBe(200);
+		expect(res.headers.get('x-robots-tag')).toBe('noindex');
+		const html = await res.text();
+		expect(html).toContain('<meta name="robots" content="noindex" />');
+		expect(html).toContain('<meta property="og:image" content="https://qotm.site/q/rev1ew/og.png" />');
+	});
+
+	it('redirects an id with its q_ prefix to the site’s URL', async () => {
+		const res = await fetch(`${base}/q/q_5k0q2j?ref=x`, { redirect: 'manual' });
+		expect(res.status).toBe(301);
+		expect(res.headers.get('location')).toBe('/q/5k0q2j?ref=x');
+	});
+
+	it('serves a rendered og:image from this origin, cached; a fallback, never cached', async () => {
+		const card = await fetch(`${base}/q/5k0q2j/og.png`);
+		expect(card.status).toBe(200);
+		expect(card.headers.get('content-type')).toBe('image/png');
+		expect(card.headers.get('cache-control')).toBe('public, max-age=86400, stale-while-revalidate=604800');
+		expect(Buffer.from(await card.arrayBuffer())).toEqual(RENDER);
+
+		const site = await fetch(`${base}/og.png`);
+		expect(site.headers.get('cache-control')).toBe('no-store');
+		expect(Buffer.from(await site.arrayBuffer())).toEqual(FALLBACK);
+
+		expect((await fetch(`${base}/authors/nobody/og.png`)).status).toBe(404);
+	});
+
+	it('tags a profile, the home page and the feeds', async () => {
+		expect(await (await fetch(`${base}/@ada`)).text()).toContain('<title>Ada (@ada) · qotm</title>');
+		expect(await (await fetch(`${base}/@ada/contributions`)).text()).toContain(
+			'<link rel="canonical" href="https://qotm.site/@ada" />'
+		);
+		const home = await (await fetch(`${base}/`)).text();
+		expect(home).toContain('<title>qotm — a thought between commands</title>');
+		expect(home).toContain('"@type":"WebSite"');
+		expect(home).toContain('<meta property="og:image" content="https://qotm.site/og.png" />');
+		const search = await fetch(`${base}/search?q=knuth`);
+		expect(search.headers.get('x-robots-tag')).toBe('noindex');
+	});
+
+	it('serves the RSS feeds', async () => {
+		const res = await fetch(`${base}/feed.xml`);
+		expect(res.headers.get('content-type')).toBe('application/rss+xml; charset=utf-8');
+		const xml = await res.text();
+		expect(xml).toContain('<rss version="2.0"');
+		expect(xml).toContain('<link>https://qotm.site/q/5k0q2j</link>');
+		expect(xml).toContain('<title>“Premature optimization is the root of all evil.” — Donald E. Knuth</title>');
+		expect(xml).toContain('<pubDate>Thu, 24 Sep 2026 09:30:00 GMT</pubDate>');
+		expect(xml).toContain('<category>debugging</category>');
+	});
+
+	it('serves the IndexNow key', async () => {
+		expect(await (await fetch(`${base}/abc123key.txt`)).text()).toBe('abc123key');
 	});
 
 	it('tags authors and topics', async () => {
-		expect(await (await fetch(`${base}/authors/knuth`)).text()).toContain('<title>Donald E. Knuth · qotm</title>');
+		const author = await (await fetch(`${base}/authors/knuth`)).text();
+		expect(author).toContain('<title>Donald E. Knuth · qotm</title>');
+		expect(author).toContain('"sameAs":["https://www.wikidata.org/wiki/Q17457"]');
+		expect(author).toContain('<a href="/q/5k0q2j">Premature optimization is the root of all evil.</a>');
 		expect(await (await fetch(`${base}/topics/debugging`)).text()).toContain('<title>Debugging · qotm</title>');
 	});
 
@@ -111,8 +237,8 @@ describe('web server', () => {
 
 	it('does not ask the API for other routes', async () => {
 		const before = calls;
-		await fetch(`${base}/discover`);
-		await fetch(`${base}/@ada`);
+		await fetch(`${base}/terms`);
+		await fetch(`${base}/somewhere/else`);
 		expect(calls).toBe(before);
 	});
 
@@ -120,7 +246,10 @@ describe('web server', () => {
 		expect(await (await fetch(`${base}/robots.txt`)).text()).toContain('Disallow: /admin');
 		const sitemap = await fetch(`${base}/sitemap.xml`);
 		expect(sitemap.headers.get('content-type')).toContain('application/xml');
-		expect(await sitemap.text()).toContain('<loc>https://qotm.site/q/5k0q2j</loc>');
+		expect(await sitemap.text()).toContain('<loc>https://qotm.site/sitemaps/quotes.xml</loc>');
+		const quotes = await (await fetch(`${base}/sitemaps/quotes.xml`)).text();
+		expect(quotes).toContain('<url><loc>https://qotm.site/q/5k0q2j</loc><lastmod>2026-09-24</lastmod></url>');
+		expect((await fetch(`${base}/sitemaps/secrets.xml`)).status).toBe(404);
 		expect(await (await fetch(`${base}/healthz`)).text()).toBe('ok\n');
 	});
 

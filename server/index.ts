@@ -8,9 +8,9 @@ import { createHandler } from './app.ts';
  *
  *   PORT             listen port (8080)
  *   API_URL          where this server reaches the API (required)
- *   PUBLIC_API_URL   the API as browsers and crawlers reach it, for og:image (API_URL)
  *   SITE_URL         this site's public origin, for canonical URLs and the sitemap (required)
  *   DIST             the built app (./dist)
+ *   INDEXNOW_KEY     IndexNow's key, served at /<key>.txt (the API's INDEXNOW_KEY); optional
  */
 const need = (key: string) => {
 	const value = process.env[key]?.replace(/\/+$/, '');
@@ -25,8 +25,8 @@ const api = need('API_URL');
 const handler = createHandler({
 	dist: resolve(process.env.DIST ?? 'dist'),
 	api,
-	publicApi: process.env.PUBLIC_API_URL?.replace(/\/+$/, '') || api,
-	site: need('SITE_URL')
+	site: need('SITE_URL'),
+	indexNowKey: process.env.INDEXNOW_KEY || undefined
 });
 
 const port = Number(process.env.PORT ?? 8080);

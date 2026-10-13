@@ -1,23 +1,34 @@
-import type { QuoteFeedEntity, TopicListEntity } from '../src/shared/types/api/types.gen.ts';
+import type { SitemapEntity } from '../src/shared/types/api/types.gen.ts';
 import { PRIVATE_PREFIXES, paths } from '../src/lib/paths.ts';
 
 /** The sitemap protocol's limit for one file. */
 export const MAX_URLS = 50_000;
-/** The API's largest feed page. */
-const PAGE = 50;
 
 export type SitemapUrl = { loc: string; lastmod?: string };
 
+/** The sitemap's parts, each its own file under /sitemaps/. */
+export const SITEMAP_PARTS = ['pages', 'quotes', 'authors', 'topics'] as const;
+export type SitemapPart = (typeof SITEMAP_PARTS)[number];
+
 const xml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const day = (iso?: string) => (iso ? iso.slice(0, 10) : undefined);
+const latest = (dates: (string | undefined)[]) => dates.filter(Boolean).sort().at(-1);
 
 export function sitemapXml(urls: SitemapUrl[]): string {
 	const body = urls
 		.slice(0, MAX_URLS)
-		.map(
-			(u) => `\t<url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod.slice(0, 10)}</lastmod>` : ''}</url>`
-		)
+		.map((u) => `\t<url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${day(u.lastmod)}</lastmod>` : ''}</url>`)
 		.join('\n');
 	return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+}
+
+/** /sitemap.xml: an index of the parts, each with its newest lastmod. */
+export function sitemapIndexXml(site: string, parts: Record<SitemapPart, SitemapUrl[]>): string {
+	const body = SITEMAP_PARTS.map((p) => {
+		const lastmod = day(latest(parts[p].map((u) => u.lastmod)));
+		return `\t<sitemap><loc>${xml(`${site}/sitemaps/${p}.xml`)}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</sitemap>`;
+	}).join('\n');
+	return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</sitemapindex>\n`;
 }
 
 /** Everything public may be crawled; the account pages and the console may not. */
@@ -35,29 +46,20 @@ export function robotsTxt(site: string): string {
 type GetJson = <T>(path: string) => Promise<T>;
 
 /**
- * Every public URL: the feeds, the topics, each public quote (newest first,
- * from the API's latest feed) and each author those quotes credit.
+ * Every indexable URL, by part, from the API's /v1/sitemap: the feeds and
+ * the topic index; each quote that is checked and not disputed; the authors
+ * and topics those quotes are under. lastmod is the record's updatedAt.
  */
-export async function collectUrls(get: GetJson, site: string): Promise<SitemapUrl[]> {
-	const urls: SitemapUrl[] = [paths.home, paths.discover, paths.latest, paths.curated, paths.topics].map((p) => ({
-		loc: `${site}${p}`
-	}));
-	const topics = await get<TopicListEntity>('/v1/topics');
-	for (const t of topics.list) urls.push({ loc: `${site}${paths.topic(t.slug)}` });
-
-	const authors = new Set<string>();
-	let cursor: string | null = null;
-	do {
-		const page: QuoteFeedEntity = await get<QuoteFeedEntity>(
-			`/v1/quotes?feed=latest&limit=${PAGE}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`
-		);
-		for (const q of page.list) {
-			urls.push({ loc: `${site}${paths.quote(q.id)}`, lastmod: q.publishedAt ?? undefined });
-			if (q.author) authors.add(q.author.slug);
-		}
-		cursor = page.nextCursor;
-	} while (cursor && urls.length + authors.size < MAX_URLS);
-
-	for (const slug of authors) urls.push({ loc: `${site}${paths.author(slug)}` });
-	return urls.slice(0, MAX_URLS);
+export async function collectUrls(get: GetJson, site: string): Promise<Record<SitemapPart, SitemapUrl[]>> {
+	const data = await get<SitemapEntity>('/v1/sitemap');
+	const newest = latest(data.quotes.map((q) => q.updatedAt));
+	return {
+		pages: [paths.home, paths.discover, paths.latest, paths.curated, paths.topics].map((p) => ({
+			loc: `${site}${p === paths.home ? '/' : p}`,
+			lastmod: p === paths.topics ? latest(data.topics.map((t) => t.updatedAt)) : newest
+		})),
+		quotes: data.quotes.map((q) => ({ loc: `${site}${paths.quote(q.id)}`, lastmod: q.updatedAt })),
+		authors: data.authors.map((a) => ({ loc: `${site}${paths.author(a.slug)}`, lastmod: a.updatedAt })),
+		topics: data.topics.map((t) => ({ loc: `${site}${paths.topic(t.slug)}`, lastmod: t.updatedAt }))
+	};
 }
