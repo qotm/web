@@ -3,14 +3,14 @@ import { Form, Formik } from 'formik';
 import { Navigate, useSearchParams } from 'react-router';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { getSafeRedirect, useAuth } from '@/shared/auth';
-import { Button, Card, FormField, Logo, Notice, PageMeta } from '@/shared/ui';
+import { Button, Card, Divider, FormField, Logo, Notice, PageMeta, socialMark } from '@/shared/ui';
 import { DeviceCode, SignInAside } from '@/features/auth/components/sign-in-aside';
 import { linkError, sendMagicLink, signInWithProvider, type SocialProvider } from '@/features/auth/lib/auth-actions';
 import { magicLinkSchema } from '@/features/auth/lib/schemas';
 
 const PROVIDERS: { id: SocialProvider; label: string }[] = [
-	{ id: 'github', label: 'GitHub' },
-	{ id: 'google', label: 'Google' }
+	{ id: 'google', label: 'Google' },
+	{ id: 'github', label: 'GitHub' }
 ];
 
 /** The terminal code in a `/device?user_code=` redirect, if that is where sign-in leads. */
@@ -106,18 +106,23 @@ export function LoginRoute() {
 									<Button type="submit" block disabled={isSubmitting}>
 										{isSubmitting ? 'Sending…' : 'Email me a sign-in link'}
 									</Button>
-									{PROVIDERS.map((p) => (
-										<Button
-											key={p.id}
-											type="button"
-											variant="outline"
-											block
-											disabled={isSubmitting}
-											onClick={() => void signInWithProvider(p.id, target)}
-										>
-											Continue with {p.label}
-										</Button>
-									))}
+									<Divider variant="graphic" gap="4px" />
+									<div className="grid grid-cols-2 gap-3">
+										{PROVIDERS.map((p) => (
+											<Button
+												key={p.id}
+												type="button"
+												variant="outline"
+												block
+												disabled={isSubmitting}
+												aria-label={`Continue with ${p.label}`}
+												onClick={() => void signInWithProvider(p.id, target)}
+											>
+												{socialMark(p.id)}
+												{p.label}
+											</Button>
+										))}
+									</div>
 								</Form>
 							)}
 						</Formik>
