@@ -71,10 +71,17 @@ export function SiteShell() {
 						<>
 							<SearchField
 								size="sm"
-								className="narrow:hidden"
+								className="max-lg:hidden"
 								placeholder="Search quotes, authors, topics"
 								onSubmit={(q) => navigate(paths.search(q))}
 							/>
+							{/* 761–1023px: the nav and the field do not both fit; a link to search does. */}
+							<Link
+								to={paths.search()}
+								className="tap border-0 font-mono text-[13px]/[1.6] text-muted-foreground no-underline hover:text-ink narrow:hidden lg:hidden"
+							>
+								search
+							</Link>
 							<Button asChild variant="outline" size="sm">
 								<Link to={paths.submit}>Submit</Link>
 							</Button>
@@ -82,14 +89,16 @@ export function SiteShell() {
 						</>
 					) : (
 						<>
-							<InstallPill copyable className="narrow:hidden" />
+							<InstallPill copyable className="max-lg:hidden" />
 							<Button asChild size="sm">
 								<Link to={paths.login}>Sign in</Link>
 							</Button>
 						</>
 					)}
 				</SiteHeader>
-				<main className="flex-1">
+				{/* At least a screen tall, so the footer starts below the fold and
+				    does not jump down as the page's data arrives (Lighthouse CLS). */}
+				<main className="min-h-[calc(100svh-var(--spacing-header))] flex-1">
 					{/* Content-box, as the kit's .qk-page: 960 (or 1180) of content inside the gutters. */}
 					<div className={cn('mx-auto box-content px-page', wide.page ? 'max-w-site-wide' : 'max-w-site')}>
 						<Outlet />

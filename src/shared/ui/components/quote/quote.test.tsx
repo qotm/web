@@ -28,8 +28,8 @@ describe('ActionBar', () => {
 	it('flips a toggle and its count at once, and reports the new state', () => {
 		const onAction = vi.fn();
 		render(<ActionBar counts={{ likes: 1, favorites: 2, recommends: 3 }} onAction={onAction} />);
-		fireEvent.click(screen.getByRole('button', { name: 'like, 1' }));
-		expect(screen.getByRole('button', { name: 'like, 2' })).toHaveAttribute('aria-pressed', 'true');
+		fireEvent.click(screen.getByRole('button', { name: 'like 1' }));
+		expect(screen.getByRole('button', { name: 'like 2' })).toHaveAttribute('aria-pressed', 'true');
 		expect(onAction).toHaveBeenLastCalledWith('like', true);
 		fireEvent.click(screen.getByRole('button', { name: 'share' }));
 		expect(onAction).toHaveBeenLastCalledWith('share');
@@ -37,10 +37,10 @@ describe('ActionBar', () => {
 
 	it('takes the parent’s answer over its optimistic flip (a rollback)', () => {
 		const { rerender } = render(<ActionBar counts={{ likes: 1 }} state={{ liked: false }} />);
-		fireEvent.click(screen.getByRole('button', { name: 'like, 1' }));
-		expect(screen.getByRole('button', { name: 'like, 2' })).toHaveAttribute('aria-pressed', 'true');
+		fireEvent.click(screen.getByRole('button', { name: 'like 1' }));
+		expect(screen.getByRole('button', { name: 'like 2' })).toHaveAttribute('aria-pressed', 'true');
 		rerender(<ActionBar counts={{ likes: 5 }} state={{ liked: false }} />);
-		expect(screen.getByRole('button', { name: 'like, 5' })).toHaveAttribute('aria-pressed', 'false');
+		expect(screen.getByRole('button', { name: 'like 5' })).toHaveAttribute('aria-pressed', 'false');
 	});
 
 	it('shows words at md only, and share and report are not toggles', () => {

@@ -46,7 +46,11 @@ function SiteHeader({
 					wide ? 'max-w-site-wide' : 'max-w-site'
 				)}
 			>
-				<Link to="/" aria-label="qotm home" className="inline-flex items-center gap-2.5 border-0 text-ink no-underline">
+				<Link
+					to="/"
+					aria-label="qotm home"
+					className="tap inline-flex items-center gap-2.5 border-0 text-ink no-underline"
+				>
 					<Logo lockup="symbol" height={24} alt="" />
 					<b className="font-display text-[20px] font-semibold tracking-[-0.01em]">qotm</b>
 				</Link>

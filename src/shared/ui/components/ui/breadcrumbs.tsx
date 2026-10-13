@@ -23,7 +23,7 @@ function Breadcrumbs({ items, className }: { items: Crumb[]; className?: string 
 						) : (
 							<Link
 								to={it.to}
-								className="text-muted-foreground no-underline transition-colors duration-[180ms] hover:text-ink"
+								className="tap text-muted-foreground no-underline transition-colors duration-[180ms] hover:text-ink"
 							>
 								{it.label}
 							</Link>

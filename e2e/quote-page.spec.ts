@@ -15,7 +15,7 @@ test.describe('quote page', () => {
 		await expect(page.locator('blockquote')).toHaveText('“Simplicity is prerequisite for reliability.”');
 		await expect(page.locator('figcaption')).toContainText('Edsger W. Dijkstra · EWD 498, 1975');
 		await expect(actions(page).getByRole('button', { name: /^recommend/ })).toHaveCount(0);
-		await expect(actions(page).getByRole('button', { name: `like, ${q.counts.likes}` })).toBeVisible();
+		await expect(actions(page).getByRole('button', { name: `like ${q.counts.likes}` })).toBeVisible();
 		await expect(page.getByRole('region', { name: 'Provenance' })).toContainText('@mireille');
 		await expect(page.locator('code', { hasText: 'qotm --author dijkstra' })).toBeVisible();
 		const author = await (await page.request.get(`${E2E.api}/v1/authors/dijkstra`)).json();
@@ -54,10 +54,10 @@ test.describe('quote page', () => {
 		await signIn(page, 'member');
 		await page.goto('/q/1t7c4e');
 		const fav = actions(page).getByRole('button', { name: /^favorite/ });
-		const before = Number((await fav.getAttribute('aria-label'))!.split(', ')[1]);
+		const before = Number((await fav.getAttribute('aria-label'))!.split(' ')[1]);
 		const on = (await fav.getAttribute('aria-pressed')) === 'true';
 		await fav.click();
-		await expect(fav).toHaveAttribute('aria-label', `favorite, ${before + (on ? -1 : 1)}`);
+		await expect(fav).toHaveAttribute('aria-label', `favorite ${before + (on ? -1 : 1)}`);
 		await page.reload();
 		await expect(actions(page).getByRole('button', { name: /^favorite/ })).toHaveAttribute('aria-pressed', String(!on));
 		await actions(page)

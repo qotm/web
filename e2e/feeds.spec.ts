@@ -92,16 +92,16 @@ test.describe('feeds', () => {
 		await page.goto('/latest');
 		const card = cards(page).first();
 		const like = card.getByRole('button', { name: /^like/ });
-		const before = Number((await like.getAttribute('aria-label'))!.split(', ')[1]);
+		const before = Number((await like.getAttribute('aria-label'))!.split(' ')[1]);
 		await like.click();
 		await expect(like).toHaveAttribute('aria-pressed', 'true');
-		await expect(like).toHaveAttribute('aria-label', `like, ${before + 1}`);
+		await expect(like).toHaveAttribute('aria-label', `like ${before + 1}`);
 		await page.reload();
 		await expect(cards(page).first().getByRole('button', { name: /^like/ })).toHaveAttribute('aria-pressed', 'true');
 		await cards(page).first().getByRole('button', { name: /^like/ }).click();
 		await expect(cards(page).first().getByRole('button', { name: /^like/ })).toHaveAttribute(
 			'aria-label',
-			`like, ${before}`
+			`like ${before}`
 		);
 		await page.reload();
 		await expect(cards(page).first().getByRole('button', { name: /^like/ })).toHaveAttribute('aria-pressed', 'false');

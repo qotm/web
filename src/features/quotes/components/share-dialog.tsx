@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { getApiBaseUrl } from '@/shared/api';
 import { Button, Dialog, Field, Input, ShareCard, Tabs, notify } from '@/shared/ui';
 import { paths } from '@/lib/paths';
@@ -37,9 +37,28 @@ type ShareDialogProps = {
  * Share (artboard Share): the quote card or the terminal card, the
  * permanent link, the image to download (the worker's render) and copy link.
  */
+/**
+ * The preview's width: the dialog's content width, up to the 548px it was
+ * drawn at. A callback ref, since the dialog mounts its content when it opens.
+ */
+function usePreviewWidth() {
+	const [width, setWidth] = useState(548);
+	const observer = useRef<ResizeObserver | null>(null);
+	const measure = useCallback((el: HTMLDivElement | null) => {
+		observer.current?.disconnect();
+		if (!el || typeof ResizeObserver === 'undefined') return;
+		const measure = () => el.clientWidth && setWidth(Math.min(548, el.clientWidth));
+		measure();
+		observer.current = new ResizeObserver(measure);
+		observer.current.observe(el);
+	}, []);
+	return [measure, width] as const;
+}
+
 export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProps) {
 	const [variant, setVariant] = useState<Variant>('quote');
 	const [busy, setBusy] = useState(false);
+	const [measurePreview, previewWidth] = usePreviewWidth();
 	const link = `${window.location.origin}${paths.quote(id)}`;
 
 	const copy = () =>
@@ -92,7 +111,10 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 				active={variant}
 				onSelect={(v) => setVariant(v as Variant)}
 			/>
-			<ShareCard quote={text} author={author} id={id} variant={variant} width={548} className="max-w-full" />
+			{/* Scaled to the dialog, not cropped by it, on a phone. */}
+			<div ref={measurePreview} className="w-full">
+				<ShareCard quote={text} author={author} id={id} variant={variant} width={previewWidth} />
+			</div>
 			<Field label="Link" htmlFor="share-link">
 				<Input id="share-link" mono readOnly value={link} onFocus={(e) => e.currentTarget.select()} />
 			</Field>

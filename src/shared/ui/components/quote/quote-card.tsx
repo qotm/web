@@ -38,7 +38,8 @@ function QuoteCard({ quote: q, variant = 'feed', showActions = true, onAction, c
 				className
 			)}
 		>
-			<div className="flex min-h-5 items-center gap-2">
+			{/* Badges wrap on a narrow card; the id keeps the far end of the last row. */}
+			<div className="flex min-h-5 flex-wrap items-center gap-x-2 gap-y-1.5">
 				{unique.map((b) => (
 					<StatusBadge key={b} status={b} />
 				))}

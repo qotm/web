@@ -93,7 +93,7 @@ function Menu({ trigger, label, items, onSelect, align = 'end', defaultOpen = fa
 						requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus());
 					}
 				}}
-				className="inline-flex cursor-pointer rounded-full border-0 bg-transparent p-0"
+				className="tap inline-flex cursor-pointer rounded-full border-0 bg-transparent p-0"
 			>
 				{trigger}
 			</button>

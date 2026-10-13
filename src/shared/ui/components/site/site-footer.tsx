@@ -15,7 +15,7 @@ type SiteFooterProps = {
 };
 
 const linkClasses =
-	'w-fit border-0 font-mono text-[13px]/[1.6] text-ink no-underline transition-colors duration-[180ms] hover:text-clay-600';
+	'w-fit border-0 font-mono text-[13px]/[1.6] text-ink no-underline transition-colors duration-[180ms] hover:text-clay-600 pointer-coarse:py-2.5';
 
 /** qotm_kit SiteFooter: the brand and tagline, link columns, and the licence note. */
 function SiteFooter({
@@ -42,10 +42,11 @@ function SiteFooter({
 				</div>
 				<div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-card-y">
 					{columns.map((c) => (
-						<div key={c.title} className="flex flex-col gap-2">
-							<h4 className="m-0 mb-1 font-mono text-[12px]/[1.15] font-normal tracking-[0.14em] text-stone-600 uppercase">
+						<div key={c.title} className="flex flex-col gap-2 pointer-coarse:gap-0">
+							{/* A label, not a heading: the footer sits under every page's h1/h2s. */}
+							<p className="m-0 mb-1 font-mono text-[12px]/[1.15] font-normal tracking-[0.14em] text-stone-600 uppercase">
 								{c.title}
-							</h4>
+							</p>
 							{c.links.map((l) =>
 								l.to ? (
 									<Link key={l.id} to={l.to} className={linkClasses}>

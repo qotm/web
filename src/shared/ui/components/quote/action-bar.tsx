@@ -91,11 +91,11 @@ function ActionBar({
 						key={a}
 						type="button"
 						aria-pressed={toggle ? on : undefined}
-						aria-label={d.word + (c != null ? `, ${c}` : '')}
+						aria-label={d.word + (c != null ? ` ${c}` : '')}
 						title={d.meaning}
 						onClick={() => act(a)}
 						className={cn(
-							'inline-flex cursor-pointer items-center gap-1.5 rounded-control border border-transparent bg-transparent font-mono text-[13px]/none transition-colors duration-[180ms]',
+							'tap inline-flex cursor-pointer items-center gap-1.5 rounded-control border border-transparent bg-transparent font-mono text-[13px]/none transition-colors duration-[180ms]',
 							md ? 'border-border px-3 py-[9px]' : 'px-2.5 py-[7px]',
 							onDark
 								? 'text-stone-400 hover:border-dark-rule hover:text-dark-foreground'

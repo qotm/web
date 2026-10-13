@@ -46,7 +46,7 @@ function CommandBlock({ command, caption, glyph = '$', tone = 'dark', className,
 					onClick={copy}
 					aria-label={`Copy ${command}`}
 					className={cn(
-						'flex-none cursor-pointer rounded-control border bg-transparent px-2.5 py-1 font-mono text-[13px]/[1.6] transition-colors duration-[180ms]',
+						'tap flex-none cursor-pointer rounded-control border bg-transparent px-2.5 py-1 font-mono text-[13px]/[1.6] transition-colors duration-[180ms]',
 						dark
 							? 'border-dark-rule text-stone-400 hover:border-stone-600 hover:text-dark-foreground'
 							: 'border-border text-stone-600 hover:border-foreground hover:text-foreground'

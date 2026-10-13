@@ -38,13 +38,19 @@ function Tabs({ items, active, onSelect, dark = false, label, className, ...prop
 			role="tablist"
 			aria-label={label}
 			onKeyDown={moveFocus}
-			className={cn('flex gap-tile overflow-x-auto border-b border-border', dark && 'border-dark-rule', className)}
+			className={cn(
+				'flex gap-tile overflow-x-auto border-b border-border [scrollbar-width:none]',
+				// Narrow: a row that runs past the edge fades out, so it reads as more to scroll to.
+				'narrow:pr-8 narrow:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]',
+				dark && 'border-dark-rule',
+				className
+			)}
 			{...props}
 		>
 			{items.map((it) => {
 				const on = active === it.id;
 				const classes = cn(
-					'-mb-px inline-flex items-baseline gap-2 border-0 border-b border-transparent bg-transparent px-0 pt-0 pb-3 whitespace-nowrap no-underline',
+					'-mb-px inline-flex items-baseline gap-2 border-0 border-b border-transparent bg-transparent px-0 pt-0 pb-3 whitespace-nowrap no-underline pointer-coarse:pt-3',
 					'cursor-pointer font-mono text-[13px]/[1.6] tracking-[0.02em] transition-colors duration-[180ms]',
 					// As in the kit: a button tab keeps the UA's normal line height, a link inherits 1.6.
 					!it.to && 'leading-[normal]',

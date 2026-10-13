@@ -33,8 +33,8 @@ test.describe('kit: site chrome', () => {
 				['.qk-footer__in', 'css:footer > div'],
 				['.qk-footer__brand b', 'css:footer b'],
 				['.qk-footer__brand p', 'css:footer p'],
-				['.qk-footer__col h4', 'css:footer h4'],
-				['.qk-footer__col a', 'css:footer h4 + a'],
+				['.qk-footer__col h4', 'css:footer .grid > div > p'],
+				['.qk-footer__col a', 'css:footer .grid > div > p + a'],
 				['.qk-footer__note', 'css:footer > div > div:last-child']
 			],
 			TEXT

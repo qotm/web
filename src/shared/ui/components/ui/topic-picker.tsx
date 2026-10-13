@@ -18,7 +18,7 @@ type TopicPickerProps = {
 
 /** The pill a topic is drawn as, in a picker or as a TopicTag. */
 const topicPillClasses = cn(
-	'inline-flex items-center whitespace-nowrap rounded-pill border border-border bg-transparent px-2.5 py-[3px]',
+	'tap inline-flex items-center whitespace-nowrap rounded-pill border border-border bg-transparent px-2.5 py-[3px]',
 	'font-mono text-xs/[18px] text-stone-600 no-underline transition-colors duration-[180ms]',
 	'hover:border-foreground hover:text-foreground'
 );

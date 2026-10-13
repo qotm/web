@@ -16,7 +16,7 @@ type PaginationProps = {
 const n = (v: number) => v.toLocaleString('en-US');
 
 const pagerButton =
-	'cursor-pointer rounded-control border border-border bg-transparent px-3 py-[5px] font-mono text-[13px]/[1.6] text-ink transition-colors duration-[180ms] enabled:hover:border-foreground disabled:cursor-not-allowed disabled:text-stone-400';
+	'tap cursor-pointer rounded-control border border-border bg-transparent px-3 py-[5px] font-mono text-[13px]/[1.6] text-ink transition-colors duration-[180ms] enabled:hover:border-foreground disabled:cursor-not-allowed disabled:text-stone-400';
 
 /** qotm_kit Pagination: "26–50 of 12,631" with prev / next, or "load more". */
 function Pagination({

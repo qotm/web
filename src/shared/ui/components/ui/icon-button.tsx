@@ -9,7 +9,7 @@ import { cn, glyph as textGlyph } from '../../lib/utils';
  */
 const iconButtonVariants = cva(
 	[
-		'inline-flex shrink-0 items-center justify-center p-0 font-mono leading-none',
+		'tap inline-flex shrink-0 items-center justify-center p-0 font-mono leading-none',
 		'rounded-control border border-border bg-transparent text-foreground',
 		'cursor-pointer transition-colors duration-[180ms] ease-[cubic-bezier(.2,0,.2,1)]',
 		'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',

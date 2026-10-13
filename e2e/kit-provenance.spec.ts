@@ -52,7 +52,8 @@ test.describe('kit: provenance', () => {
 	});
 
 	test('LifecycleSteps matches the kit: done, current, todo and an outcome', async ({ page }) => {
-		const ol = (n: number) => `css:ol:nth-of-type(${n})`;
+		// Each track sits in its wrapper (the compact form beside it, for narrow cards).
+		const ol = (n: number) => `css:[data-lifecycle]:nth-of-type(${n}) > ol`;
 		await expectMatchesKit(
 			page,
 			'LifecycleSteps',
@@ -86,8 +87,8 @@ test.describe('kit: provenance', () => {
 				.locator(sel)
 				.first()
 				.evaluate((el) => getComputedStyle(el, '::before').backgroundColor);
-		expect(await before('ol:nth-of-type(1) [data-state="done"]')).toBe('rgb(20, 18, 16)');
-		expect(await before('ol:nth-of-type(1) [data-state="todo"]')).toBe('rgb(218, 215, 208)');
+		expect(await before('[data-lifecycle]:nth-of-type(1) > ol [data-state="done"]')).toBe('rgb(20, 18, 16)');
+		expect(await before('[data-lifecycle]:nth-of-type(1) > ol [data-state="todo"]')).toBe('rgb(218, 215, 208)');
 		const current = page.locator('ol').first().locator('[aria-current="step"]');
 		await expect(current).toContainText('curation review');
 		await expect(page.locator('ol').nth(1).locator('[aria-current="step"]')).toContainText('needs evidence');

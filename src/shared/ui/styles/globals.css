@@ -267,3 +267,23 @@
 		outline-offset: 2px;
 	}
 }
+
+/*
+ * `tap`: on a touch screen, a control's hit area grows to at least 44×44px
+ * (WCAG 2.5.5) around its centre, without changing how it looks. Put it on
+ * small controls: pills, the quote actions, tabs, footer links, icon buttons.
+ */
+@utility tap {
+	position: relative;
+	@media (pointer: coarse) {
+		&::after {
+			content: '';
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			width: max(100%, 44px);
+			height: max(100%, 44px);
+			transform: translate(-50%, -50%);
+		}
+	}
+}

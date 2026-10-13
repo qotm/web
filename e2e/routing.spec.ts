@@ -65,7 +65,7 @@ test.describe('public-first routing', () => {
 	for (const path of ['/nothing-here', '/authors', '/@']) {
 		test(`${path} is a 404, unindexed`, async ({ page }) => {
 			await page.goto(path);
-			await expect(page.getByText(/not found/i).first()).toBeVisible();
+			await expect(page.getByRole('heading', { name: 'No page here.' })).toBeVisible();
 			await expect(robots(page)).toHaveAttribute('content', /noindex/);
 		});
 	}

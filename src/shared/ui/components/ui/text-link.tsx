@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
  */
 const textLinkVariants = cva(
 	[
-		'border-b no-underline transition-colors duration-[180ms] ease-[cubic-bezier(.2,0,.2,1)]',
+		'tap border-b no-underline transition-colors duration-[180ms] ease-[cubic-bezier(.2,0,.2,1)]',
 		'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 	],
 	{

@@ -68,7 +68,7 @@ test.describe('profile', () => {
 		await page.goto('/@nobody_here');
 		await expect(page.getByText('No member called @nobody_here.')).toBeVisible();
 		await page.goto('/ada');
-		await expect(page.getByText(/not found/i).first()).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'No page here.' })).toBeVisible();
 	});
 
 	test('stacks at 760 without sideways scroll', async ({ page }) => {

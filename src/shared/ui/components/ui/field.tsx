@@ -53,6 +53,8 @@ const controlClasses = (mono?: boolean, size: 'md' | 'sm' = 'md') =>
 		'disabled:cursor-not-allowed disabled:bg-transparent disabled:text-stone-400',
 		'aria-invalid:border-clay-600',
 		size === 'sm' ? 'min-h-8 px-3 py-[5px] text-[13px]/[1.4]' : 'min-h-10 px-3.5 py-[9px] text-[15px]/[1.4]',
+		// Touch: a 44px target, and 16px text so iOS Safari does not zoom into the field.
+		'pointer-coarse:min-h-11 pointer-coarse:text-[16px]',
 		mono && 'font-mono'
 	);
 

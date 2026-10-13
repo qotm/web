@@ -14,10 +14,23 @@ const title = (name: string) => `${name[0].toUpperCase()}${name.slice(1)}`;
 function TopicStrip({ current }: { current?: string }) {
 	const { data } = useTopicsQuery();
 	return (
-		<nav aria-label="All topics" className="flex flex-wrap gap-2">
+		// Narrow: one row that scrolls sideways (the current topic scrolled into
+		// view), fading at the right edge, so the topic's own heading stays near
+		// the top instead of under a cloud of twenty pills.
+		<nav
+			aria-label="All topics"
+			className="flex flex-wrap gap-2 narrow:-mx-page narrow:flex-nowrap narrow:overflow-x-auto narrow:px-page narrow:py-1.5 narrow:[mask-image:linear-gradient(to_right,black_85%,transparent)] narrow:[scrollbar-width:none]"
+		>
 			{data
 				? data.list.map((t) => (
-						<TopicTag key={t.slug} slug={t.slug} selected={t.slug === current}>
+						<TopicTag
+							key={t.slug}
+							slug={t.slug}
+							selected={t.slug === current}
+							ref={
+								t.slug === current ? (el) => el?.scrollIntoView?.({ block: 'nearest', inline: 'center' }) : undefined
+							}
+						>
 							{t.name}
 						</TopicTag>
 					))

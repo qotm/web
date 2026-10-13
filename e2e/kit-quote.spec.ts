@@ -71,9 +71,9 @@ test.describe('kit: quotes', () => {
 	test('ActionBar toggles are aria-pressed buttons, with keyboard and focus ring', async ({ page }) => {
 		await page.goto('/_kit?only=ActionBar');
 		const bar = page.getByRole('group', { name: 'Quote actions' }).first();
-		const like = bar.getByRole('button', { name: 'like, 412' });
+		const like = bar.getByRole('button', { name: 'like 412' });
 		await expect(like).toHaveAttribute('aria-pressed', 'false');
-		await expect(bar.getByRole('button', { name: 'favorite, 188' })).toHaveAttribute('aria-pressed', 'true');
+		await expect(bar.getByRole('button', { name: 'favorite 188' })).toHaveAttribute('aria-pressed', 'true');
 		await expect(bar.getByRole('button', { name: 'share' })).not.toHaveAttribute('aria-pressed');
 		const bounds = await bar.boundingBox();
 		const report = await bar.getByRole('button', { name: 'report' }).boundingBox();
@@ -81,11 +81,11 @@ test.describe('kit: quotes', () => {
 		await like.focus();
 		await expect.poll(() => like.evaluate((el) => getComputedStyle(el).outlineColor)).toBe('rgb(184, 92, 62)');
 		await page.keyboard.press('Space');
-		const liked = bar.getByRole('button', { name: 'like, 413' });
+		const liked = bar.getByRole('button', { name: 'like 413' });
 		await expect(liked).toHaveAttribute('aria-pressed', 'true');
 		await expect(liked).toContainText('liked');
 		await page.keyboard.press('Enter');
-		await expect(bar.getByRole('button', { name: 'like, 412' })).toHaveAttribute('aria-pressed', 'false');
+		await expect(bar.getByRole('button', { name: 'like 412' })).toHaveAttribute('aria-pressed', 'false');
 	});
 
 	test('QuoteCard matches the kit: feed, original and compact', async ({ page }) => {
@@ -124,7 +124,7 @@ test.describe('kit: quotes', () => {
 		const card = page.getByRole('article').first();
 		await expect(card.getByRole('link', { name: /Simplicity is prerequisite/ })).toHaveAttribute('href', '/q/8f2k1c');
 		await expect(card.getByRole('button', { name: /^recommend/ })).toHaveCount(0);
-		await expect(page.getByRole('article').nth(1).getByRole('button', { name: 'recommend, 14' })).toHaveAttribute(
+		await expect(page.getByRole('article').nth(1).getByRole('button', { name: 'recommend 14' })).toHaveAttribute(
 			'aria-pressed',
 			'true'
 		);

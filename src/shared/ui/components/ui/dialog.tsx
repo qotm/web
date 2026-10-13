@@ -109,7 +109,7 @@ function Dialog({
 						type="button"
 						aria-label="Close"
 						onClick={onClose}
-						className="-mt-1 -mr-1.5 size-7 flex-none cursor-pointer rounded-control border-0 bg-transparent px-1.5 py-px font-mono text-[13px] text-stone-600 hover:bg-background hover:text-foreground"
+						className="tap -mt-1 -mr-1.5 size-7 flex-none cursor-pointer rounded-control border-0 bg-transparent px-1.5 py-px font-mono text-[13px] text-stone-600 hover:bg-background hover:text-foreground"
 					>
 						{glyph('✕')}
 					</button>

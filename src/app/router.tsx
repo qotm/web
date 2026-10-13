@@ -73,6 +73,8 @@ export const router = createBrowserRouter([
 		children: [
 			// Public: anyone, signed in or not, and indexable.
 			{ index: true, element: <LandingRoute /> },
+			// Anything else: the 404, inside the site's header and footer.
+			{ path: '*', element: <NotFound /> },
 			// The feeds and the topic index run at the wide (1180) width.
 			{ path: 'discover', element: lazyRoute(<DiscoverRoute />), handle: { wide: true } },
 			{ path: 'latest', element: lazyRoute(<LatestRoute />), handle: { wide: true } },
@@ -138,6 +140,5 @@ export const router = createBrowserRouter([
 		]
 	},
 	// Dev only: the kit gallery the component tests compare with qotm_kit.
-	...(import.meta.env.DEV ? [{ path: '/_kit', element: lazyRoute(<KitRoute />) }] : []),
-	{ path: '*', element: <NotFound /> }
+	...(import.meta.env.DEV ? [{ path: '/_kit', element: lazyRoute(<KitRoute />) }] : [])
 ]);

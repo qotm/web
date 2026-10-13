@@ -12,7 +12,7 @@ test.describe('site shell', () => {
 		await page.goto('/');
 		const footer = page.getByRole('contentinfo');
 		for (const title of ['Read', 'Contribute', 'CLI'])
-			await expect(footer.getByRole('heading', { name: title })).toBeVisible();
+			await expect(footer.getByText(title, { exact: true })).toBeVisible();
 		await expect(footer.getByRole('link', { name: 'github' })).toHaveAttribute(
 			'href',
 			'https://github.com/wesscoby/qotm'

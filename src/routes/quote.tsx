@@ -67,7 +67,8 @@ function MoreFromAuthor({ slug, name }: { slug: string; name: string }) {
 	const { data } = useAuthorQuery(slug);
 	return (
 		<Card tone="wash" label={`More from ${surname(name)}`}>
-			<TextLink to={paths.author(slug)}>
+			{/* clay-700: clay-600 on the wash is 4.41:1, short of 4.5. */}
+			<TextLink to={paths.author(slug)} className="text-clay-700">
 				{data ? `${data.tabs.all} quotes, ${data.tabs.curated} curated` : 'All their quotes'} {glyph('→')}
 			</TextLink>
 		</Card>
@@ -155,7 +156,7 @@ export function QuoteRoute() {
 		<button
 			type="button"
 			onClick={() => onAction('report')}
-			className="w-fit cursor-pointer border-0 bg-transparent p-0 font-mono text-[13px] text-muted-foreground transition-colors duration-[180ms] hover:text-foreground"
+			className="tap w-fit cursor-pointer border-0 bg-transparent p-0 font-mono text-[13px] text-muted-foreground transition-colors duration-[180ms] hover:text-foreground"
 		>
 			{glyph('⚑')} report a problem with this quote
 		</button>

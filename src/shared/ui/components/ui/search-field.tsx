@@ -44,7 +44,7 @@ function SearchField({
 				'box-border flex min-w-[220px] items-center gap-2.5 rounded-field border border-input bg-card pr-2.5 pl-3.5',
 				'transition-colors duration-[180ms] hover:border-foreground',
 				'focus-within:border-clay-500 focus-within:shadow-[0_0_0_1px_var(--color-clay-500)]',
-				size === 'sm' ? 'min-h-8' : 'min-h-10',
+				size === 'sm' ? 'min-h-8 pointer-coarse:min-h-11' : 'min-h-10 pointer-coarse:min-h-11',
 				className
 			)}
 			onSubmit={(event) => {
@@ -61,7 +61,7 @@ function SearchField({
 				type="search"
 				aria-label="Search"
 				placeholder={placeholder}
-				className="min-w-0 flex-1 border-0 bg-transparent py-2 font-mono text-[13px]/[normal] text-foreground outline-0 placeholder:text-stone-400 [&::-webkit-search-cancel-button]:hidden"
+				className="min-w-0 flex-1 border-0 bg-transparent py-2 font-mono text-[13px]/[normal] text-foreground pointer-coarse:text-[16px] outline-0 placeholder:text-stone-400 [&::-webkit-search-cancel-button]:hidden"
 				{...props}
 			/>
 			{shortcut ? <Kbd>{shortcut}</Kbd> : null}
