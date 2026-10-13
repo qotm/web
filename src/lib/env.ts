@@ -24,3 +24,9 @@ export const TELEMETRY = {
 	clientToken: env.VITE_OPENOBSERVE_CLIENT_TOKEN as string | undefined,
 	environment: env.MODE
 };
+
+/** Umami page views (see @/shared/analytics); unset keeps the tracker off. */
+export const ANALYTICS = {
+	host: env.VITE_UMAMI_URL as string | undefined,
+	websiteId: env.VITE_UMAMI_WEBSITE_ID as string | undefined
+};

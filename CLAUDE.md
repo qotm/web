@@ -112,6 +112,10 @@ backend's e2e suite: both use the test database.
   `StateScreen` for errors, from `@/shared/layouts`.
 - **Telemetry**: OpenObserve RUM once `VITE_OPENOBSERVE_*` are set;
   `reportError` from `@/shared/telemetry` for errors you catch.
+- **Analytics**: Umami page views once `VITE_UMAMI_URL` and
+  `VITE_UMAMI_WEBSITE_ID` are set (`@/shared/analytics`). Public pages report
+  their path; `PRIVATE_PREFIXES` pages report the route pattern, and no page
+  sends its query or hash.
 
 ## The kit (qotm_kit)
 

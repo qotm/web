@@ -46,6 +46,11 @@ ARG VITE_OPENOBSERVE_CLIENT_TOKEN
 ENV VITE_OPENOBSERVE_URL=$VITE_OPENOBSERVE_URL \
 	VITE_OPENOBSERVE_ORG=$VITE_OPENOBSERVE_ORG \
 	VITE_OPENOBSERVE_CLIENT_TOKEN=$VITE_OPENOBSERVE_CLIENT_TOKEN
+# Umami page views. Leave unset and no tracker loads. The website id is public.
+ARG VITE_UMAMI_URL
+ARG VITE_UMAMI_WEBSITE_ID
+ENV VITE_UMAMI_URL=$VITE_UMAMI_URL \
+	VITE_UMAMI_WEBSITE_ID=$VITE_UMAMI_WEBSITE_ID
 
 # Fail loudly rather than silently producing a bundle with `undefined` URLs baked
 # in — that failure is invisible until the app 404s at runtime.

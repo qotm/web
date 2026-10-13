@@ -1,7 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { startAnalytics } from '@/shared/analytics';
 import { initTelemetry } from '@/shared/telemetry';
-import { API_URL, TELEMETRY } from '@/lib/env';
+import { ANALYTICS, API_URL, TELEMETRY } from '@/lib/env';
 import { RouterProvider } from 'react-router';
 import '@/shared/ui/styles/globals.css';
 import { Providers } from './app/providers';
@@ -13,6 +14,7 @@ import { router } from './app/router';
 // so the fetch races the session check instead of queueing behind it.
 
 initTelemetry({ service: 'qotm-web', ...TELEMETRY, apiUrls: [API_URL] });
+startAnalytics({ ...ANALYTICS, routes: router.routes });
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>

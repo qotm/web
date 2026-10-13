@@ -50,6 +50,8 @@ jobs:
             VITE_OPENOBSERVE_URL=${{ secrets.VITE_OPENOBSERVE_URL }}
             VITE_OPENOBSERVE_ORG=${{ secrets.VITE_OPENOBSERVE_ORG }}
             VITE_OPENOBSERVE_CLIENT_TOKEN=${{ secrets.VITE_OPENOBSERVE_CLIENT_TOKEN }}
+            VITE_UMAMI_URL=${{ secrets.VITE_UMAMI_URL }}
+            VITE_UMAMI_WEBSITE_ID=${{ secrets.VITE_UMAMI_WEBSITE_ID }}
           tags: |
             ${{ secrets.REGISTRY }}/${{ steps.tag.outputs.OWNER }}/web:latest
             ${{ secrets.REGISTRY }}/${{ steps.tag.outputs.OWNER }}/web:${{ steps.tag.outputs.TAG }}
