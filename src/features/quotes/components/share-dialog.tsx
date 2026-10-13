@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { track } from '@/shared/analytics';
 import { getApiBaseUrl } from '@/shared/api';
 import { Button, Dialog, Field, Input, ShareCard, Tabs, notify } from '@/shared/ui';
 import { paths } from '@/lib/paths';
@@ -61,10 +62,17 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 	const [measurePreview, previewWidth] = usePreviewWidth();
 	const link = `${window.location.origin}${paths.quote(id)}`;
 
+	useEffect(() => {
+		if (open) track('share_card_opened');
+	}, [open]);
+
 	const copy = () =>
 		navigator.clipboard
 			.writeText(link)
-			.then(() => notify(`Link copied: ${paths.quote(id)}`, { glyph: '↗' }))
+			.then(() => {
+				track('quote_link_copied', { from: 'share_dialog' });
+				notify(`Link copied: ${paths.quote(id)}`, { glyph: '↗' });
+			})
 			.catch(() => notify('Select the link to copy it.'));
 
 	const download = async () => {
@@ -75,6 +83,7 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 			const url = URL.createObjectURL(await res.blob());
 			const a = Object.assign(document.createElement('a'), { href: url, download: `qotm-${id}-${variant}.png` });
 			a.click();
+			track('share_card_downloaded', { variant });
 			URL.revokeObjectURL(url);
 		} catch {
 			notify('The image did not download. Try again.');

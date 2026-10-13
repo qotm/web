@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { RouteObject } from 'react-router';
-import { routePattern, sanitizePayload, startAnalytics } from '.';
+import { cliCommand, routePattern, sanitizePayload, startAnalytics, track } from '.';
 
 const routes: RouteObject[] = [
 	{
@@ -61,5 +61,30 @@ describe('startAnalytics', () => {
 		expect(scripts).toHaveLength(1);
 		expect(scripts[0].src).toBe('https://umami.example.com/script.js');
 		expect(scripts[0].dataset.beforeSend).toBe('__qotmUmamiBeforeSend');
+	});
+});
+
+describe('cliCommand', () => {
+	it('names a command without its arguments', () => {
+		expect(cliCommand('npm i -g qotm')).toBe('install');
+		expect(cliCommand('qotm --author edsger-dijkstra')).toBe('--author');
+		expect(cliCommand('qotm sync')).toBe('sync');
+		expect(cliCommand('qotm open q_8f2k1c')).toBe('open');
+		expect(cliCommand('qotm')).toBe('qotm');
+		expect(cliCommand('qotm "some words"')).toBe('other');
+	});
+});
+
+describe('track', () => {
+	afterEach(() => {
+		delete (window as { umami?: unknown }).umami;
+	});
+
+	it('sends through the tracker once it has loaded, and is quiet before', () => {
+		expect(() => track('share_card_opened')).not.toThrow();
+		const send = vi.fn();
+		(window as { umami?: unknown }).umami = { track: send };
+		track('quote_reacted', { reaction: 'like', on: true });
+		expect(send).toHaveBeenCalledWith('quote_reacted', { reaction: 'like', on: true });
 	});
 });

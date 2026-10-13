@@ -115,7 +115,10 @@ backend's e2e suite: both use the test database.
 - **Analytics**: Umami page views once `VITE_UMAMI_URL` and
   `VITE_UMAMI_WEBSITE_ID` are set (`@/shared/analytics`). Public pages report
   their path; `PRIVATE_PREFIXES` pages report the route pattern, and no page
-  sends its query or hash.
+  sends its query or hash. Custom events go through `track()`, after the action
+  succeeds; each one and its data is declared in `AnalyticsEvents`, with fixed
+  values only (never an id, handle or search text). The terminal components'
+  copies arrive through `onTerminalCopy` (registered in `main.tsx`).
 
 ## The kit (qotm_kit)
 

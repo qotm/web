@@ -19,6 +19,7 @@ import {
 import { paths } from '@/lib/paths';
 import { useMeQuery } from '@/features/account/api';
 import { useTopicsQuery } from '@/features/quotes/api';
+import { track } from '@/shared/analytics';
 import { useMatchQuoteQuery, useSubmitQuoteMutation } from '@/features/submissions/api';
 import {
 	cleanText,
@@ -120,6 +121,7 @@ export function SubmitRoute() {
 						return;
 					}
 					const q = res.data;
+					track('quote_submitted', { type: as ?? values.type });
 					if (q.type === 'original') {
 						// The originality check runs in the background (the worker): with no
 						// match it publishes on its own, else a moderator decides.

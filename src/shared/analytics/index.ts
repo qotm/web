@@ -99,3 +99,62 @@ export function startAnalytics({ host, websiteId, routes }: AnalyticsConfig): vo
 	script.dataset.excludeHash = 'true';
 	document.head.appendChild(script);
 }
+
+/**
+ * Every custom event and the only data it may carry. Values are fixed
+ * enumerations on purpose: never a user id, quote id, handle or search text.
+ */
+export type AnalyticsEvents = {
+	quote_reacted: { reaction: 'like' | 'favorite' | 'recommend'; on: boolean };
+	quote_link_copied: { from: 'actions' | 'share_dialog' };
+	share_card_opened: undefined;
+	share_card_downloaded: { variant: 'quote' | 'terminal' };
+	sign_in_started: { method: 'email' | 'github' | 'google' };
+	quote_submitted: { type: 'canonical' | 'original' | 'private' };
+	quote_reported: { reason: 'attribution' | 'content' | 'originality' | 'duplicate' | 'other' };
+	search_performed: { type: 'quotes' | 'authors' | 'topics'; results: 'some' | 'none' };
+	/** `command` is {@link cliCommand}'s name for it, never its arguments. */
+	cli_command_copied: { command: string };
+};
+
+type EventArgs<E extends keyof AnalyticsEvents> = AnalyticsEvents[E] extends undefined ? [] : [AnalyticsEvents[E]];
+
+type Umami = { track: (name: string, data?: object) => void | Promise<unknown> };
+const umami = () => (window as Window & { umami?: Umami }).umami;
+
+/**
+ * Sends a custom event, scrubbed by the same before-send hook as page views.
+ * Call it once the action has succeeded. Dropped when the tracker isn't loaded.
+ */
+export function track<E extends keyof AnalyticsEvents>(name: E, ...[data]: EventArgs<E>): void {
+	void Promise.resolve(umami()?.track(name, data)).catch(() => undefined);
+}
+
+/** The longest {@link trackBeforeLeaving} may hold up a redirect. */
+const LEAVE_TIMEOUT_MS = 1500;
+
+/**
+ * `track` before the page navigates away (an OAuth redirect): waits for the
+ * deferred tracker and then the send, for at most 1.5s, and never rejects.
+ * Resolves at once when analytics is off.
+ */
+export async function trackBeforeLeaving<E extends keyof AnalyticsEvents>(
+	name: E,
+	...[data]: EventArgs<E>
+): Promise<void> {
+	if (!window[BEFORE_SEND]) return;
+	const deadline = Date.now() + LEAVE_TIMEOUT_MS;
+	while (!umami() && Date.now() < deadline) await new Promise((r) => setTimeout(r, 50));
+	const sent = Promise.resolve(umami()?.track(name, data)).catch(() => undefined);
+	await Promise.race([sent, new Promise((r) => setTimeout(r, Math.max(0, deadline - Date.now())))]);
+}
+
+/**
+ * A copied terminal command's name, without its arguments: `npm i -g qotm` is
+ * `install`, `qotm --author dijkstra` is `--author`, `qotm sync` is `sync`.
+ */
+export function cliCommand(command: string): string {
+	const words = command.trim().split(/\s+/);
+	if (words[0] !== 'qotm') return words.includes('qotm') ? 'install' : 'other';
+	return /^(-{1,2})?[a-z][a-z-]*$/.test(words[1] ?? '') ? words[1] : words.length > 1 ? 'other' : 'qotm';
+}

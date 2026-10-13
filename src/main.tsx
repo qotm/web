@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { startAnalytics } from '@/shared/analytics';
+import { cliCommand, startAnalytics, track } from '@/shared/analytics';
+import { onTerminalCopy } from '@/shared/ui';
 import { initTelemetry } from '@/shared/telemetry';
 import { ANALYTICS, API_URL, TELEMETRY } from '@/lib/env';
 import { RouterProvider } from 'react-router';
@@ -15,6 +16,7 @@ import { router } from './app/router';
 
 initTelemetry({ service: 'qotm-web', ...TELEMETRY, apiUrls: [API_URL] });
 startAnalytics({ ...ANALYTICS, routes: router.routes });
+onTerminalCopy((command) => track('cli_command_copied', { command: cliCommand(command) }));
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>

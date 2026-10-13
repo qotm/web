@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { track } from '@/shared/analytics';
 import type { CreateReport } from '@/shared/types';
 import { Button, Dialog, Field, Notice, RadioGroup, Textarea, notify } from '@/shared/ui';
 import { useReportQuoteMutation } from '../api';
@@ -31,6 +32,7 @@ export function ReportDialog({ open, onClose, id }: { open: boolean; onClose: ()
 			);
 			return;
 		}
+		track('quote_reported', { reason });
 		notify('Report sent. Moderators will review it; the quote stays up meanwhile.');
 		setDetails('');
 		onClose();

@@ -1,3 +1,4 @@
+import { track, trackBeforeLeaving } from '@/shared/analytics';
 import { getAuthClient } from '@/shared/auth';
 
 type ActionResult = { error?: string };
@@ -20,7 +21,10 @@ export async function sendMagicLink(input: {
 		callbackURL: input.callbackURL,
 		errorCallbackURL: input.errorCallbackURL
 	});
-	if (!error) return {};
+	if (!error) {
+		track('sign_in_started', { method: 'email' });
+		return {};
+	}
 	if (error.code === 'TOO_MANY_LINKS' || error.status === 429) {
 		return { error: 'Too many links asked for. Wait a few minutes, then try again.' };
 	}
@@ -31,6 +35,7 @@ export async function sendMagicLink(input: {
 }
 
 export async function signInWithProvider(provider: SocialProvider, callbackURL: string): Promise<void> {
+	await trackBeforeLeaving('sign_in_started', { method: provider });
 	await getAuthClient().signIn.social({ provider, callbackURL });
 }
 

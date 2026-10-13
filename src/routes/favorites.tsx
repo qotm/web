@@ -15,6 +15,7 @@ import {
 	type QuoteAction
 } from '@/shared/ui';
 import { useMyFavoritesQuery } from '@/features/account/api';
+import { track } from '@/shared/analytics';
 import { useReactMutation } from '@/features/quotes/api';
 import { useQuoteActions } from '@/features/quotes/use-quote-actions';
 
@@ -83,12 +84,13 @@ export function FavoritesRoute() {
 		if (action !== 'favorite' || on) return act(id)(action, on);
 		void react({ id, reaction: 'favorite', on: false })
 			.unwrap()
-			.then(() =>
+			.then(() => {
+				track('quote_reacted', { reaction: 'favorite', on: false });
 				notify('Removed from favorites.', {
 					action: 'undo',
 					onAction: () => void react({ id, reaction: 'favorite', on: true })
-				})
-			)
+				});
+			})
 			.catch(() => notify('That did not save. Try again.'));
 	};
 	const total = first.data?.total;

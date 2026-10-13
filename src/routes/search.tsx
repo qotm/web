@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
+import { track } from '@/shared/analytics';
 import { PageSkeleton, StateScreen } from '@/shared/layouts';
 import {
 	Button,
@@ -51,6 +53,14 @@ export function SearchRoute() {
 		{ q, type: 'topics', limit: 2 },
 		{ skip: !q || type !== 'quotes' || !data?.counts.topics }
 	);
+
+	const tracked = useRef('');
+	useEffect(() => {
+		const key = `${type}|${q}`;
+		if (!data || isFetching || page !== 1 || tracked.current === key) return;
+		tracked.current = key;
+		track('search_performed', { type, results: data.total ? 'some' : 'none' });
+	}, [data, isFetching, page, q, type]);
 
 	const go = (next: Record<string, string | undefined>) => {
 		const p = new URLSearchParams(params);
