@@ -18,7 +18,7 @@ function CommandBlock({ command, caption, glyph = '$', tone = 'dark', className,
 	return (
 		<div
 			className={cn(
-				'rounded-field font-mono text-[15px]',
+				'max-w-full min-w-0 rounded-field font-mono text-[15px]',
 				dark ? 'bg-dark text-dark-foreground' : 'border border-border bg-card text-foreground',
 				className
 			)}
@@ -35,7 +35,7 @@ function CommandBlock({ command, caption, glyph = '$', tone = 'dark', className,
 				</div>
 			) : null}
 			<div className="flex items-center justify-between gap-3 py-3 pr-3 pl-4">
-				<code className="overflow-x-auto text-[length:inherit] whitespace-nowrap">
+				<code className="min-w-0 overflow-x-auto text-[length:inherit] whitespace-nowrap">
 					<span aria-hidden="true" className={dark ? 'text-clay-400' : 'text-clay-600'}>
 						{glyph}
 					</span>{' '}

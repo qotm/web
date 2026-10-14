@@ -49,4 +49,16 @@ test.describe('topic page', () => {
 		await expect(page.getByRole('article').first()).toBeVisible();
 		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(760);
 	});
+
+	test('a long topic’s command fits a phone: it scrolls inside its block, the copy button stays in view', async ({
+		page
+	}) => {
+		await page.setViewportSize({ width: 360, height: 800 });
+		await page.goto('/topics/engineering-leadership');
+		const copy = page.getByRole('button', { name: 'Copy qotm --topic engineering-leadership' });
+		await expect(copy).toBeVisible();
+		const box = (await copy.boundingBox())!;
+		expect(box.x + box.width).toBeLessThanOrEqual(360 - 16);
+		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+	});
 });
