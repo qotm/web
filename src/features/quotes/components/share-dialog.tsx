@@ -11,16 +11,16 @@ const RENDER_POLL_MS = 2_500;
 const RENDER_TRIES = 12;
 
 /**
- * The rendered image, or null if it is still not ready after ~30s. The API
- * redirects to the render once it exists; until then it answers 200 with a
- * placeholder (and Retry-After, which a cross-origin fetch cannot read), so
- * "followed a redirect" is what tells a real image from the stand-in.
+ * The rendered image, or null if it is still not ready after ~30s. Until the
+ * render exists the API answers with a placeholder marked `no-store` (and
+ * Retry-After, which a cross-origin fetch cannot read); Cache-Control is
+ * readable cross-origin, so it is what tells a real image from the stand-in.
  */
 async function renderedImage(url: string): Promise<Response | null> {
 	for (let i = 0; i < RENDER_TRIES; i++) {
-		const res = await fetch(url);
+		const res = await fetch(url, { cache: 'no-store' });
 		if (!res.ok) throw new Error(String(res.status));
-		if (res.redirected) return res;
+		if (!res.headers.get('cache-control')?.includes('no-store')) return res;
 		await new Promise((r) => setTimeout(r, RENDER_POLL_MS));
 	}
 	return null;
@@ -60,7 +60,9 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 	const [variant, setVariant] = useState<Variant>('quote');
 	const [busy, setBusy] = useState(false);
 	const [measurePreview, previewWidth] = usePreviewWidth();
-	const link = `${window.location.origin}${paths.quote(id)}`;
+	// The link carries the card, so it unfurls as the card picked here.
+	const path = paths.sharedQuote(id, variant);
+	const link = `${window.location.origin}${path}`;
 
 	useEffect(() => {
 		if (open) track('share_card_opened');
@@ -70,8 +72,8 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 		navigator.clipboard
 			.writeText(link)
 			.then(() => {
-				track('quote_link_copied', { from: 'share_dialog' });
-				notify(`Link copied: ${paths.quote(id)}`, { glyph: '↗' });
+				track('quote_link_copied', { from: 'share_dialog', card: variant });
+				notify(`Link copied: ${path}`, { glyph: '↗' });
 			})
 			.catch(() => notify('Select the link to copy it.'));
 
@@ -98,7 +100,7 @@ export function ShareDialog({ open, onClose, id, text, author }: ShareDialogProp
 			onClose={onClose}
 			width={600}
 			title="Share this quote"
-			description="The link always points at the quote’s permanent id, even if its wording is corrected later."
+			description="The link always points at the quote’s permanent id, even if its wording is corrected later. Shared, it shows the card you pick."
 			footer={
 				<>
 					<Button variant="quiet" onClick={onClose}>

@@ -106,7 +106,7 @@ export function startAnalytics({ host, websiteId, routes }: AnalyticsConfig): vo
  */
 export type AnalyticsEvents = {
 	quote_reacted: { reaction: 'like' | 'favorite' | 'recommend'; on: boolean };
-	quote_link_copied: { from: 'actions' | 'share_dialog' };
+	quote_link_copied: { from: 'actions' | 'share_dialog'; card?: 'quote' | 'terminal' };
 	share_card_opened: undefined;
 	share_card_downloaded: { variant: 'quote' | 'terminal' };
 	sign_in_started: { method: 'email' | 'github' | 'google' };

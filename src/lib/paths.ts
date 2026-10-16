@@ -61,6 +61,9 @@ export const paths = {
 	latest: '/latest',
 	curated: '/curated',
 	quote: (id: string) => `/q/${id.replace(/^q_/, '')}`,
+	/** A quote's link as shared: `?card=terminal` makes its og:image the terminal card. */
+	sharedQuote: (id: string, card: 'quote' | 'terminal') =>
+		`/q/${id.replace(/^q_/, '')}${card === 'terminal' ? '?card=terminal' : ''}`,
 	author: (slug: string) => `/authors/${slug}`,
 	topics: '/topics',
 	topic: (slug: string) => `/topics/${slug}`,

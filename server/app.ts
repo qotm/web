@@ -22,6 +22,7 @@ import {
 	staticTags,
 	topicTags,
 	type PageTags,
+	type QuoteCard,
 	type Site
 } from './meta.ts';
 import { topicIndexBody } from './prerender.ts';
@@ -155,7 +156,9 @@ export function createHandler(config: ServerConfig) {
 		let m = /^\/q\/([a-z0-9]{3,32})$/i.exec(path);
 		if (m) {
 			const id = `q_${m[1]}`;
-			return tagsCache(path, async () => quoteTags(await get<QuoteEntity>(`/v1/quotes/${id}`), site));
+			const card: QuoteCard = search.get('card') === 'terminal' ? 'terminal' : 'quote';
+			const key = card === 'quote' ? path : `${path}?card=${card}`;
+			return tagsCache(key, async () => quoteTags(await get<QuoteEntity>(`/v1/quotes/${id}`), site, card));
 		}
 		m = /^\/authors\/([a-z0-9-]{1,80})$/.exec(path);
 		if (m) {
@@ -262,10 +265,10 @@ export function createHandler(config: ServerConfig) {
 	}
 
 	/** The og:image route on the API for one of this site's og:image paths, or null. */
-	function ogRoute(path: string): string | null {
+	function ogRoute(path: string, search: URLSearchParams): string | null {
 		if (path === '/og.png') return '/v1/og.png';
 		let m = /^\/q\/([a-z0-9]{3,32})\/og\.png$/i.exec(path);
-		if (m) return `/v1/quotes/q_${m[1]}/og.png`;
+		if (m) return `/v1/quotes/q_${m[1]}/og.png${search.get('card') === 'terminal' ? '?variant=terminal' : ''}`;
 		m = /^\/authors\/([a-z0-9-]{1,80})\/og\.png$/.exec(path);
 		if (m) return `/v1/authors/${m[1]}/og.png`;
 		m = /^\/topics\/([a-z0-9-]{1,60})\/og\.png$/.exec(path);
@@ -327,7 +330,7 @@ export function createHandler(config: ServerConfig) {
 		const prefixed = /^\/q\/q_([a-z0-9]{3,32})(\/og\.png)?$/i.exec(path);
 		if (prefixed) return redirect(res, `/q/${prefixed[1]}${prefixed[2] ?? ''}${url.search}`);
 
-		const image = ogRoute(path);
+		const image = ogRoute(path, url.searchParams);
 		if (image) return og(req, res, image);
 
 		const part = /^\/sitemaps\/([a-z]+)\.xml$/.exec(path)?.[1];

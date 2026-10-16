@@ -51,7 +51,8 @@ backend's e2e suite: both use the test database.
   (`prerender.ts`; `createRoot` replaces it) from the API. It serves the
   og:images on this origin (`/q/:id/og.png`, `/authors/:slug/og.png`,
   `/topics/:slug/og.png`, `/og.png`, streamed from the API, which waits for
-  the render), `/sitemap.xml` (an index of `/sitemaps/{pages,quotes,authors,topics}.xml`
+  the render; a quote link's `?card=terminal`, set by the Share dialog, makes
+  its og:image the terminal card), `/sitemap.xml` (an index of `/sitemaps/{pages,quotes,authors,topics}.xml`
   from `/v1/sitemap`), the RSS feeds `/feed.xml` and `/curated.xml`,
   `robots.txt`, the IndexNow key and `/healthz`. Quotes under review or
   disputed are `noindex` (`src/shared/ui/meta/indexing.ts`). It imports

@@ -83,6 +83,7 @@ const API: Record<string, unknown> = {
 
 const RENDER = Buffer.from('rendered png');
 const FALLBACK = Buffer.from('fallback png');
+const TERMINAL = Buffer.from('terminal png');
 /** The API's og:image routes, and the bucket a render redirects to. */
 const IMAGES: Record<string, { status: number; headers: Record<string, string>; body: Buffer }> = {
 	'http://api.internal/v1/quotes/q_5k0q2j/og.png': {
@@ -91,6 +92,12 @@ const IMAGES: Record<string, { status: number; headers: Record<string, string>; 
 		body: Buffer.alloc(0)
 	},
 	'https://media.example/og/q.png': { status: 200, headers: {}, body: RENDER },
+	// The API sends the bytes itself (no redirect) since it reads the bucket with its own credentials.
+	'http://api.internal/v1/quotes/q_5k0q2j/og.png?variant=terminal': {
+		status: 200,
+		headers: { 'x-og-image': 'render' },
+		body: TERMINAL
+	},
 	'http://api.internal/v1/og.png': { status: 200, headers: { 'x-og-image': 'fallback' }, body: FALLBACK }
 };
 
@@ -142,6 +149,21 @@ describe('web server', () => {
 		// The quote itself, for crawlers that do not run the app.
 		expect(html).toContain('<div id="root"><main data-prerender');
 		expect(html).toContain('<blockquote><p>Premature optimization is the root of all evil.</p></blockquote>');
+	});
+
+	it('gives a shared ?card=terminal link the terminal card, with the same canonical URL', async () => {
+		const html = await (await fetch(`${base}/q/5k0q2j?card=terminal`)).text();
+		expect(html).toContain('<meta property="og:image" content="https://qotm.site/q/5k0q2j/og.png?card=terminal" />');
+		expect(html).toContain('<meta name="twitter:image" content="https://qotm.site/q/5k0q2j/og.png?card=terminal" />');
+		expect(html).toContain('<link rel="canonical" href="https://qotm.site/q/5k0q2j" />');
+		// Any other value is the default card.
+		const plain = await (await fetch(`${base}/q/5k0q2j?card=poster`)).text();
+		expect(plain).toContain('<meta property="og:image" content="https://qotm.site/q/5k0q2j/og.png" />');
+
+		const card = await fetch(`${base}/q/5k0q2j/og.png?card=terminal`);
+		expect(card.status).toBe(200);
+		expect(card.headers.get('cache-control')).toBe('public, max-age=86400, stale-while-revalidate=604800');
+		expect(Buffer.from(await card.arrayBuffer())).toEqual(TERMINAL);
 	});
 
 	it('keeps a quote under review out of search engines, but shareable', async () => {

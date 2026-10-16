@@ -55,8 +55,11 @@ export const creditOf = (q: Pick<QuoteEntity, 'type' | 'author' | 'attribution' 
 			: 'a former member'
 		: (q.author?.name ?? q.attribution ?? 'Unknown');
 
+/** Which of a quote's cards its og:image is: the link's `?card=` (the Share dialog's choice). */
+export type QuoteCard = 'quote' | 'terminal';
+
 /** A quote's page: its words as the title, author and source in the description, its card as og:image. */
-export function quoteTags(q: QuoteEntity, site: Site): PageTags {
+export function quoteTags(q: QuoteEntity, site: Site, variant: QuoteCard = 'quote'): PageTags {
 	const name = creditOf(q);
 	const original = q.type === 'original';
 	const canonical = `${site.origin}${paths.quote(q.id)}`;
@@ -68,7 +71,10 @@ export function quoteTags(q: QuoteEntity, site: Site): PageTags {
 		),
 		canonical,
 		type: 'article',
-		image: card(`${canonical}/og.png`, `“${q.text}”${original ? '' : ` — ${name}`}`),
+		image: card(
+			`${canonical}/og.png${variant === 'terminal' ? '?card=terminal' : ''}`,
+			`“${q.text}”${original ? '' : ` — ${name}`}`
+		),
 		noindex: NOT_INDEXED.includes(q.status),
 		jsonLd: [
 			quotation(q, site.origin),

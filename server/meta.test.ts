@@ -68,6 +68,12 @@ describe('page tags', () => {
 		});
 	});
 
+	it('makes the terminal card the og:image when the link asks for it', () => {
+		const tags = quoteTags(knuth, SITE, 'terminal');
+		expect(tags.image.url).toBe('https://qotm.site/q/5k0q2j/og.png?card=terminal');
+		expect(tags.canonical).toBe('https://qotm.site/q/5k0q2j');
+	});
+
 	it('shortens a long quote’s title, credits an original to no one, and keeps a withdrawn one out', () => {
 		const long = {
 			...knuth,
