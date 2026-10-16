@@ -61,6 +61,7 @@ describe('startAnalytics', () => {
 		expect(scripts).toHaveLength(1);
 		expect(scripts[0].src).toBe('https://umami.example.com/script.js');
 		expect(scripts[0].dataset.beforeSend).toBe('__qotmUmamiBeforeSend');
+		expect(scripts[0].dataset.performance).toBe('true');
 	});
 });
 

@@ -97,6 +97,9 @@ export function startAnalytics({ host, websiteId, routes }: AnalyticsConfig): vo
 	// Query/hash-only changes (search terms, tabs) are not new page views.
 	script.dataset.excludeSearch = 'true';
 	script.dataset.excludeHash = 'true';
+	// Core Web Vitals (LCP, INP, CLS, FCP, TTFB), once per page view; the
+	// payload's url goes through the same before-send as a page view's.
+	script.dataset.performance = 'true';
 	document.head.appendChild(script);
 }
 
