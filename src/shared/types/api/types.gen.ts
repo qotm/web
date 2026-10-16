@@ -1248,6 +1248,26 @@ export type QuotesResponses = {
 
 export type QuotesResponse = QuotesResponses[keyof QuotesResponses];
 
+export type QuotesTodayData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/quotes/today';
+};
+
+export type QuotesTodayErrors = {
+    /**
+     * Nothing is curated yet
+     */
+    404: unknown;
+};
+
+export type QuotesTodayResponses = {
+    200: QuoteCardEntity;
+};
+
+export type QuotesTodayResponse = QuotesTodayResponses[keyof QuotesTodayResponses];
+
 export type QuotesIdData = {
     body?: never;
     path: {
@@ -1689,7 +1709,7 @@ export type QuotesIdShareImageErrors = {
 
 export type QuotesIdShareImageResponses = {
     /**
-     * A placeholder; a render is queued
+     * The rendered image, or a placeholder while a render is queued
      */
     200: Blob | File;
 };
@@ -1701,7 +1721,9 @@ export type QuotesIdOgPngData = {
     path: {
         id: string;
     };
-    query?: never;
+    query?: {
+        variant?: 'quote' | 'terminal';
+    };
     url: '/v1/quotes/{id}/og.png';
 };
 
@@ -1714,7 +1736,7 @@ export type QuotesIdOgPngErrors = {
 
 export type QuotesIdOgPngResponses = {
     /**
-     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
      */
     200: Blob | File;
 };
@@ -1739,7 +1761,7 @@ export type AuthorsSlugOgPngErrors = {
 
 export type AuthorsSlugOgPngResponses = {
     /**
-     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
      */
     200: Blob | File;
 };
@@ -1764,7 +1786,7 @@ export type TopicsSlugOgPngErrors = {
 
 export type TopicsSlugOgPngResponses = {
     /**
-     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
      */
     200: Blob | File;
 };
@@ -1787,7 +1809,7 @@ export type OgPngErrors = {
 
 export type OgPngResponses = {
     /**
-     * X-Og-Image: fallback: the bundled brand card, while the render is still queued
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
      */
     200: Blob | File;
 };

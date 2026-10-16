@@ -20,7 +20,7 @@ import {
 	lifecycleOf
 } from '@/shared/ui';
 import { paths } from '@/lib/paths';
-import { useQuoteFeedQuery, useQuoteQuery } from '@/features/quotes/api';
+import { useQuoteFeedQuery, useQuoteQuery, useTodayQuoteQuery } from '@/features/quotes/api';
 import { useQuoteActions } from '@/features/quotes/use-quote-actions';
 
 const section = 'border-t border-border py-section';
@@ -78,7 +78,10 @@ function TerminalDemo({ text, author, id }: { text?: string; author?: string; id
  */
 export function LandingRoute() {
 	const curated = useQuoteFeedQuery({ feed: 'curated', limit: 2 });
-	const featured = curated.data?.list[0];
+	// The terminal and the provenance record show today's quote (a short
+	// programming one, rotating daily); the newest curated one if it fails.
+	const today = useTodayQuoteQuery();
+	const featured = today.data ?? (today.isError ? curated.data?.list[0] : undefined);
 	const detail = useQuoteQuery(featured?.id ?? '', { skip: !featured });
 	const act = useQuoteActions();
 	const name = (q?: { author: { name: string } | null; attribution: string | null }) =>

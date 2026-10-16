@@ -4,13 +4,13 @@ import { E2E, expect, test } from './fixtures';
 test.describe('landing', () => {
 	test('the hero, how it works, curated this week, provenance and contribute, from the API', async ({ page }) => {
 		const curated = await (await page.request.get(`${E2E.api}/v1/quotes?feed=curated&limit=2`)).json();
-		const featured = curated.list[0];
+		const featured = await (await page.request.get(`${E2E.api}/v1/quotes/today`)).json();
 		await page.goto('/');
 		await expect(page).toHaveTitle('qotm — a thought between commands');
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('A thought between commands.');
 		await expect(page.getByRole('button', { name: 'Copy npm i -g qotm' }).first()).toBeVisible();
 		await expect(page.getByRole('link', { name: /browse the quotes/ })).toHaveAttribute('href', '/discover');
-		// The terminal prints the featured curated quote.
+		// The terminal prints today's quote.
 		await expect(page.getByText(featured.text, { exact: true }).first()).toBeVisible();
 		await expect(page.getByText(`opening q/${featured.id.slice(2)} in your browser`)).toBeVisible();
 		await expect(page.getByRole('heading', { name: 'Terminal first. Community behind it.' })).toBeVisible();
@@ -23,6 +23,13 @@ test.describe('landing', () => {
 		await expect(page.getByRole('list', { name: 'Lifecycle' })).toBeVisible();
 		await expect(page.getByRole('link', { name: 'Submit a quote', exact: true })).toHaveAttribute('href', '/submit');
 		await expect(page.getByRole('link', { name: 'Create an account' })).toHaveAttribute('href', '/login');
+	});
+
+	test("without today's quote, the terminal prints the newest curated one", async ({ page }) => {
+		const curated = await (await page.request.get(`${E2E.api}/v1/quotes?feed=curated&limit=2`)).json();
+		await page.route('**/v1/quotes/today', (route) => route.fulfill({ status: 500, body: '{}' }));
+		await page.goto('/');
+		await expect(page.getByText(`opening q/${curated.list[0].id.slice(2)} in your browser`)).toBeVisible();
 	});
 
 	test('nothing curated yet says so; a failed feed retries', async ({ page }) => {

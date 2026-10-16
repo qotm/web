@@ -7,6 +7,7 @@ import type {
 	QuotesIdRelatedResponse,
 	QuotesIdResponse,
 	QuotesResponse,
+	QuotesTodayResponse,
 	SearchData,
 	SearchResponse,
 	TopicsSlugResponse,
@@ -44,6 +45,11 @@ export const quotesApi = baseApi.injectEndpoints({
 		/** One page of a feed (`nextCursor` loads the next). */
 		quoteFeed: build.query<QuotesResponse, FeedArgs>({
 			query: (args) => `/v1/quotes?${query(args)}`,
+			providesTags: ['QuoteFeed']
+		}),
+		/** Today's quote (the landing terminal): the same for everyone on a UTC day. */
+		todayQuote: build.query<QuotesTodayResponse, void>({
+			query: () => '/v1/quotes/today',
 			providesTags: ['QuoteFeed']
 		}),
 		/** One quote's page (a withdrawn one keeps its record). */
@@ -135,6 +141,7 @@ export const quotesApi = baseApi.injectEndpoints({
 export const {
 	useQuoteFeedQuery,
 	useQuoteQuery,
+	useTodayQuoteQuery,
 	useRelatedQuotesQuery,
 	useAuthorQuery,
 	useReportQuoteMutation,
