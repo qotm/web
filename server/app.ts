@@ -366,13 +366,24 @@ export function createHandler(config: ServerConfig) {
 		// A missing hashed asset is a real 404, not the app shell.
 		if (path.startsWith('/assets/')) return send(req, res, 404, TYPES['.txt'], 'Not found\n', 'no-store');
 
+		// One URL per page: `/discover/` is `/discover`.
+		if (path.length > 1 && path.endsWith('/')) {
+			return redirect(res, `${encodeURI(path.replace(/\/+$/, '')) || '/'}${url.search}`);
+		}
+
 		const page = 'no-cache, must-revalidate';
 		if (isPrivate(path)) {
 			res.setHeader('X-Robots-Tag', 'noindex');
 			return send(req, res, 200, TYPES['.html'], noindex(index), page);
 		}
+		// Every public page has tags and every account page is private, so a
+		// path with neither is one the app has no route for: its not-found page,
+		// with the status a crawler needs to drop it (no soft 404).
 		const pending = tagsFor(path, url.searchParams);
-		if (!pending) return send(req, res, 200, TYPES['.html'], index, page);
+		if (!pending) {
+			res.setHeader('X-Robots-Tag', 'noindex');
+			return send(req, res, 404, TYPES['.html'], noindex(index), page);
+		}
 		try {
 			const tags = await pending;
 			if (tags?.noindex) res.setHeader('X-Robots-Tag', 'noindex');

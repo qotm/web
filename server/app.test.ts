@@ -238,6 +238,29 @@ describe('web server', () => {
 		expect(await res.text()).toContain('<div id="root"></div>');
 	});
 
+	it('answers 404 for a path the app has no route for (no soft 404)', async () => {
+		for (const path of ['/does-not-exist', '/q/5k0q2j/extra', '/wp-login.php', '/ada']) {
+			const res = await fetch(`${base}${path}`);
+			expect(res.status, path).toBe(404);
+			expect(res.headers.get('x-robots-tag')).toBe('noindex');
+			const html = await res.text();
+			expect(html).toContain('<meta name="robots" content="noindex" />');
+			expect(html).toContain('<div id="root"></div>');
+		}
+		// The public pages without an API record still answer 200.
+		for (const path of ['/', '/discover', '/terms', '/search']) {
+			expect((await fetch(`${base}${path}`)).status, path).toBe(200);
+		}
+	});
+
+	it('sends a trailing-slash URL to the page’s own URL', async () => {
+		const res = await fetch(`${base}/discover/?ref=x`, { redirect: 'manual' });
+		expect(res.status).toBe(301);
+		expect(res.headers.get('location')).toBe('/discover?ref=x');
+		const deep = await fetch(`${base}/q/5k0q2j//`, { redirect: 'manual' });
+		expect(deep.headers.get('location')).toBe('/q/5k0q2j');
+	});
+
 	it('serves the app without tags when the API is down', async () => {
 		down = true;
 		const res = await fetch(`${base}/q/5k0q2j`);

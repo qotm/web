@@ -88,6 +88,10 @@ backend's e2e suite: both use the test database.
 - **`VITE_*` is inlined at build time.** A built image is pinned to one
   environment, and nothing secret may ever be a `VITE_*` variable. Read env
   only through `src/lib/env.ts`.
+- **A new public route needs its tags in `server/`** (`tagsFor`, or
+  `STATIC` in `meta.ts`), or a new account route a `PRIVATE_PREFIXES` entry:
+  the server answers 404 (noindex) for any path with neither, so crawlers
+  never index the app's not-found page as a page.
 - **`PageMeta` on every screen** (`title` is the page's own segment; the brand
   is appended). Admin and error pages pass `robots="noindex"`.
 - **Phones and tablets.** No screen may scroll sideways at 360px
