@@ -20,7 +20,29 @@
 			html {
 				background: %THEME_COLOR%;
 			}
+			/*
+				The server's crawler markup (server/prerender.ts) stays in the HTML but is
+				not painted while the app loads; it shows after 4s only if the app never
+				replaced it, and at once without JavaScript (the <noscript> below).
+			*/
+			main[data-prerender] {
+				visibility: hidden;
+				animation: prerender-reveal 0s 4s forwards;
+			}
+			@keyframes prerender-reveal {
+				to {
+					visibility: visible;
+				}
+			}
 		</style>
+		<noscript>
+			<style>
+				main[data-prerender] {
+					visibility: visible;
+					animation: none;
+				}
+			</style>
+		</noscript>
 		<meta
 			name="description"
 			content="qotm: one considered programming quote in your terminal, from a community that verifies and curates them."
