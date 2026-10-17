@@ -273,6 +273,19 @@ function Paths({ rows }: { rows: Extract<CliBlock, { paths: unknown }>['paths'] 
 	);
 }
 
+/** The README card itself, and the line that embeds it. */
+function Embed({ image, alt, markdown }: { image: string; alt: string; markdown: string }) {
+	return (
+		<div className="flex flex-col gap-3">
+			<img src={image} alt={alt} width={640} className="h-auto max-w-full" />
+			<div className={cn(ink, 'flex items-center gap-3 py-3 pr-3 pl-[18px]')}>
+				<code className="min-w-0 flex-1 overflow-x-auto text-[13px]/[21px] whitespace-nowrap">{markdown}</code>
+				<CopyButton text={markdown} label="Copy the README line" />
+			</div>
+		</div>
+	);
+}
+
 /** One block of a section. */
 export function CliBlockView({ block }: { block: CliBlock }) {
 	if (typeof block === 'string')
@@ -289,6 +302,7 @@ export function CliBlockView({ block }: { block: CliBlock }) {
 	if ('options' in block) return <Options rows={block.options} />;
 	if ('styles' in block) return <Styles styles={block.styles} />;
 	if ('paths' in block) return <Paths rows={block.paths} />;
+	if ('embed' in block) return <Embed {...block.embed} />;
 	if ('tip' in block)
 		return (
 			<p className="m-0 border-l-2 border-clay-100 pl-4 text-[14px]/[22px] text-muted-foreground">

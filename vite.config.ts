@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 import { BRAND } from './src/shared/ui/meta/brand.ts';
 import { THEME_COLOR } from './src/shared/ui/theme/theme-colors.ts';
+import { httpGet } from './server/http-get.ts';
+import { FALLBACK_QUOTE, readmeCardSvg, readmeQuoteOf } from './server/readme-card.ts';
 
 /**
  * Opens the connection to the API origin while the HTML is still parsing.
@@ -68,12 +70,43 @@ function injectHtmlConstants(): Plugin {
 
 // `loadEnv` rather than `process.env`: VITE_APP_* live in `.env`, not the shell,
 // so the build would otherwise never see them.
+/**
+ * `/today.svg` in `vite dev`: the README card, which the web image's server
+ * draws in production (server/readme-card.ts), drawn the same way from the
+ * dev API, so the /cli page's preview shows here too. No embedded font.
+ */
+function readmeCard(apiUrl: string): Plugin {
+	return {
+		name: 'app:readme-card',
+		configureServer(server) {
+			server.middlewares.use('/today.svg', (req, res) => {
+				const theme =
+					new URL(req.url ?? '/', 'http://localhost').searchParams.get('theme') === 'light' ? 'light' : 'dark';
+				void httpGet(`${apiUrl.replace(/\/+$/, '')}/v1/quotes/today`, 3000)
+					.then((r) => (r.status === 200 ? readmeQuoteOf(JSON.parse(r.body)) : FALLBACK_QUOTE))
+					.catch(() => FALLBACK_QUOTE)
+					.then((quote) => {
+						res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+						res.setHeader('Cache-Control', 'no-store');
+						res.end(readmeCardSvg(quote, theme));
+					});
+			});
+		}
+	};
+}
+
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, import.meta.dirname, '');
 	const hosts = env.VITE_APP_ALLOWED_HOSTS;
 
 	return {
-		plugins: [react(), tailwindcss(), apiPreconnect(env.VITE_APP_API_URL), injectHtmlConstants()],
+		plugins: [
+			react(),
+			tailwindcss(),
+			apiPreconnect(env.VITE_APP_API_URL),
+			injectHtmlConstants(),
+			readmeCard(env.VITE_APP_API_URL)
+		],
 		server: {
 			host: true,
 			port: env.PORT ? Number(env.PORT) : undefined,

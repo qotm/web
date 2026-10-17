@@ -150,6 +150,8 @@ const cliBlock = (b: CliBlock): string => {
 	}
 	if ('device' in b)
 		return `<p><code>qotm login</code> prints a code such as <code>${e(b.device.code)}</code>; approve it at ${a(paths.device, 'qotm.dev/device')}.</p>`;
+	if ('embed' in b)
+		return `<p><img src="${e(b.embed.image)}" alt="${e(b.embed.alt)}" width="640"></p>${pre(b.embed.markdown)}`;
 	if ('styles' in b)
 		return b.styles.map((s) => `<h3>${e(s.id)}${s.default ? ' (the default)' : ''}</h3>${pre(s.render)}`).join('');
 	if ('paths' in b)

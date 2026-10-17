@@ -32,6 +32,8 @@ export type CliBlock =
 	| { styles: { id: string; render: string; default?: boolean }[] }
 	/** Where the files live. */
 	| { paths: { os: string; config: string; data: string }[] }
+	/** A live image and the Markdown that embeds it, copyable. */
+	| { embed: { image: string; alt: string; markdown: string } }
 	/** A quieter aside, with a clay rule. */
 	| { tip: string }
 	/** A boxed note. */
@@ -108,6 +110,24 @@ export const CLI_DOC = {
 				},
 				{
 					tip: 'The guard skips it where qotm isn’t installed, so the line is safe in shared dotfiles. Prefer it quieter? `qotm config set style slab` draws a lighter panel, and `--plain` prints just the words.'
+				}
+			]
+		},
+		{
+			id: 'github',
+			label: 'On your GitHub profile',
+			heading: 'A quote on your profile, too.',
+			blocks: [
+				'`qotm.dev/today.svg` is the quote of the moment as an image, drawn the way `qotm` draws it. Put it in your profile README and it changes every day, no action needed.',
+				{
+					embed: {
+						image: '/today.svg',
+						alt: 'Today’s quote of the moment, as the README card draws it',
+						markdown: '[![Quote of the moment](https://qotm.dev/today.svg)](https://qotm.dev)'
+					}
+				},
+				{
+					tip: 'On a light profile, `?theme=light` draws it on paper. GitHub keeps a copy of images and checks for a new one every hour, so the change can show up a little after midnight UTC.'
 				}
 			]
 		},

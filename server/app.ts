@@ -1,10 +1,11 @@
-import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extname, join, normalize, sep } from 'node:path';
 import { createGzip } from 'node:zlib';
 import type {
 	AuthorEntity,
 	ProfileEntity,
+	QuoteCardEntity,
 	QuoteEntity,
 	QuoteFeedEntity,
 	TopicEntity,
@@ -26,6 +27,7 @@ import {
 	type Site
 } from './meta.ts';
 import { topicIndexBody } from './prerender.ts';
+import { FALLBACK_QUOTE, readmeCardSvg, readmeQuoteOf, type ReadmeQuote } from './readme-card.ts';
 import {
 	SITEMAP_PARTS,
 	collectUrls,
@@ -145,6 +147,15 @@ export function createHandler(config: ServerConfig) {
 	const request = (url: string, ms: number) => fetchJson(url, ms, keyFor(url));
 	const bytes = (url: string, ms: number) => fetchBytes(url, ms, keyFor(url));
 	const index = readFileSync(join(dist, 'index.html'), 'utf8');
+	// The README card's font: the site's own JetBrains Mono, from the build, read once.
+	const cardFont = (() => {
+		const assets = join(dist, 'assets');
+		const file = existsSync(assets)
+			? readdirSync(assets).find((f) => /^jetbrains-mono-latin-wght-normal.*\.woff2$/.test(f))
+			: undefined;
+		return file ? readFileSync(join(assets, file)).toString('base64') : undefined;
+	})();
+	const todayCache = memo<ReadmeQuote>(config.cacheMs ?? 600_000, 1);
 	const tagsCache = memo<PageTags | null>(config.cacheMs ?? 60_000);
 	const sitemapCache = memo<Record<SitemapPart, SitemapUrl[]>>(config.cacheMs ?? 3_600_000, 1);
 	const feedCache = memo<string>(config.cacheMs ?? 600_000, 4);
@@ -276,6 +287,30 @@ export function createHandler(config: ServerConfig) {
 		}
 	}
 
+	/**
+	 * /today.svg, the README card: the quote of the moment (the API's quote of
+	 * the day), drawn as the CLI draws it. GitHub's image proxy re-checks it
+	 * hourly; while the API is down, the site's line, held only briefly.
+	 */
+	async function today(req: IncomingMessage, res: ServerResponse, search: URLSearchParams) {
+		const theme = search.get('theme') === 'light' ? 'light' : 'dark';
+		let quote: ReadmeQuote | null = null;
+		try {
+			quote = await todayCache('today', async () => readmeQuoteOf(await get<QuoteCardEntity>('/v1/quotes/today')));
+		} catch (err) {
+			console.error(JSON.stringify({ level: 'warn', msg: 'readme card without a quote', err: String(err) }));
+		}
+		res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; font-src data:");
+		return send(
+			req,
+			res,
+			200,
+			'image/svg+xml; charset=utf-8',
+			readmeCardSvg(quote ?? FALLBACK_QUOTE, theme, cardFont),
+			quote ? 'public, max-age=3600' : 'public, max-age=300'
+		);
+	}
+
 	/** The og:image route on the API for one of this site's og:image paths, or null. */
 	function ogRoute(path: string, search: URLSearchParams): string | null {
 		if (path === '/og.png') return '/v1/og.png';
@@ -341,6 +376,8 @@ export function createHandler(config: ServerConfig) {
 		// The API's public ids carry a `q_` the site's URLs leave out.
 		const prefixed = /^\/q\/q_([a-z0-9]{3,32})(\/og\.png)?$/i.exec(path);
 		if (prefixed) return redirect(res, `/q/${prefixed[1]}${prefixed[2] ?? ''}${url.search}`);
+
+		if (path === '/today.svg') return today(req, res, url.searchParams);
 
 		const image = ogRoute(path, url.searchParams);
 		if (image) return og(req, res, image);

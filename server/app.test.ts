@@ -11,6 +11,15 @@ import type { HttpGet, HttpGetBytes } from './http-get.ts';
 const INDEX = `<!doctype html><html><head><meta name="description" content="base" /><title>qotm</title></head><body><div id="root"></div></body></html>`;
 
 const API: Record<string, unknown> = {
+	'/v1/quotes/today': {
+		id: 'q_4r8y1p',
+		text: 'Ship the smallest thing that teaches you something.',
+		type: 'original',
+		status: 'PUBLISHED',
+		author: null,
+		attribution: null,
+		contributor: { handle: 'ada' }
+	},
 	'/v1/quotes/q_5k0q2j': {
 		id: 'q_5k0q2j',
 		text: 'Premature optimization is the root of all evil.',
@@ -281,6 +290,28 @@ describe('web server', () => {
 		expect(html).toContain('<pre><code>command -v qotm &gt;/dev/null &amp;&amp; qotm</code></pre>');
 		expect(html).toContain('<td><code>~/.local/share/qotm</code></td>');
 		expect(html).not.toContain('noindex');
+	});
+
+	it('draws the quote of the moment as the README card, in ink or paper', async () => {
+		const res = await fetch(`${base}/today.svg`);
+		expect(res.status).toBe(200);
+		expect(res.headers.get('content-type')).toBe('image/svg+xml; charset=utf-8');
+		expect(res.headers.get('cache-control')).toBe('public, max-age=3600');
+		expect(res.headers.get('content-security-policy')).toContain("default-src 'none'");
+		const svg = await res.text();
+		expect(svg).toContain('Ship the smallest thing that teaches you something.');
+		expect(svg).toContain('@ada  ·  q/4r8y1p');
+		expect(svg).toContain('fill="#141210"');
+		expect(await (await fetch(`${base}/today.svg?theme=light`)).text()).toContain('fill="#f4f2ed"');
+	});
+
+	it('draws the site’s line on the README card while the API is down, held briefly', async () => {
+		down = true;
+		const res = await fetch(`${base}/today.svg?fresh=1`);
+		down = false;
+		expect(res.status).toBe(200);
+		expect(res.headers.get('cache-control')).toBe('public, max-age=300');
+		expect(await res.text()).toContain('A thought between commands.');
 	});
 
 	it('sends a trailing-slash URL to the page’s own URL', async () => {

@@ -11,8 +11,8 @@ test.describe('cli docs', () => {
 		await expect(page.getByText('Software gets slower faster than hardware gets faster.')).toBeVisible();
 		await expect(page.getByRole('link', { name: /on GitHub/ })).toHaveAttribute('href', 'https://github.com/qotm/cli');
 		const index = page.getByRole('navigation', { name: 'On this page' }).first();
-		await expect(index.getByRole('link')).toHaveCount(9);
-		await expect(page.getByRole('heading', { level: 2 })).toHaveCount(9);
+		await expect(index.getByRole('link')).toHaveCount(10);
+		await expect(page.getByRole('heading', { level: 2 })).toHaveCount(10);
 		await expect(page.getByRole('contentinfo').getByRole('link', { name: 'npm i -g qotm' })).toHaveAttribute(
 			'href',
 			'/cli'
@@ -34,6 +34,18 @@ test.describe('cli docs', () => {
 		);
 		await page.getByRole('button', { name: 'Copy npm i -g qotm and qotm' }).click();
 		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('npm i -g qotm\nqotm');
+	});
+
+	test('shows the README card and the line that embeds it', async ({ page, context }) => {
+		await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+		await page.goto('/cli#github');
+		const card = page.getByRole('img', { name: /quote of the moment, as the README card draws it/ });
+		await expect(card).toBeVisible();
+		expect(await card.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBe(640);
+		await page.getByRole('button', { name: 'Copy the README line' }).click();
+		expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+			'[![Quote of the moment](https://qotm.dev/today.svg)](https://qotm.dev)'
+		);
 	});
 
 	test('the index marks the section being read', async ({ page }) => {
