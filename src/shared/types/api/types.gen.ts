@@ -1478,6 +1478,7 @@ export type AdminSubmissionsData = {
     query?: {
         page?: number;
         limit?: number;
+        focus?: string;
     };
     url: '/v1/admin/submissions';
 };
@@ -1536,6 +1537,7 @@ export type AdminVerificationData = {
     query?: {
         page?: number;
         limit?: number;
+        focus?: string;
     };
     url: '/v1/admin/verification';
 };
@@ -1613,6 +1615,7 @@ export type AdminCurationData = {
     query?: {
         page?: number;
         limit?: number;
+        focus?: string;
     };
     url: '/v1/admin/curation';
 };
@@ -1652,7 +1655,9 @@ export type AdminReportsData = {
     query?: {
         page?: number;
         limit?: number;
+        focus?: string;
         status?: 'open' | 'resolved';
+        quote?: string;
     };
     url: '/v1/admin/reports';
 };

@@ -22,7 +22,7 @@ test.describe('admin shell', () => {
 		for (const title of ['Content', 'Taxonomy', 'People', 'System']) await expect(nav.getByText(title)).toBeVisible();
 		await expect(nav.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
 		for (const [label, key] of [
-			['Submissions', 'submissions'],
+			['Originality holds', 'submissions'],
 			['Verification queue', 'verification'],
 			['Curation queue', 'curation'],
 			['Reports', 'reports']
@@ -58,17 +58,20 @@ test.describe('admin shell', () => {
 		await signIn(page, 'verifier');
 		await page.goto('/admin');
 		await expect(page).toHaveURL(/\/admin\/verification$/);
+		await page.getByRole('button', { name: /Console\s*Verification queue/ }).click();
 		await expect(sidebar(page).getByRole('link')).toHaveCount(1);
 		await expect(page.getByRole('banner').locator('[data-status="VERIFIER"]')).toBeVisible();
 		await page.goto('/admin/users');
 		await expect(page.getByText('Not authorized')).toBeVisible();
 	});
 
-	test('a moderator sees submissions and reports', async ({ page }) => {
+	test('a moderator sees originality holds and reports', async ({ page }) => {
 		await signIn(page, 'moderator');
 		await page.goto('/admin');
 		await expect(page).toHaveURL(/\/admin\/submissions$/);
-		await expect(sidebar(page).getByRole('link')).toHaveText([/Submissions/, /Reports/]);
+		// A review queue folds the sidebar into the Console menu, at every width.
+		await page.getByRole('button', { name: /Console\s*Originality holds/ }).click();
+		await expect(sidebar(page).getByRole('link')).toHaveText([/Originality holds/, /Reports/]);
 	});
 
 	test('under 760 the sidebar folds into the Console menu above the page', async ({ page }) => {

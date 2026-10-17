@@ -16,7 +16,7 @@ type Oldest = AdminQueuesOldestResponse['list'][number];
 const QUEUE_LABEL: Record<Oldest['queue'], string> = {
 	verification: 'Verification',
 	curation: 'Curation',
-	submissions: 'Submissions',
+	submissions: 'Originality',
 	reports: 'Reports'
 };
 

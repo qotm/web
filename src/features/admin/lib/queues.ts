@@ -29,10 +29,6 @@ export function moderation(status: QuoteEntity['status'], note: string): Moderat
 	return null;
 }
 
-/** Only held originals take a moderator's decision; canonical quotes go to the verifiers. */
-export const isModerated = (item: Pick<QueueItemEntity, 'type' | 'status'>) =>
-	item.type === 'original' && item.status === 'ORIGINALITY_CHECK';
-
 /** ReviewDecision's verification outcome as the API's decision (evidence and rejection need a note). */
 export function verification(status: QuoteEntity['status'], note: string): VerificationDecision | null {
 	const n = note.trim();
@@ -115,3 +111,38 @@ export function reportDecision(status: QuoteEntity['status'], note: string): Rep
 	if (status === 'WITHDRAWN') return n ? { decision: 'withdraw', note: n } : null;
 	return null;
 }
+
+/** The item `by` places from `id` in the page's list (−1 the one above), or null past either end. */
+export function stepFrom(ids: string[], id: string | undefined, by: number): string | null {
+	const i = id ? ids.indexOf(id) : -1;
+	return i < 0 ? null : (ids[i + by] ?? null);
+}
+
+/**
+ * Where a queue goes once `id` is decided: the next item down, else the first
+ * other one (the decided one may stay, waiting for evidence), else none.
+ */
+export function nextAfter(ids: string[], id: string): string | null {
+	return stepFrom(ids, id, 1) ?? ids.find((x) => x !== id) ?? null;
+}
+
+type Waiting = Pick<AdminQuoteEntity, 'type' | 'status' | 'history'>;
+
+/**
+ * The queue a quote waits in for someone's decision, if any (the API's
+ * QUEUES). A verified quote waits for curation until a curator has looked at
+ * it: every curation decision passes through curation review.
+ */
+export function waitsIn(q: Waiting): 'submissions' | 'verification' | 'curation' | null {
+	if (q.type === 'original' && q.status === 'ORIGINALITY_CHECK') return 'submissions';
+	if (q.type === 'canonical' && ['SUBMITTED', 'UNDER_REVIEW', 'NEEDS_EVIDENCE'].includes(q.status))
+		return 'verification';
+	if (['CURATION_CANDIDATE', 'CURATION_REVIEW'].includes(q.status)) return 'curation';
+	if (q.type === 'canonical' && q.status === 'VERIFIED' && !q.history.some((h) => h.status === 'CURATION_REVIEW'))
+		return 'curation';
+	return null;
+}
+
+/** Keys typed into a field, which queue shortcuts (J / K, Esc) leave alone. */
+export const isTyping = (el: EventTarget | null) =>
+	el instanceof HTMLElement && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));

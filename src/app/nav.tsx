@@ -72,6 +72,9 @@ export const ADMIN_ACCESS: Record<AdminPage, string[]> = {
 	audit: ['admin', 'superuser']
 };
 
+/** The review queues: a split inbox, with the sidebar folded into the Console menu at every width. */
+export const REVIEW_PAGES: AdminPage[] = ['submissions', 'verification', 'curation', 'reports'];
+
 type AdminNavItem = {
 	id: AdminPage;
 	label: string;
@@ -88,7 +91,7 @@ export const ADMIN_SECTIONS: { title?: string; items: AdminNavItem[] }[] = [
 		title: 'Content',
 		items: [
 			{ id: 'quotes', label: 'Quotes' },
-			{ id: 'submissions', label: 'Submissions', count: 'submissions' },
+			{ id: 'submissions', label: 'Originality holds', count: 'submissions' },
 			{ id: 'verification', label: 'Verification queue', count: 'verification', attention: true },
 			{ id: 'curation', label: 'Curation queue', count: 'curation' },
 			{ id: 'reports', label: 'Reports', count: 'reports', attention: true }

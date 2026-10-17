@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { useAdminAuditQuery, useAuditActionsQuery } from '@/features/admin/api';
 import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import { useDebouncedValue } from '@/shared/hooks/use-debounced-value';
@@ -8,7 +9,7 @@ import { paths } from '@/lib/paths';
 
 type Action = NonNullable<NonNullable<AdminAuditData['query']>['action']>;
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 15;
 
 /** "2026-09-26 18:02", in the admin's own time zone. */
 const when = (iso: string) => {
@@ -36,11 +37,14 @@ function Target({ target }: { target: AuditEntryEntity['target'] }) {
 
 /**
  * The audit log (artboard AdminAudit): who changed what, and why, newest
- * first. Search covers actor, action, target and note; the action filter
+ * first. Search covers actor, action, target and note (and starts from
+ * `?q=`); the action filter
  * lists every action the API records.
  */
 export function AdminAuditRoute() {
-	const [search, setSearch] = useState('');
+	// `?q=q_5k0q2j` opens it searched (the quote drawer's "All in the audit log").
+	const [params] = useSearchParams();
+	const [search, setSearch] = useState(params.get('q') ?? '');
 	const q = useDebouncedValue(search.trim(), 300);
 	const [action, setAction] = useState<Action | ''>('');
 	const [page, setPage] = useState(1);

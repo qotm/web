@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useAdminQuotesQuery, useExportQuotesMutation, useExportStatusQuery } from '@/features/admin/api';
+import { QuotePeek } from '@/features/admin/components/quote-peek';
+import { stepFrom } from '@/features/admin/lib/queues';
 import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import { useDebouncedValue } from '@/shared/hooks/use-debounced-value';
 import type { AdminQuoteRowEntity, AdminQuotesData } from '@/shared/types';
@@ -24,7 +26,7 @@ import { paths } from '@/lib/paths';
 
 type Filters = NonNullable<AdminQuotesData['query']>;
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 15;
 const EXPORT_POLL_MS = 2_000;
 
 const TYPES = [
@@ -120,8 +122,9 @@ function ExportProgress({ id, onDone }: { id: string; onDone: () => void }) {
 /**
  * Admin quotes (artboard AdminQuotes): every public quote, searched by text,
  * author or id and filtered by type and state, in a selectable table with
- * paging. Export CSV queues the filtered list and offers the file when the
- * worker has written it. Filters live in the URL.
+ * paging. A row opens the quote's drawer (`?peek=q_…`); its id still links to
+ * the public page. Export CSV queues the filtered list and offers the file
+ * when the worker has written it. Filters live in the URL.
  */
 export function AdminQuotesRoute() {
 	const [params, setParams] = useSearchParams();
@@ -139,6 +142,17 @@ export function AdminQuotesRoute() {
 	const [selected, setSelected] = useState<string[]>([]);
 	const [exporting, setExporting] = useState<string | null>(null);
 	const [startExport, { isLoading: queuing }] = useExportQuotesMutation();
+	const peek = params.get('peek');
+	const ids = data?.list.map((r) => r.id) ?? [];
+	const setPeek = (id: string | null) =>
+		setParams(
+			(p) => {
+				if (id) p.set('peek', id);
+				else p.delete('peek');
+				return p;
+			},
+			{ replace: true }
+		);
 
 	const set = (next: Record<string, string>) =>
 		setParams(
@@ -244,6 +258,9 @@ export function AdminQuotesRoute() {
 						className={isFetching ? 'opacity-70' : undefined}
 						rows={data.list}
 						rowKey={(r) => r.id}
+						onRowClick={(r) => setPeek(r.id)}
+						rowLabel={(r) => `Open ${r.id}`}
+						activeKey={peek ?? undefined}
 						selectable
 						selected={selected}
 						onSelect={setSelected}
@@ -253,7 +270,7 @@ export function AdminQuotesRoute() {
 								label: 'id',
 								mono: true,
 								render: (r) => (
-									<TextLink to={paths.quote(r.id)} mono variant="quiet">
+									<TextLink to={paths.quote(r.id)} mono variant="quiet" onClick={(e) => e.stopPropagation()}>
 										{r.id}
 									</TextLink>
 								)
@@ -285,6 +302,17 @@ export function AdminQuotesRoute() {
 					/>
 				</>
 			)}
+			{peek ? (
+				<QuotePeek
+					key="peek"
+					id={peek}
+					position={ids.includes(peek) ? `${ids.indexOf(peek) + 1} of ${ids.length}` : ''}
+					prev={stepFrom(ids, peek, -1)}
+					next={stepFrom(ids, peek, 1)}
+					onGo={setPeek}
+					onClose={() => setPeek(null)}
+				/>
+			) : null}
 		</div>
 	);
 }

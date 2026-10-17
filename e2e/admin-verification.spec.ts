@@ -16,15 +16,15 @@ async function submitted(text: string, attribution = 'Grace Hopper') {
 test.describe('admin verification', () => {
 	test('lists the queue, and shows the selected quote with its provenance and notes', async ({ page }) => {
 		await signIn(page, 'verifier');
-		const queue = await (await page.request.get(`${E2E.api}/v1/admin/verification?limit=20`)).json();
+		const queue = await (await page.request.get(`${E2E.api}/v1/admin/verification?limit=10`)).json();
 		await page.goto('/admin/verification');
 		await expect(page).toHaveTitle(/^Verification queue/);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
-		const table = page.getByRole('table', { name: 'Verification queue' });
-		await expect(table.getByRole('row', { name: /^Review / })).toHaveCount(queue.list.length);
+		const list = page.getByRole('list', { name: 'Verification queue' });
+		await expect(list.getByRole('link', { name: /^Review / })).toHaveCount(queue.list.length);
 
-		await table.getByRole('row', { name: /^Review q_6h2w8r/ }).click();
-		const card = page.getByRole('region', { name: 'Submission q_6h2w8r' }).or(page.getByLabel('Submission q_6h2w8r'));
+		await list.getByRole('link', { name: /^Review q_6h2w8r/ }).click();
+		const card = page.getByRole('region', { name: 'Submission q_6h2w8r' });
 		await expect(card).toContainText('cache invalidation and naming things');
 		await expect(card).toContainText('submitted by @');
 		await expect(page.getByText('A verifier needs a primary source.')).toBeVisible();
@@ -53,7 +53,7 @@ test.describe('admin verification', () => {
 
 		await decision.getByRole('button', { name: 'Verify' }).click();
 		await expect(page.getByText(`${id} verified.`)).toBeVisible();
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
+		await expect(page.getByRole('link', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${id}'`)).toBe('VERIFIED');
 	});
 
@@ -87,8 +87,9 @@ test.describe('admin verification', () => {
 		await decision.getByRole('button', { name: 'Needs evidence' }).click();
 		await expect(page.getByText(`Evidence requested for ${id}.`)).toBeVisible();
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${id}'`)).toBe('NEEDS_EVIDENCE');
-		// Still in the queue, now with the note.
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${id}`) })).toBeVisible();
+		// The next one opens; this one stays in the queue, now with the note.
+		await expect(page).not.toHaveURL(new RegExp(`id=${id}`));
+		await page.getByRole('link', { name: new RegExp(`^Review ${id}`) }).click();
 		await expect(page.getByText('Where was this said? A talk, an interview?').last()).toBeVisible();
 	});
 
@@ -98,11 +99,36 @@ test.describe('admin verification', () => {
 		await expect(page.getByText('Not authorized')).toBeVisible();
 	});
 
-	test('stacks at 760', async ({ page }) => {
-		await page.setViewportSize({ width: 760, height: 1000 });
+	test('on a phone, the list and the item are two screens, the decision pinned at the foot', async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: 844 });
 		await signIn(page, 'admin');
 		await page.goto('/admin/verification');
-		await expect(page.getByRole('region', { name: 'Verification decision' })).toBeVisible();
-		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(760);
+		const list = page.getByRole('list', { name: 'Verification queue' });
+		await expect(list).toBeVisible();
+		await expect(page.getByRole('region', { name: 'Verification decision' })).toBeHidden();
+		await list.getByRole('link', { name: /^Review q_6h2w8r/ }).click();
+		await expect(list).toBeHidden();
+		const decision = page.getByRole('region', { name: 'Verification decision' });
+		await expect(decision.getByRole('button', { name: 'Verify' })).toBeInViewport();
+		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+		await page.getByRole('button', { name: /Queue$/ }).click();
+		await expect(list).toBeVisible();
+	});
+
+	test('J and K, and the arrows, move through the queue', async ({ page }) => {
+		await signIn(page, 'admin');
+		const queue = await (await page.request.get(`${E2E.api}/v1/admin/verification?limit=10`)).json();
+		test.skip(queue.list.length < 2, 'needs two items');
+		const [a, b] = queue.list;
+		await page.goto(`/admin/verification?id=${a.id}`);
+		await expect(page.getByRole('region', { name: `Submission ${a.id}` })).toBeVisible();
+		await page.keyboard.press('j');
+		await expect(page).toHaveURL(new RegExp(`id=${b.id}`));
+		await expect(page.getByRole('region', { name: `Submission ${b.id}` })).toContainText(`2 of ${queue.total}`);
+		await page.getByRole('button', { name: 'Previous' }).click();
+		await expect(page).toHaveURL(new RegExp(`id=${a.id}`));
+		// Not while typing a note.
+		await page.getByRole('region', { name: 'Verification decision' }).getByLabel('Note').fill('j');
+		await expect(page).toHaveURL(new RegExp(`id=${a.id}`));
 	});
 });

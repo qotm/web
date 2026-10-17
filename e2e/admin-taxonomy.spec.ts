@@ -6,7 +6,7 @@ const stamp = () => Date.now().toString(36);
 test.describe('admin taxonomy', () => {
 	test('authors: the list, search, add, edit, and a taken slug', async ({ page }) => {
 		await signIn(page, 'admin');
-		const all = await (await page.request.get(`${E2E.api}/v1/admin/authors?limit=20`)).json();
+		const all = await (await page.request.get(`${E2E.api}/v1/admin/authors?limit=15`)).json();
 		await page.goto('/admin/authors');
 		await expect(page).toHaveTitle(/^Authors/);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);

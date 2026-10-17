@@ -7,7 +7,7 @@ const rows = (page: import('@playwright/test').Page) =>
 test.describe('admin audit log', () => {
 	test('lists entries newest first, and searches and filters by action', async ({ page }) => {
 		await signIn(page, 'admin');
-		const log = await (await page.request.get(`${E2E.api}/v1/admin/audit?limit=25`)).json();
+		const log = await (await page.request.get(`${E2E.api}/v1/admin/audit?limit=15`)).json();
 		const actions = await (await page.request.get(`${E2E.api}/v1/admin/audit/actions`)).json();
 		await page.goto('/admin/audit');
 		await expect(page).toHaveTitle(/^Audit log/);

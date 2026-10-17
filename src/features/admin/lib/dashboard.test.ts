@@ -32,7 +32,7 @@ describe('dashboard', () => {
 				verification: { count: 12, oldestSince: '2026-10-06T10:00:00Z', needsEvidence: 3 },
 				curation: { count: 7, oldestSince: null, communityCandidates: 1 },
 				reports: { count: 3, oldestSince: null, onCurated: 1 },
-				submissions: { count: 23, oldestSince: null, originalityChecks: 9 }
+				submissions: { count: 23, oldestSince: '2026-10-10T12:00:00Z', originalityChecks: 23 }
 			},
 			now
 		);
@@ -40,7 +40,7 @@ describe('dashboard', () => {
 			['Verification queue', 12, 'oldest waiting 6 days'],
 			['Curation queue', 7, '1 community candidate'],
 			['Open reports', 3, '1 on a curated quote'],
-			['Submissions', 23, '9 originality checks']
+			['Originality holds', 23, 'oldest waiting 2 days']
 		]);
 	});
 

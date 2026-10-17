@@ -22,17 +22,17 @@ async function reported(text: string, reason = 'content', details = 'Reads like 
 test.describe('admin reports', () => {
 	test('lists open reports, and shows the selected one with its quote', async ({ page }) => {
 		await signIn(page, 'moderator');
-		const open = await (await page.request.get(`${E2E.api}/v1/admin/reports?status=open&limit=20`)).json();
+		const open = await (await page.request.get(`${E2E.api}/v1/admin/reports?status=open&limit=10`)).json();
 		await page.goto('/admin/reports');
 		await expect(page).toHaveTitle(/^Reports/);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
-		const table = page.getByRole('table', { name: 'Reports' });
-		await expect(table.getByRole('row', { name: /^Review / })).toHaveCount(open.list.length);
+		const list = page.getByRole('list', { name: 'Reports' });
+		await expect(list.getByRole('link', { name: /^Review / })).toHaveCount(open.list.length);
 
 		const first = open.list[0];
-		await table.getByRole('row', { name: new RegExp(`^Review ${first.id}`) }).click();
-		const card = page.getByLabel(`Report ${first.id}`);
-		await expect(card).toContainText(`Report ${first.id} · ${first.reason}`);
+		await list.getByRole('link', { name: new RegExp(`^Review ${first.id}`) }).click();
+		const card = page.getByRole('region', { name: `Report ${first.id}` });
+		await expect(card).toContainText(`${first.id} · ${first.reason}`);
 		await expect(card).toContainText(first.quote.text);
 		const decision = page.getByRole('region', { name: 'Moderation decision' });
 		await expect(decision.getByRole('button', { name: 'Dismiss report' })).toBeVisible();
@@ -63,7 +63,7 @@ test.describe('admin reports', () => {
 			.getByRole('button', { name: 'Dismiss report' })
 			.click();
 		await expect(page.getByText(`${report} dismissed.`)).toBeVisible();
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${report}`) })).toHaveCount(0);
+		await expect(page.getByRole('link', { name: new RegExp(`^Review ${report}`) })).toHaveCount(0);
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${quote}'`)).toBe('PUBLISHED');
 	});
 
@@ -81,7 +81,7 @@ test.describe('admin reports', () => {
 		await decision.getByRole('button', { name: 'Mark disputed' }).click();
 		await expect(page.getByText(`${quote} marked disputed`)).toBeVisible();
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${quote}'`)).toBe('DISPUTED');
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${report}`) })).toBeVisible();
+		await expect(page.getByRole('link', { name: new RegExp(`^Review ${report}`) })).toBeVisible();
 	});
 
 	test('withdrawing needs a note, and withdraws the quote', async ({ page }) => {
@@ -105,7 +105,8 @@ test.describe('admin reports', () => {
 		await page.setViewportSize({ width: 760, height: 1000 });
 		await signIn(page, 'moderator');
 		await page.goto('/admin/reports');
-		await expect(page.getByRole('region', { name: 'Moderation decision' })).toBeVisible();
+		// Under 1024 the list comes first; an item opens on its own screen.
+		await expect(page.getByRole('heading', { level: 1, name: 'Reports.' })).toBeVisible();
 		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(760);
 	});
 });

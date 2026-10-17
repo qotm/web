@@ -10,6 +10,8 @@ type PaginationProps = {
 	/** `pages`: range and prev / next. `more`: one "load more" button, for feeds. */
 	mode?: 'pages' | 'more';
 	loading?: boolean;
+	/** For a narrow column: prev and next at the ends, the page between, no range. */
+	compact?: boolean;
 	className?: string;
 };
 
@@ -26,6 +28,7 @@ function Pagination({
 	onPage,
 	mode = 'pages',
 	loading = false,
+	compact = false,
 	className
 }: PaginationProps) {
 	if (mode === 'more')
@@ -39,6 +42,26 @@ function Pagination({
 	const from = total ? (page - 1) * pageSize + 1 : 0;
 	const to = Math.min(total, page * pageSize);
 	const last = Math.max(1, Math.ceil(total / pageSize));
+	if (compact)
+		return (
+			<nav
+				aria-label="Pagination"
+				className={cn(
+					'flex items-center justify-between gap-3 py-stack font-mono text-[13px]/[1.6] text-muted-foreground',
+					className
+				)}
+			>
+				<button type="button" className={pagerButton} disabled={page <= 1} onClick={() => onPage?.(page - 1)}>
+					{glyph('←')} prev
+				</button>
+				<span>
+					{n(page)} / {n(last)}
+				</span>
+				<button type="button" className={pagerButton} disabled={page >= last} onClick={() => onPage?.(page + 1)}>
+					next {glyph('→')}
+				</button>
+			</nav>
+		);
 	return (
 		<nav
 			aria-label="Pagination"

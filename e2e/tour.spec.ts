@@ -66,10 +66,9 @@ test.describe('tour', () => {
 		const id = `q_${sql(`select public_id from quotes where text = '${TEXT}'`).replace(/^q_/, '')}`;
 		await shot(member, 'member-my-quotes-in-review');
 
-		// 3. Submissions: canonical quotes pass through on their way to a verifier.
-		await staff.goto(`/admin/submissions?id=${id}`);
-		await expect(staff.getByText('Canonical quotes go to verification.', { exact: true })).toBeVisible();
-		await shot(staff, 'submissions-canonical');
+		// 3. Canonical quotes go straight to a verifier: originality holds take originals only.
+		await staff.goto('/admin/submissions');
+		await expect(staff.getByRole('link', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
 
 		// 4. Verification: the author is not linked yet, so it cannot be verified. Ask for evidence first.
 		await staff.goto(`/admin/verification?id=${id}`);
@@ -220,9 +219,8 @@ test.describe('tour', () => {
 		// 14. An original that resembles an existing quote waits for a moderator.
 		await staff.goto('/admin/submissions');
 		await staff
-			.getByRole('table', { name: 'Submissions' })
-			.getByRole('row', { name: /^Review / })
-			.filter({ hasText: 'original' })
+			.getByRole('list', { name: 'Originality holds' })
+			.getByRole('link', { name: /^Review / })
 			.first()
 			.click();
 		await expect(staff.getByRole('region', { name: 'Moderation decision' })).toBeVisible();

@@ -4,7 +4,7 @@ import { E2E, expect, signIn, signUp, sql, test } from './fixtures';
 test.describe('admin users', () => {
 	test('lists users with their roles, and searches and filters', async ({ page }) => {
 		await signIn(page, 'admin');
-		const all = await (await page.request.get(`${E2E.api}/v1/admin/users?limit=20`)).json();
+		const all = await (await page.request.get(`${E2E.api}/v1/admin/users?limit=15`)).json();
 		await page.goto('/admin/users');
 		await expect(page).toHaveTitle(/^Users/);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);

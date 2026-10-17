@@ -287,3 +287,26 @@
 		}
 	}
 }
+
+/*
+ * `scrollbar-slim`: a 6px hairline scrollbar for a panel that scrolls on its
+ * own (the review queue's list and item), in Chrome and Safari. Not
+ * Tailwind's `scrollbar-thin`: any scrollbar-width makes Chrome drop these
+ * -webkit- rules, so Firefox keeps its own scrollbar.
+ */
+@utility scrollbar-slim {
+	&::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	&::-webkit-scrollbar-thumb {
+		border-radius: 999px;
+		background: var(--color-hairline);
+	}
+	&:hover::-webkit-scrollbar-thumb {
+		background: var(--color-stone-400);
+	}
+}

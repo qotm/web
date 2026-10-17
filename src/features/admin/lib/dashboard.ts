@@ -45,9 +45,9 @@ export function queueCards(q: AdminStatsResponse['queues'], now = Date.now()) {
 		},
 		{
 			page: 'submissions',
-			label: 'Submissions',
+			label: 'Originality holds',
 			value: q.submissions.count,
-			note: `${q.submissions.originalityChecks} originality check${q.submissions.originalityChecks === 1 ? '' : 's'}`
+			note: oldestNote(q.submissions.oldestSince, now) ?? 'nothing held'
 		}
 	] as const;
 }

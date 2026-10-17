@@ -19,7 +19,9 @@ test.describe('admin dashboard', () => {
 		await expect(main.getByRole('link', { name: `Open reports: ${stats.queues.reports.count}` })).toContainText(
 			`${stats.queues.reports.onCurated} on a curated quote`
 		);
-		await expect(main.getByRole('link', { name: `Submissions: ${stats.queues.submissions.count}` })).toBeVisible();
+		await expect(
+			main.getByRole('link', { name: `Originality holds: ${stats.queues.submissions.count}` })
+		).toBeVisible();
 
 		const table = main.getByRole('table', { name: 'Oldest in the queues' });
 		if (oldest.list.length)

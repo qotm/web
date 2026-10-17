@@ -5,7 +5,7 @@ import { useAuth } from '@/shared/auth';
 import { ErrorBoundary } from '@/shared/layouts';
 import { Avatar, ConsoleMenu, SideNav, SiteHeader, StatusBadge, TextLink, cn } from '@/shared/ui';
 import { ADMIN_BASE, adminPaths, paths } from '@/lib/paths';
-import { ADMIN_SECTIONS, canOpen, rolesOf, type AdminPage } from './nav';
+import { ADMIN_SECTIONS, REVIEW_PAGES, canOpen, rolesOf, type AdminPage } from './nav';
 
 /** The page a route belongs to: `handle: { admin: 'verification' }`. */
 function useAdminPage() {
@@ -27,7 +27,8 @@ function shownRole(role?: string | null) {
  * The console: the admin header (view site, the role badge, the avatar) over
  * the sidebar and the page, at 1180. The sidebar lists only the pages the
  * role may open, with live queue sizes. Under 1024 it folds into the Console
- * menu, a bar above the page, so a tablet's page gets the full width.
+ * menu, a bar above the page, so a tablet's page gets the full width; the
+ * review queues fold it at every width, for the list and the item side by side.
  */
 export function AdminShell() {
 	const { user } = useAuth();
@@ -35,6 +36,7 @@ export function AdminShell() {
 	const role = me?.role ?? user?.role;
 	const { data: counts } = useAdminCountsQuery(undefined, { pollingInterval: COUNTS_POLL_MS });
 	const active = useAdminPage();
+	const review = Boolean(active && REVIEW_PAGES.includes(active));
 	const sections = ADMIN_SECTIONS.map((s) => ({
 		title: s.title,
 		items: s.items
@@ -66,12 +68,16 @@ export function AdminShell() {
 					<div
 						className={cn(
 							'mx-auto box-content grid max-w-site-wide grid-cols-[240px_minmax(0,1fr)] gap-10 px-page pt-page pb-14',
-							'max-lg:grid-cols-1 max-lg:gap-card-y'
+							'max-lg:grid-cols-1 max-lg:gap-card-y',
+							// The review queues fill the window (ReviewQueue), over a short foot.
+							review && 'grid-cols-1 gap-card-y lg:pb-6'
 						)}
 					>
-						<SideNav aria-label="Console" sections={sections} active={active} className="max-lg:hidden" />
+						{review ? null : (
+							<SideNav aria-label="Console" sections={sections} active={active} className="max-lg:hidden" />
+						)}
 						{/* Under 1024 (a tablet or a phone) the sidebar is one bar that opens the console's sections. */}
-						<ConsoleMenu sections={sections} active={active} className="lg:hidden" />
+						<ConsoleMenu sections={sections} active={active} className={review ? 'lg:w-[340px]' : 'lg:hidden'} />
 						<main className="min-w-0">
 							<Outlet />
 						</main>

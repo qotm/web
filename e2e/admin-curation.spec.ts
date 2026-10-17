@@ -27,15 +27,15 @@ const tickAll = async (page: import('@playwright/test').Page) => {
 test.describe('admin curation', () => {
 	test('lists the queue, and shows a candidate’s signals and the checklist', async ({ page }) => {
 		await signIn(page, 'admin');
-		const queue = await (await page.request.get(`${E2E.api}/v1/admin/curation?limit=20`)).json();
+		const queue = await (await page.request.get(`${E2E.api}/v1/admin/curation?limit=10`)).json();
 		await page.goto('/admin/curation');
 		await expect(page).toHaveTitle(/^Curation queue/);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
-		const table = page.getByRole('table', { name: 'Curation queue' });
-		await expect(table.getByRole('row', { name: /^Review / })).toHaveCount(queue.list.length);
+		const list = page.getByRole('list', { name: 'Curation queue' });
+		await expect(list.getByRole('link', { name: /^Review / })).toHaveCount(queue.list.length);
 
 		const candidate = queue.list.find((q: { type: string }) => q.type === 'original');
-		await table.getByRole('row', { name: new RegExp(`^Review ${candidate.id}`) }).click();
+		await list.getByRole('link', { name: new RegExp(`^Review ${candidate.id}`) }).click();
 		const card = page.getByLabel(`Candidate ${candidate.id}`);
 		await expect(card).toContainText(candidate.text);
 		await expect(card).toContainText('declared original');
@@ -56,7 +56,7 @@ test.describe('admin curation', () => {
 		await tickAll(page);
 		await page.getByRole('region', { name: 'Curation decision' }).getByRole('button', { name: 'Curate' }).click();
 		await expect(page.getByText(`${id} curated.`)).toBeVisible();
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
+		await expect(page.getByRole('link', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${id}'`)).toBe('CURATED');
 	});
 
@@ -69,7 +69,7 @@ test.describe('admin curation', () => {
 		await decision.getByLabel('Note').fill('Needs its context to land.');
 		await decision.getByRole('button', { name: 'Keep out of dataset' }).click();
 		await expect(page.getByText(`${id} kept out of the dataset.`)).toBeVisible();
-		await expect(page.getByRole('row', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
+		await expect(page.getByRole('link', { name: new RegExp(`^Review ${id}`) })).toHaveCount(0);
 		expect(sql(`SELECT status FROM quotes WHERE public_id = '${id}'`)).toBe('VERIFIED');
 	});
 
@@ -98,7 +98,8 @@ test.describe('admin curation', () => {
 		await page.setViewportSize({ width: 760, height: 1000 });
 		await signIn(page, 'admin');
 		await page.goto('/admin/curation');
-		await expect(page.getByRole('region', { name: 'Curation decision' })).toBeVisible();
+		// Under 1024 the list comes first; an item opens on its own screen.
+		await expect(page.getByRole('heading', { level: 1, name: 'Curation queue.' })).toBeVisible();
 		expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(760);
 	});
 });

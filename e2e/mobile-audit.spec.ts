@@ -23,7 +23,13 @@ const EXTRA: Shot[] = [
 	{ name: 'privacy', path: '/privacy' },
 	{ name: 'not-found', path: '/no/such/page' },
 	{ name: 'quote-signed-out', path: '/q/8f2k1c' },
-	{ name: 'menu-open', path: '/discover', as: 'member', press: 'Menu' }
+	{ name: 'menu-open', path: '/discover', as: 'member', press: 'Menu' },
+	// The review queues' list screens (an item opens on its own screen on a phone), and the quote drawer.
+	{ name: 'verification-list', path: '/admin/verification', as: 'admin' },
+	{ name: 'curation-list', path: '/admin/curation', as: 'admin' },
+	{ name: 'reports-list', path: '/admin/reports', as: 'admin' },
+	{ name: 'submissions-list', path: '/admin/submissions', as: 'admin' },
+	{ name: 'quote-drawer', path: '/admin/quotes?peek=q_6h2w8r', as: 'admin' }
 ];
 
 type Finding = {

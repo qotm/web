@@ -101,7 +101,10 @@ backend's e2e suite: both use the test database.
   (`pointer-coarse:`), so iOS does not zoom. Components that must reflow by
   their own width use container queries (`@container`, `@min-[480px]:`):
   DataTable rows become cards under 480px, LifecycleSteps goes compact under
-  560px. The admin sidebar is the Console menu under 1024px. The patterns are
+  560px. The admin sidebar is the Console menu under 1024px, and at every
+  width on the review queues, which are a split inbox (`ReviewQueue` in
+  `features/admin/components`: list and item side by side, the decision
+  pinned under the item; two screens on a phone). The patterns are
   on the canvas's Mobile page. `AUDIT=1 yarn test:e2e e2e/mobile-audit.spec.ts`
   screenshots every screen at 390/360/768 and lists overflow, small tap
   targets and tiny text (e2e/.screenshots/audit/report.json); the screen list

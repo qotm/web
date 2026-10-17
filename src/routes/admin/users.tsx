@@ -19,7 +19,7 @@ import {
 
 type Role = AdminUsersIdRoleData['body']['role'];
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 /** The roles an admin assigns, and what each may do (BUILD-PLAN §5). */
 const ROLES: { value: Role; label: string; description: string }[] = [

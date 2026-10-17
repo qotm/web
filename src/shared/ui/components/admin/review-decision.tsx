@@ -46,6 +46,8 @@ type ReviewDecisionProps = {
 	unavailable?: Status[];
 	/** Other words for an outcome's button (a report's "Publish" keeps the quote up: "Dismiss report"). */
 	labels?: Partial<Record<Status, string>>;
+	/** Docked under a review pane: no frame, the question beside the eyebrow (left out on a phone), a two-line note. */
+	compact?: boolean;
 	className?: string;
 };
 
@@ -58,6 +60,7 @@ function ReviewDecision({
 	noteRequired = [],
 	unavailable = [],
 	labels = {},
+	compact = false,
 	className
 }: ReviewDecisionProps) {
 	const [note, setNote] = React.useState('');
@@ -67,28 +70,51 @@ function ReviewDecision({
 		<section
 			aria-label={`${kind[0].toUpperCase()}${kind.slice(1)} decision`}
 			className={cn(
-				'box-border flex flex-col gap-stack rounded-card border border-border bg-background px-card-x py-card-y',
+				'box-border flex flex-col',
+				compact ? 'gap-3' : 'gap-stack rounded-card border border-border bg-background px-card-x py-card-y',
 				className
 			)}
 		>
-			<Eyebrow tone="clay" className="m-0">
-				{kind}
-			</Eyebrow>
-			<p className="m-0 font-display text-[18px]/[1.4] font-medium">{question ?? QUESTIONS[kind]}</p>
-			<Field label="Note" hint="Kept in the audit log with your name." htmlFor={id}>
+			{compact ? (
+				<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+					<Eyebrow tone="clay" className="m-0">
+						{kind}
+					</Eyebrow>
+					<p className="m-0 text-[14px]/[1.4] text-muted-foreground max-lg:hidden">{question ?? QUESTIONS[kind]}</p>
+				</div>
+			) : (
+				<>
+					<Eyebrow tone="clay" className="m-0">
+						{kind}
+					</Eyebrow>
+					<p className="m-0 font-display text-[18px]/[1.4] font-medium">{question ?? QUESTIONS[kind]}</p>
+				</>
+			)}
+			<Field
+				label="Note"
+				hint={compact ? undefined : 'Kept in the audit log with your name.'}
+				htmlFor={id}
+				className={compact ? '[&>label]:sr-only' : undefined}
+			>
 				<Textarea
 					id={id}
-					rows={3}
-					placeholder="What you checked, and where."
+					rows={compact ? 2 : 3}
+					placeholder={compact ? 'What you checked, and where. Kept in the audit log.' : 'What you checked, and where.'}
 					value={note}
 					onChange={(e) => setNote(e.target.value)}
 				/>
 			</Field>
 			<div className="flex flex-wrap gap-2.5">
-				{DECISIONS[kind].map(([status, label, variant]) => (
+				{DECISIONS[kind].map(([status, label, variant], i) => (
 					<Button
 						key={status}
 						variant={variant}
+						// Docked on a phone: with three answers the main one takes the first row, the others share the next.
+						className={
+							compact
+								? cn('flex-[1_1_0] px-3.5 lg:flex-none', i === 0 && DECISIONS[kind].length > 2 && 'max-lg:basis-full')
+								: undefined
+						}
 						disabled={busy || unavailable.includes(status) || (noteRequired.includes(status) && !trimmed)}
 						onClick={() => onDecide?.(status, trimmed)}
 					>

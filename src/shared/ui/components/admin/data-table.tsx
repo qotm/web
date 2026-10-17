@@ -33,6 +33,8 @@ type DataTableProps<T> = {
 	onRowClick?: (row: T) => void;
 	/** Names a clickable row for assistive tech ("Open q_6h2w8r"). */
 	rowLabel?: (row: T) => string;
+	/** The row whose detail is open beside the table (a drawer): marked, and `aria-current`. */
+	activeKey?: string;
 	empty?: React.ReactNode;
 	dense?: boolean;
 	/** The table's accessible name. */
@@ -132,31 +134,33 @@ function RowCards<T>({
 							on && 'border-clay-500 bg-clay-100'
 						)}
 					>
-						<div className="flex min-h-6 flex-wrap items-center gap-2">
-							{selectable ? (
-								<input
-									type="checkbox"
-									aria-label={`Select ${k}`}
-									className="tap m-0 size-4 accent-clay-500"
-									checked={on}
-									onClick={(e) => e.stopPropagation()}
-									onChange={() => toggle(k)}
-								/>
-							) : null}
-							{by('id').map((c) => (
-								<span key={c.key} className="font-mono text-[13px] text-stone-600">
-									<Cell column={c} row={r} />
-								</span>
-							))}
-							{by('badge').map((c) => (
-								<Cell key={c.key} column={c} row={r} />
-							))}
-							{by('end').map((c) => (
-								<span key={c.key} className="ml-auto font-mono text-[13px] text-stone-600">
-									<Cell column={c} row={r} />
-								</span>
-							))}
-						</div>
+						{selectable || by('id').length || by('badge').length || by('end').length ? (
+							<div className="flex min-h-6 flex-wrap items-center gap-2">
+								{selectable ? (
+									<input
+										type="checkbox"
+										aria-label={`Select ${k}`}
+										className="tap m-0 size-4 accent-clay-500"
+										checked={on}
+										onClick={(e) => e.stopPropagation()}
+										onChange={() => toggle(k)}
+									/>
+								) : null}
+								{by('id').map((c) => (
+									<span key={c.key} className="font-mono text-[13px] text-stone-600">
+										<Cell column={c} row={r} />
+									</span>
+								))}
+								{by('badge').map((c) => (
+									<Cell key={c.key} column={c} row={r} />
+								))}
+								{by('end').map((c) => (
+									<span key={c.key} className="ml-auto font-mono text-[13px] text-stone-600">
+										<Cell column={c} row={r} />
+									</span>
+								))}
+							</div>
+						) : null}
 						{by('title').map((c) => (
 							<div key={c.key} className="font-medium text-ink [&_*]:max-w-none [&_*]:line-clamp-3">
 								<Cell column={c} row={r} />
@@ -200,6 +204,7 @@ function DataTable<T>({
 	onSelect,
 	onRowClick,
 	rowLabel,
+	activeKey,
 	empty = 'Nothing here.',
 	dense = false,
 	label,
@@ -281,10 +286,12 @@ function DataTable<T>({
 								rows.map((r) => {
 									const k = rowKey(r);
 									const on = sel.includes(k);
+									const active = k === activeKey;
 									return (
 										<tr
 											key={k}
 											aria-selected={selectable ? on : undefined}
+											aria-current={active ? 'true' : undefined}
 											aria-label={onRowClick && rowLabel ? rowLabel(r) : undefined}
 											tabIndex={onRowClick ? 0 : undefined}
 											onClick={onRowClick ? () => onRowClick(r) : undefined}
@@ -300,6 +307,8 @@ function DataTable<T>({
 											className={cn(
 												'group/row [&:hover>td]:bg-background',
 												on && '[&>td]:bg-clay-100 [&:hover>td]:bg-clay-100',
+												active &&
+													'[&>td]:bg-background [&>td:first-child]:shadow-[inset_3px_0_0_var(--color-clay-600)]',
 												onRowClick && 'cursor-pointer'
 											)}
 										>

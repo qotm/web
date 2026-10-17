@@ -7,13 +7,15 @@ import {
 	emptyChecklist,
 	correctionBody,
 	correctionValues,
-	isModerated,
 	moderation,
+	nextAfter,
 	notesOf,
 	openMatch,
 	reportDecision,
+	stepFrom,
 	submitter,
-	verification
+	verification,
+	waitsIn
 } from './queues';
 
 const knuth = {
@@ -55,11 +57,6 @@ describe('queues', () => {
 		expect(moderation('DISPUTED', 'Kent Beck’s')).toEqual({ decision: 'mark_disputed', note: 'Kent Beck’s' });
 		expect(moderation('WITHDRAWN', 'dup')).toEqual({ decision: 'withdraw', note: 'dup' });
 		expect(moderation('VERIFIED', 'x')).toBeNull();
-	});
-
-	it('moderates held originals only', () => {
-		expect(isModerated({ type: 'original', status: 'ORIGINALITY_CHECK' })).toBe(true);
-		expect(isModerated({ type: 'canonical', status: 'SUBMITTED' })).toBe(false);
 	});
 
 	it('turns a verification outcome into the API decision; evidence and rejection need a note', () => {
@@ -120,5 +117,36 @@ describe('queues', () => {
 			note: 'Checking the EWD archive.'
 		});
 		expect(reportDecision('WITHDRAWN', 'Misattributed.')).toEqual({ decision: 'withdraw', note: 'Misattributed.' });
+	});
+
+	it('steps through the page, stopping at either end', () => {
+		const ids = ['a', 'b', 'c'];
+		expect(stepFrom(ids, 'b', 1)).toBe('c');
+		expect(stepFrom(ids, 'b', -1)).toBe('a');
+		expect(stepFrom(ids, 'c', 1)).toBeNull();
+		expect(stepFrom(ids, 'a', -1)).toBeNull();
+		expect(stepFrom(ids, 'x', 1)).toBeNull();
+	});
+
+	it('opens the next item after a decision, wrapping to the first, or none when it was the last', () => {
+		expect(nextAfter(['a', 'b', 'c'], 'a')).toBe('b');
+		expect(nextAfter(['a', 'b', 'c'], 'c')).toBe('a');
+		expect(nextAfter(['a'], 'a')).toBeNull();
+	});
+
+	it('names the queue a quote waits in', () => {
+		const at = (status: string, type = 'canonical', history: string[] = []) =>
+			waitsIn({
+				type,
+				status,
+				history: history.map((h) => ({ status: h, at: '', note: null, by: null }))
+			} as unknown as Parameters<typeof waitsIn>[0]);
+		expect(at('ORIGINALITY_CHECK', 'original')).toBe('submissions');
+		expect(at('NEEDS_EVIDENCE')).toBe('verification');
+		expect(at('VERIFIED')).toBe('curation');
+		expect(at('VERIFIED', 'canonical', ['CURATION_REVIEW'])).toBeNull();
+		expect(at('CURATION_CANDIDATE', 'original')).toBe('curation');
+		expect(at('PUBLISHED', 'original')).toBeNull();
+		expect(at('CURATED')).toBeNull();
 	});
 });

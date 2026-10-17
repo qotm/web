@@ -10,12 +10,22 @@ type MatchCompareProps = {
 	match: Omit<MatchEntity, 'method'> & { method: keyof typeof METHODS };
 	onDismiss?: () => void;
 	onMarkDuplicate?: () => void;
+	/** Its own two answers; off where a decision panel already offers them. */
+	actions?: boolean;
 	busy?: boolean;
 	className?: string;
 };
 
 /** qotm_kit MatchCompare: a submission beside the quote it may duplicate, with the method and score. */
-function MatchCompare({ submitted, match: m, onDismiss, onMarkDuplicate, busy = false, className }: MatchCompareProps) {
+function MatchCompare({
+	submitted,
+	match: m,
+	onDismiss,
+	onMarkDuplicate,
+	actions = true,
+	busy = false,
+	className
+}: MatchCompareProps) {
 	const col = 'rounded-field border border-border bg-background px-4 py-3.5';
 	const label = 'mb-2 flex items-center gap-2 font-mono text-[12px]/[1.6] tracking-[0.12em] text-stone-600 uppercase';
 	const text = 'm-0 mb-1.5 font-display text-[17px]/[1.4] font-medium';
@@ -59,14 +69,16 @@ function MatchCompare({ submitted, match: m, onDismiss, onMarkDuplicate, busy = 
 					) : null}
 				</div>
 			</div>
-			<div className="flex flex-wrap gap-2.5">
-				<Button variant="outline" size="sm" disabled={busy} onClick={onDismiss}>
-					Not a duplicate
-				</Button>
-				<Button size="sm" disabled={busy} onClick={onMarkDuplicate}>
-					Mark duplicate
-				</Button>
-			</div>
+			{actions ? (
+				<div className="flex flex-wrap gap-2.5">
+					<Button variant="outline" size="sm" disabled={busy} onClick={onDismiss}>
+						Not a duplicate
+					</Button>
+					<Button size="sm" disabled={busy} onClick={onMarkDuplicate}>
+						Mark duplicate
+					</Button>
+				</div>
+			) : null}
 		</section>
 	);
 }
