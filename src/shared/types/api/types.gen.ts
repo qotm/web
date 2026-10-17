@@ -844,6 +844,7 @@ export type ManifestEntity = {
         corrected: number;
         withdrawn: number;
     };
+    license: string;
 };
 
 export type CurrentReleaseEntity = {
@@ -1325,6 +1326,133 @@ export type SitemapResponses = {
 
 export type SitemapResponse = SitemapResponses[keyof SitemapResponses];
 
+export type QuotesIdShareImageData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        variant?: 'quote' | 'terminal';
+    };
+    url: '/v1/quotes/{id}/share-image';
+};
+
+export type QuotesIdShareImageErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type QuotesIdShareImageResponses = {
+    /**
+     * The rendered image, or a placeholder while a render is queued
+     */
+    200: Blob | File;
+};
+
+export type QuotesIdShareImageResponse = QuotesIdShareImageResponses[keyof QuotesIdShareImageResponses];
+
+export type QuotesIdOgPngData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        variant?: 'quote' | 'terminal';
+    };
+    url: '/v1/quotes/{id}/og.png';
+};
+
+export type QuotesIdOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type QuotesIdOgPngResponses = {
+    /**
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
+     */
+    200: Blob | File;
+};
+
+export type QuotesIdOgPngResponse = QuotesIdOgPngResponses[keyof QuotesIdOgPngResponses];
+
+export type AuthorsSlugOgPngData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/authors/{slug}/og.png';
+};
+
+export type AuthorsSlugOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type AuthorsSlugOgPngResponses = {
+    /**
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
+     */
+    200: Blob | File;
+};
+
+export type AuthorsSlugOgPngResponse = AuthorsSlugOgPngResponses[keyof AuthorsSlugOgPngResponses];
+
+export type TopicsSlugOgPngData = {
+    body?: never;
+    path: {
+        slug: string;
+    };
+    query?: never;
+    url: '/v1/topics/{slug}/og.png';
+};
+
+export type TopicsSlugOgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type TopicsSlugOgPngResponses = {
+    /**
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
+     */
+    200: Blob | File;
+};
+
+export type TopicsSlugOgPngResponse = TopicsSlugOgPngResponses[keyof TopicsSlugOgPngResponses];
+
+export type OgPngData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/og.png';
+};
+
+export type OgPngErrors = {
+    /**
+     * Unknown, private or not public
+     */
+    404: unknown;
+};
+
+export type OgPngResponses = {
+    /**
+     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
+     */
+    200: Blob | File;
+};
+
+export type OgPngResponse = OgPngResponses[keyof OgPngResponses];
+
 export type SubmissionsCreateData = {
     body: SubmitQuote;
     path?: never;
@@ -1693,133 +1821,6 @@ export type AdminReportsIdDecisionResponses = {
 };
 
 export type AdminReportsIdDecisionResponse = AdminReportsIdDecisionResponses[keyof AdminReportsIdDecisionResponses];
-
-export type QuotesIdShareImageData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        variant?: 'quote' | 'terminal';
-    };
-    url: '/v1/quotes/{id}/share-image';
-};
-
-export type QuotesIdShareImageErrors = {
-    /**
-     * Unknown, private or not public
-     */
-    404: unknown;
-};
-
-export type QuotesIdShareImageResponses = {
-    /**
-     * The rendered image, or a placeholder while a render is queued
-     */
-    200: Blob | File;
-};
-
-export type QuotesIdShareImageResponse = QuotesIdShareImageResponses[keyof QuotesIdShareImageResponses];
-
-export type QuotesIdOgPngData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: {
-        variant?: 'quote' | 'terminal';
-    };
-    url: '/v1/quotes/{id}/og.png';
-};
-
-export type QuotesIdOgPngErrors = {
-    /**
-     * Unknown, private or not public
-     */
-    404: unknown;
-};
-
-export type QuotesIdOgPngResponses = {
-    /**
-     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
-     */
-    200: Blob | File;
-};
-
-export type QuotesIdOgPngResponse = QuotesIdOgPngResponses[keyof QuotesIdOgPngResponses];
-
-export type AuthorsSlugOgPngData = {
-    body?: never;
-    path: {
-        slug: string;
-    };
-    query?: never;
-    url: '/v1/authors/{slug}/og.png';
-};
-
-export type AuthorsSlugOgPngErrors = {
-    /**
-     * Unknown, private or not public
-     */
-    404: unknown;
-};
-
-export type AuthorsSlugOgPngResponses = {
-    /**
-     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
-     */
-    200: Blob | File;
-};
-
-export type AuthorsSlugOgPngResponse = AuthorsSlugOgPngResponses[keyof AuthorsSlugOgPngResponses];
-
-export type TopicsSlugOgPngData = {
-    body?: never;
-    path: {
-        slug: string;
-    };
-    query?: never;
-    url: '/v1/topics/{slug}/og.png';
-};
-
-export type TopicsSlugOgPngErrors = {
-    /**
-     * Unknown, private or not public
-     */
-    404: unknown;
-};
-
-export type TopicsSlugOgPngResponses = {
-    /**
-     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
-     */
-    200: Blob | File;
-};
-
-export type TopicsSlugOgPngResponse = TopicsSlugOgPngResponses[keyof TopicsSlugOgPngResponses];
-
-export type OgPngData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/v1/og.png';
-};
-
-export type OgPngErrors = {
-    /**
-     * Unknown, private or not public
-     */
-    404: unknown;
-};
-
-export type OgPngResponses = {
-    /**
-     * The rendered image (X-Og-Image: render), or (X-Og-Image: fallback) the site card or the bundled brand card while this one renders
-     */
-    200: Blob | File;
-};
-
-export type OgPngResponse = OgPngResponses[keyof OgPngResponses];
 
 export type QuotesIdReportsData = {
     body: CreateReport;

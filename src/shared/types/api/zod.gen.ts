@@ -1271,7 +1271,8 @@ export const zManifestEntity = z.object({
         added: z.number().gte(-9007199254740991).lte(9007199254740991),
         corrected: z.number().gte(-9007199254740991).lte(9007199254740991),
         withdrawn: z.number().gte(-9007199254740991).lte(9007199254740991)
-    })
+    }),
+    license: z.string()
 });
 
 export const zCurrentReleaseEntity = z.object({
