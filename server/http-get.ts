@@ -3,19 +3,19 @@ import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 
 export type Got = { status: number; body: string };
-export type HttpGet = (url: string, timeoutMs: number) => Promise<Got>;
+export type HttpGet = (url: string, timeoutMs: number, headers?: Record<string, string>) => Promise<Got>;
 
 export type GotBytes = { status: number; headers: IncomingHttpHeaders; body: Buffer };
-export type HttpGetBytes = (url: string, timeoutMs: number) => Promise<GotBytes>;
+export type HttpGetBytes = (url: string, timeoutMs: number, headers?: Record<string, string>) => Promise<GotBytes>;
 
 /**
  * A GET with node:http, not fetch: fetch refuses the Fetch spec's "bad
  * ports" (the dev API's 5060 is one), and an internal API can live anywhere.
  * Redirects are not followed; the caller decides.
  */
-export const httpGetBytes: HttpGetBytes = (url, timeoutMs) =>
+export const httpGetBytes: HttpGetBytes = (url, timeoutMs, headers = {}) =>
 	new Promise((resolve, reject) => {
-		const req = (url.startsWith('https:') ? httpsRequest : httpRequest)(url, { timeout: timeoutMs }, (res) => {
+		const req = (url.startsWith('https:') ? httpsRequest : httpRequest)(url, { headers, timeout: timeoutMs }, (res) => {
 			const chunks: Buffer[] = [];
 			res.on('data', (c: Buffer) => chunks.push(c));
 			res.on('end', () => resolve({ status: res.statusCode ?? 0, headers: res.headers, body: Buffer.concat(chunks) }));
@@ -27,11 +27,11 @@ export const httpGetBytes: HttpGetBytes = (url, timeoutMs) =>
 	});
 
 /** A JSON GET from the API. */
-export const httpGet: HttpGet = (url, timeoutMs) =>
+export const httpGet: HttpGet = (url, timeoutMs, headers = {}) =>
 	new Promise((resolve, reject) => {
 		const req = (url.startsWith('https:') ? httpsRequest : httpRequest)(
 			url,
-			{ headers: { accept: 'application/json' }, timeout: timeoutMs },
+			{ headers: { ...headers, accept: 'application/json' }, timeout: timeoutMs },
 			(res) => {
 				const chunks: Buffer[] = [];
 				res.on('data', (c: Buffer) => chunks.push(c));

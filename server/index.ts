@@ -11,6 +11,7 @@ import { createHandler } from './app.ts';
  *   SITE_URL         this site's public origin, for canonical URLs and the sitemap (required)
  *   DIST             the built app (./dist)
  *   INDEXNOW_KEY     IndexNow's key, served at /<key>.txt (the API's INDEXNOW_KEY); optional
+ *   INTERNAL_API_KEY the API's INTERNAL_API_KEY: this server's requests skip its rate limit; optional
  */
 const need = (key: string) => {
 	const value = process.env[key]?.replace(/\/+$/, '');
@@ -26,7 +27,8 @@ const handler = createHandler({
 	dist: resolve(process.env.DIST ?? 'dist'),
 	api,
 	site: need('SITE_URL'),
-	indexNowKey: process.env.INDEXNOW_KEY || undefined
+	indexNowKey: process.env.INDEXNOW_KEY || undefined,
+	apiKey: process.env.INTERNAL_API_KEY || undefined
 });
 
 const port = Number(process.env.PORT ?? 8080);

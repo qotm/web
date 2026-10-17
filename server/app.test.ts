@@ -105,6 +105,8 @@ let base: string;
 let server: Server;
 let calls = 0;
 let down = false;
+/** The headers each request went out with, by URL. */
+const sent = new Map<string, Record<string, string> | undefined>();
 
 beforeAll(async () => {
 	const dist = mkdtempSync(join(tmpdir(), 'qotm-dist-'));
@@ -113,18 +115,23 @@ beforeAll(async () => {
 	writeFileSync(join(dist, 'assets', 'index-abc123.js'), `console.log(${JSON.stringify('x'.repeat(4000))});`);
 	writeFileSync(join(dist, 'favicon.ico'), 'ico');
 	writeFileSync(join(dist, '.env'), 'SECRET=1');
-	const get: HttpGet = async (url) => {
+	const get: HttpGet = async (url, _ms, headers) => {
+		sent.set(url, headers);
 		calls++;
 		if (down) throw new Error('connect ECONNREFUSED');
 		const path = url.replace('http://api.internal', '');
 		return path in API ? { status: 200, body: JSON.stringify(API[path]) } : { status: 404, body: '{}' };
 	};
-	const getBytes: HttpGetBytes = async (url) => IMAGES[url] ?? { status: 404, headers: {}, body: Buffer.from('{}') };
+	const getBytes: HttpGetBytes = async (url, _ms, headers) => {
+		sent.set(url, headers);
+		return IMAGES[url] ?? { status: 404, headers: {}, body: Buffer.from('{}') };
+	};
 	const handler = createHandler({
 		dist,
 		api: 'http://api.internal',
 		site: 'https://qotm.site',
 		indexNowKey: 'abc123key',
+		apiKey: 'internal-key',
 		get,
 		getBytes,
 		cacheMs: 0
@@ -137,6 +144,14 @@ beforeAll(async () => {
 afterAll(() => new Promise<void>((r) => server.close(() => r())));
 
 describe('web server', () => {
+	it('sends its key to the API, and never to the bucket an og:image redirects to', async () => {
+		await fetch(`${base}/q/5k0q2j`);
+		await fetch(`${base}/q/5k0q2j/og.png`);
+		expect(sent.get('http://api.internal/v1/quotes/q_5k0q2j')).toEqual({ 'x-qotm-server': 'internal-key' });
+		expect(sent.get('http://api.internal/v1/quotes/q_5k0q2j/og.png')).toEqual({ 'x-qotm-server': 'internal-key' });
+		expect(sent.get('https://media.example/og/q.png')).toEqual({});
+	});
+
 	it('writes a quote’s tags into the app shell', async () => {
 		const res = await fetch(`${base}/q/5k0q2j`);
 		expect(res.status).toBe(200);

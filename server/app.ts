@@ -45,6 +45,12 @@ export type ServerConfig = {
 	site: string;
 	/** IndexNow's key: served at /<key>.txt so search engines trust the API's pings. */
 	indexNowKey?: string;
+	/**
+	 * The API's INTERNAL_API_KEY, sent as X-Qotm-Server so this server's
+	 * requests (every visitor's, from one address) skip the API's rate limit.
+	 * Sent to the API's origin only, never to the bucket an og:image redirects to.
+	 */
+	apiKey?: string;
 	/** How long a page waits for the API before it is sent without its tags. */
 	timeoutMs?: number;
 	/** How long the sitemap and fetched tags are reused. */
@@ -130,8 +136,14 @@ export function createHandler(config: ServerConfig) {
 	const { dist, api, site: origin } = config;
 	const site: Site = { origin };
 	const timeoutMs = config.timeoutMs ?? 1500;
-	const request = config.get ?? httpGet;
-	const bytes = config.getBytes ?? httpGetBytes;
+	// The key goes to the API's origin and nowhere else.
+	const apiOrigin = new URL(api).origin;
+	const keyFor = (url: string): Record<string, string> =>
+		config.apiKey && new URL(url).origin === apiOrigin ? { 'x-qotm-server': config.apiKey } : {};
+	const fetchJson = config.get ?? httpGet;
+	const fetchBytes = config.getBytes ?? httpGetBytes;
+	const request = (url: string, ms: number) => fetchJson(url, ms, keyFor(url));
+	const bytes = (url: string, ms: number) => fetchBytes(url, ms, keyFor(url));
 	const index = readFileSync(join(dist, 'index.html'), 'utf8');
 	const tagsCache = memo<PageTags | null>(config.cacheMs ?? 60_000);
 	const sitemapCache = memo<Record<SitemapPart, SitemapUrl[]>>(config.cacheMs ?? 3_600_000, 1);

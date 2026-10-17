@@ -60,8 +60,10 @@ backend's e2e suite: both use the test database.
   `src/features/legal/{documents,inline}.ts` (the terms and privacy policy,
   sent to crawlers in full) at runtime, so keep those free of imports; the
   Dockerfile copies them.
-  Runtime env: `API_URL`, `SITE_URL`, `INDEXNOW_KEY` (optional), `PORT`,
-  `DIST`. `yarn dev` (Vite) does not run it.
+  Runtime env: `API_URL`, `SITE_URL`, `INDEXNOW_KEY` (optional),
+  `INTERNAL_API_KEY` (the API's: sent as `X-Qotm-Server` to the API's origin
+  only, so this server's requests, every visitor's from one address, skip
+  the API's rate limit), `PORT`, `DIST`. `yarn dev` (Vite) does not run it.
 - Imports use `@/` for `src/` (`@/shared/ui`, `@/routes/settings`).
 
 ## Rules
