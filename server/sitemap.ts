@@ -1,5 +1,6 @@
 import type { SitemapEntity } from '../src/shared/types/api/types.gen.ts';
 import { PRIVATE_PREFIXES, paths } from '../src/lib/paths.ts';
+import { CLI_DOC } from '../src/features/cli/docs.ts';
 
 /** The sitemap protocol's limit for one file. */
 export const MAX_URLS = 50_000;
@@ -54,10 +55,13 @@ export async function collectUrls(get: GetJson, site: string): Promise<Record<Si
 	const data = await get<SitemapEntity>('/v1/sitemap');
 	const newest = latest(data.quotes.map((q) => q.updatedAt));
 	return {
-		pages: [paths.home, paths.discover, paths.latest, paths.curated, paths.topics].map((p) => ({
-			loc: `${site}${p === paths.home ? '/' : p}`,
-			lastmod: p === paths.topics ? latest(data.topics.map((t) => t.updatedAt)) : newest
-		})),
+		pages: [
+			...[paths.home, paths.discover, paths.latest, paths.curated, paths.topics].map((p) => ({
+				loc: `${site}${p === paths.home ? '/' : p}`,
+				lastmod: p === paths.topics ? latest(data.topics.map((t) => t.updatedAt)) : newest
+			})),
+			{ loc: `${site}${paths.cli}`, lastmod: `${CLI_DOC.updated}T00:00:00.000Z` }
+		],
 		quotes: data.quotes.map((q) => ({ loc: `${site}${paths.quote(q.id)}`, lastmod: q.updatedAt })),
 		authors: data.authors.map((a) => ({ loc: `${site}${paths.author(a.slug)}`, lastmod: a.updatedAt })),
 		topics: data.topics.map((t) => ({ loc: `${site}${paths.topic(t.slug)}`, lastmod: t.updatedAt }))

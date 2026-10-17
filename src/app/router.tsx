@@ -28,6 +28,7 @@ const FavoritesRoute = named(() => import('@/routes/favorites'), 'FavoritesRoute
 const MyQuotesRoute = named(() => import('@/routes/my-quotes'), 'MyQuotesRoute');
 const SettingsRoute = named(() => import('@/routes/settings'), 'SettingsRoute');
 const SubmitRoute = named(() => import('@/routes/submit'), 'SubmitRoute');
+const CliRoute = named(() => import('@/routes/cli'), 'CliRoute');
 const TermsRoute = named(() => import('@/routes/legal/terms'), 'TermsRoute');
 const PrivacyRoute = named(() => import('@/routes/legal/privacy'), 'PrivacyRoute');
 const LoginRoute = named(() => import('@/routes/auth/login'), 'LoginRoute');
@@ -84,6 +85,7 @@ export const router = createBrowserRouter([
 			{ path: 'topics', element: lazyRoute(<TopicRoute />) },
 			{ path: 'topics/:slug', element: lazyRoute(<TopicRoute />) },
 			{ path: 'search', element: lazyRoute(<SearchRoute />) },
+			{ path: 'cli', element: lazyRoute(<CliRoute />) },
 			{ path: 'terms', element: lazyRoute(<TermsRoute />) },
 			{ path: 'privacy', element: lazyRoute(<PrivacyRoute />) },
 			// Sign-in: an email link or OAuth, never a password. Flat paths.

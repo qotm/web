@@ -75,6 +75,7 @@ COPY src/lib/paths.ts ./src/lib/paths.ts
 COPY src/shared/ui/meta/brand.ts ./src/shared/ui/meta/brand.ts
 COPY src/shared/ui/meta/indexing.ts ./src/shared/ui/meta/indexing.ts
 COPY src/features/legal/documents.ts src/features/legal/inline.ts ./src/features/legal/
+COPY src/features/cli/docs.ts ./src/features/cli/
 COPY --from=build /app/dist ./dist
 
 # Runtime configuration (unlike the VITE_* values above, these are read at start):

@@ -70,7 +70,8 @@ export * from './components/site/site-footer';
 export * from './components/terminal/terminal';
 export * from './components/terminal/install-pill';
 export * from './components/terminal/command-block';
-export { onTerminalCopy } from './components/terminal/use-copy';
+export { onTerminalCopy, useCopy, copyHint } from './components/terminal/use-copy';
+export { CopyStatus } from './components/terminal/copy-status';
 
 // Form primitives (Formik + Zod)
 export * from './components/form/form';

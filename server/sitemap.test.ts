@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { CLI_DOC } from '../src/features/cli/docs.ts';
 import { describe, expect, it } from 'vitest';
 import { PRIVATE_PREFIXES } from '../src/lib/paths.ts';
 import { MAX_URLS, collectUrls, robotsTxt, sitemapIndexXml, sitemapXml } from './sitemap.ts';
@@ -47,11 +48,13 @@ describe('sitemap and robots', () => {
 			`${SITE}/discover`,
 			`${SITE}/latest`,
 			`${SITE}/curated`,
-			`${SITE}/topics`
+			`${SITE}/topics`,
+			`${SITE}/cli`
 		]);
-		// The feeds changed when their newest quote did; the topic index when a topic did.
+		// The feeds changed when their newest quote did; the topic index when a topic did; the CLI page when its text did.
 		expect(urls.pages[0].lastmod).toBe('2026-10-02T10:00:00.000Z');
 		expect(urls.pages[4].lastmod).toBe('2026-07-01T00:00:00.000Z');
+		expect(urls.pages[5].lastmod).toBe(`${CLI_DOC.updated}T00:00:00.000Z`);
 		expect(urls.quotes).toEqual([
 			{ loc: `${SITE}/q/aaa111`, lastmod: '2026-09-01T10:00:00.000Z' },
 			{ loc: `${SITE}/q/bbb222`, lastmod: '2026-10-02T10:00:00.000Z' }

@@ -8,6 +8,7 @@ import type {
 import { paths } from '../src/lib/paths.ts';
 import type { LegalBlock, LegalDoc } from '../src/features/legal/documents.ts';
 import { inline } from '../src/features/legal/inline.ts';
+import type { CLI_DOC, CliBlock } from '../src/features/cli/docs.ts';
 
 /**
  * Plain HTML for `#root`: what a page says, for crawlers that do not run the
@@ -26,7 +27,8 @@ const NAV = `<nav>${[
 	a(paths.discover, 'Discover'),
 	a(paths.latest, 'Latest'),
 	a(paths.curated, 'Curated'),
-	a(paths.topics, 'Topics')
+	a(paths.topics, 'Topics'),
+	a(paths.cli, 'CLI')
 ].join(' · ')}</nav>`;
 
 const page = (inner: string) =>
@@ -126,6 +128,46 @@ export function legalBody(doc: LegalDoc): string {
 			`<h2>The short version</h2><ul>${doc.summary.map((s) => `<li>${rich(s)}</li>`).join('')}</ul>` +
 			doc.sections
 				.map((s) => `<section id="${e(s.id)}"><h2>${e(s.heading)}</h2>${s.blocks.map(block).join('')}</section>`)
+				.join('')
+	);
+}
+
+const pre = (text: string) => `<pre><code>${e(text)}</code></pre>`;
+
+const cliBlock = (b: CliBlock): string => {
+	if (typeof b === 'string') return `<p>${rich(b)}</p>`;
+	if ('commands' in b) return pre(b.commands.map((l) => `$ ${l.command}${l.note ? `  # ${l.note}` : ''}`).join('\n'));
+	if ('shells' in b)
+		return `<dl>${b.shells.map((s) => `<dt>${e(s.label)}, at the end of ${e(s.file)}</dt><dd>${pre(s.line)}</dd>`).join('')}</dl>`;
+	if ('output' in b)
+		return (
+			pre([`$ ${b.output.command}`, ...(b.output.result ? [b.output.result] : []), ...b.output.lines].join('\n')) +
+			(b.checks ? `<ul>${b.checks.map((c) => `<li>${e(c)}</li>`).join('')}</ul>` : '')
+		);
+	if ('reference' in b || 'options' in b) {
+		const rows = 'reference' in b ? b.reference : b.options;
+		return `<dl>${rows.map((r) => `<dt><code>${e(r.command)}</code></dt><dd>${rich(r.note ?? '')}</dd>`).join('')}</dl>`;
+	}
+	if ('device' in b)
+		return `<p><code>qotm login</code> prints a code such as <code>${e(b.device.code)}</code>; approve it at ${a(paths.device, 'qotm.dev/device')}.</p>`;
+	if ('styles' in b)
+		return b.styles.map((s) => `<h3>${e(s.id)}${s.default ? ' (the default)' : ''}</h3>${pre(s.render)}`).join('');
+	if ('paths' in b)
+		return `<table><thead><tr><th>System</th><th>Settings, session</th><th>Dataset, favorites, history</th></tr></thead><tbody>${b.paths
+			.map((p) => `<tr><th>${e(p.os)}</th><td><code>${e(p.config)}</code></td><td><code>${e(p.data)}</code></td></tr>`)
+			.join('')}</tbody></table>`;
+	return `<p>${rich('tip' in b ? b.tip : b.note)}</p>`;
+};
+
+/** The CLI's documentation in full: a page worth reading without the app. */
+export function cliBody(doc: typeof CLI_DOC): string {
+	return page(
+		`<h1>${e(doc.heading)}</h1><p>${e(doc.lede)}</p>${pre('npm i -g qotm')}<p>${e(doc.requirements)} · ${a(doc.repo, 'source on GitHub')}</p>` +
+			doc.sections
+				.map(
+					(s, i) =>
+						`<section id="${e(s.id)}"><h2>${String(i + 1).padStart(2, '0')} · ${e(s.label)}: ${e(s.heading)}</h2>${s.blocks.map(cliBlock).join('')}</section>`
+				)
 				.join('')
 	);
 }

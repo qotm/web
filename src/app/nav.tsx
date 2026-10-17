@@ -13,7 +13,8 @@ export const SITE_NAV: SiteNavItem[] = [
 	{ id: 'discover', label: 'discover', to: paths.discover },
 	{ id: 'latest', label: 'latest', to: paths.latest },
 	{ id: 'curated', label: 'curated', to: paths.curated },
-	{ id: 'topics', label: 'topics', to: paths.topics }
+	{ id: 'topics', label: 'topics', to: paths.topics },
+	{ id: 'cli', label: 'cli', to: paths.cli }
 ];
 
 /** The site footer's columns (artboard Footer). */
@@ -39,7 +40,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
 	{
 		title: 'CLI',
 		links: [
-			{ id: 'i', label: 'npm i -g qotm', to: '/' },
+			{ id: 'i', label: 'npm i -g qotm', to: paths.cli },
 			{ id: 'gh', label: 'github', href: 'https://github.com/qotm' }
 		]
 	}

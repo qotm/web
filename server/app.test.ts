@@ -268,6 +268,21 @@ describe('web server', () => {
 		}
 	});
 
+	it('writes the CLI docs for crawlers, without asking the API', async () => {
+		const before = calls;
+		const res = await fetch(`${base}/cli`);
+		expect(res.status).toBe(200);
+		expect(calls).toBe(before);
+		const html = await res.text();
+		expect(html).toContain('<title>The CLI · qotm</title>');
+		expect(html).toContain('<link rel="canonical" href="https://qotm.site/cli" />');
+		expect(html).toContain('<h1>qotm in your terminal.</h1>');
+		expect(html).toContain('<h2>02 · Every new terminal: A thought between commands.</h2>');
+		expect(html).toContain('<pre><code>command -v qotm &gt;/dev/null &amp;&amp; qotm</code></pre>');
+		expect(html).toContain('<td><code>~/.local/share/qotm</code></td>');
+		expect(html).not.toContain('noindex');
+	});
+
 	it('sends a trailing-slash URL to the page’s own URL', async () => {
 		const res = await fetch(`${base}/discover/?ref=x`, { redirect: 'manual' });
 		expect(res.status).toBe(301);

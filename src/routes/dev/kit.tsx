@@ -220,10 +220,13 @@ const WIDTHS: Record<string, number> = {
 	TopicPicker: 640
 };
 
+/** The kit's preview draws the header with the four feeds; the site's nav also has `cli`. */
+const KIT_NAV = SITE_NAV.filter((item) => item.id !== 'cli');
+
 const KIT_SECTIONS: Record<string, ReactNode> = {
 	SiteHeader: (
 		<div className="-m-6">
-			<SiteHeader items={SITE_NAV} active="discover" wide>
+			<SiteHeader items={KIT_NAV} active="discover" wide>
 				<SearchField size="sm" shortcut={null} />
 				<Button variant="outline" size="sm">
 					Submit
@@ -243,7 +246,7 @@ const KIT_SECTIONS: Record<string, ReactNode> = {
 				/>
 			</SiteHeader>
 			<div className="h-6" />
-			<SiteHeader items={SITE_NAV} active="">
+			<SiteHeader items={KIT_NAV} active="">
 				<Button size="sm">Sign in</Button>
 			</SiteHeader>
 		</div>

@@ -10,7 +10,8 @@ import { BRAND } from '../src/shared/ui/meta/brand.ts';
 import { NOT_INDEXED } from '../src/shared/ui/meta/indexing.ts';
 import { author as authorLd, breadcrumbs, quotation, website, type JsonLd } from './jsonld.ts';
 import { PRIVACY, TERMS } from '../src/features/legal/documents.ts';
-import { authorBody, feedBody, homeBody, legalBody, profileBody, quoteBody, topicBody } from './prerender.ts';
+import { CLI_DOC } from '../src/features/cli/docs.ts';
+import { authorBody, cliBody, feedBody, homeBody, legalBody, profileBody, quoteBody, topicBody } from './prerender.ts';
 
 /**
  * The tags a crawler needs for one page: crawlers and link unfurlers do not
@@ -158,6 +159,7 @@ const STATIC: Record<string, { title: string; exact?: boolean; description: stri
 		title: 'Topics',
 		description: "The topics qotm's quotes are filed under, each with its own feed."
 	},
+	[paths.cli]: { title: CLI_DOC.title, description: CLI_DOC.description },
 	[paths.search()]: { title: 'Search', description: 'Search qotm’s quotes, authors and topics.', noindex: true },
 	[paths.terms]: { title: TERMS.title, description: TERMS.description },
 	[paths.privacy]: { title: PRIVACY.title, description: PRIVACY.description }
@@ -186,11 +188,13 @@ export function staticTags(path: string, site: Site, quotes: QuoteCardEntity[] =
 		jsonLd: home ? website(site.origin) : undefined,
 		body: home
 			? homeBody(quotes)
-			: LEGAL[path]
-				? legalBody(LEGAL[path])
-				: quotes.length
-					? feedBody(page.title, page.description, quotes)
-					: undefined
+			: path === paths.cli
+				? cliBody(CLI_DOC)
+				: LEGAL[path]
+					? legalBody(LEGAL[path])
+					: quotes.length
+						? feedBody(page.title, page.description, quotes)
+						: undefined
 	};
 }
 

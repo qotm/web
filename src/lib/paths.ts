@@ -67,6 +67,7 @@ export const paths = {
 	author: (slug: string) => `/authors/${slug}`,
 	topics: '/topics',
 	topic: (slug: string) => `/topics/${slug}`,
+	cli: '/cli',
 	search: (q?: string) => (q ? `/search?q=${encodeURIComponent(q)}` : '/search'),
 	profile: (handle: string, tab?: 'quotes' | 'contributions') => `/@${handle.replace(/^@/, '')}${tab ? `/${tab}` : ''}`,
 	login: '/login',

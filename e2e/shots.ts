@@ -42,6 +42,10 @@ export const SHOTS: Record<string, Shot[]> = {
 		{ name: 'report', path: '/q/8f2k1c', as: 'member', press: 'report' }
 	],
 	'QOT-71': [{ name: 'landing', path: '/' }],
+	'CLI docs': [
+		{ name: 'cli', path: '/cli' },
+		{ name: 'cli-signed-in', path: '/cli', as: 'member' }
+	],
 	'QOT-74': [{ name: 'author', path: '/authors/dijkstra', as: 'member' }],
 	'QOT-75': [
 		{ name: 'topic', path: '/topics/debugging', as: 'member' },

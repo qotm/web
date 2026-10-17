@@ -58,8 +58,9 @@ backend's e2e suite: both use the test database.
   disputed are `noindex` (`src/shared/ui/meta/indexing.ts`). It imports
   `src/lib/paths.ts`, `src/shared/ui/meta/{brand,indexing}.ts` and
   `src/features/legal/{documents,inline}.ts` (the terms and privacy policy,
-  sent to crawlers in full) at runtime, so keep those free of imports; the
-  Dockerfile copies them.
+  sent to crawlers in full) and `src/features/cli/docs.ts` (the /cli page's
+  text, likewise) at runtime, so keep those free of imports; the Dockerfile
+  copies them.
   Runtime env: `API_URL`, `SITE_URL`, `INDEXNOW_KEY` (optional),
   `INTERNAL_API_KEY` (the API's: sent as `X-Qotm-Server` to the API's origin
   only, so this server's requests, every visitor's from one address, skip
