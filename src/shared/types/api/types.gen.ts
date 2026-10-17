@@ -224,6 +224,10 @@ export type QuoteEntity = {
         status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
         at: string;
     }>;
+    corrections: Array<{
+        before: string;
+        at: string;
+    }>;
     releases: Array<string>;
 };
 
@@ -485,6 +489,10 @@ export type AdminQuoteEntity = {
         status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
         at: string;
     }>;
+    corrections: Array<{
+        before: string;
+        at: string;
+    }>;
     releases: Array<string>;
     history: Array<{
         status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
@@ -536,6 +544,10 @@ export type CurationDecision = {
         no_open_reports: boolean;
     };
     note: string;
+};
+
+export type Nomination = {
+    note?: string;
 };
 
 export type AdminReportPageEntity = {
@@ -1777,6 +1789,29 @@ export type AdminQuotesIdCurationResponses = {
 
 export type AdminQuotesIdCurationResponse = AdminQuotesIdCurationResponses[keyof AdminQuotesIdCurationResponses];
 
+export type AdminQuotesIdNominationData = {
+    body: Nomination;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/quotes/{id}/nomination';
+};
+
+export type AdminQuotesIdNominationErrors = {
+    404: unknown;
+    /**
+     * Not a published original, already in curation, or your own submission
+     */
+    409: unknown;
+};
+
+export type AdminQuotesIdNominationResponses = {
+    200: QuoteEntity;
+};
+
+export type AdminQuotesIdNominationResponse = AdminQuotesIdNominationResponses[keyof AdminQuotesIdNominationResponses];
+
 export type AdminReportsData = {
     body?: never;
     path?: never;
@@ -2375,7 +2410,7 @@ export type AdminAuditData = {
          * Actor handle, action, target or note: `@kofi`, `withdrew`, `q_5d3a8w`
          */
         q?: string;
-        action?: 'quote.verified' | 'quote.evidence_requested' | 'quote.rejected' | 'quote.published' | 'quote.curated' | 'quote.kept_out' | 'quote.disputed' | 'quote.restored' | 'quote.withdrawn' | 'quote.corrected' | 'report.resolved' | 'release.preview_built' | 'release.published' | 'user.role_changed' | 'author.created' | 'author.updated' | 'source.created' | 'source.updated' | 'topic.created' | 'topic.updated';
+        action?: 'quote.verified' | 'quote.evidence_requested' | 'quote.rejected' | 'quote.published' | 'quote.nominated' | 'quote.curated' | 'quote.kept_out' | 'quote.disputed' | 'quote.restored' | 'quote.withdrawn' | 'quote.corrected' | 'report.resolved' | 'release.preview_built' | 'release.published' | 'user.role_changed' | 'author.created' | 'author.updated' | 'source.created' | 'source.updated' | 'topic.created' | 'topic.updated';
         page?: number;
         limit?: number;
     };

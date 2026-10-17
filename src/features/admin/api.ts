@@ -37,6 +37,8 @@ import type {
 	AdminCurationResponse,
 	AdminQuotesIdCurationData,
 	AdminQuotesIdCurationResponse,
+	AdminQuotesIdNominationData,
+	AdminQuotesIdNominationResponse,
 	AdminAuthorsResponse,
 	AdminQueuesOldestResponse,
 	AdminQuotesIdResponse,
@@ -193,6 +195,14 @@ export const adminApi = baseApi.injectEndpoints({
 				invalidatesTags: [...DECIDED]
 			}
 		),
+		/** A curator puts a published community original forward for curation, whatever its recommends. */
+		nominateQuote: build.mutation<
+			AdminQuotesIdNominationResponse,
+			{ id: string; body: AdminQuotesIdNominationData['body'] }
+		>({
+			query: ({ id, body }) => ({ url: `/v1/admin/quotes/${id}/nomination`, method: 'POST', body }),
+			invalidatesTags: [...DECIDED]
+		}),
 		/** Reports for the moderators: open ones oldest first, or resolved ones newest first. */
 		adminReports: build.query<AdminReportsResponse, AdminReportsData['query'] | void>({
 			query: (params) => ({ url: '/v1/admin/reports', params: params ?? undefined }),
@@ -251,6 +261,7 @@ export const {
 	useAdminAuthorsQuery,
 	useAdminCurationQuery,
 	useCurateQuoteMutation,
+	useNominateQuoteMutation,
 	useAdminReportsQuery,
 	useDecideReportMutation,
 	usePublishReleaseMutation,

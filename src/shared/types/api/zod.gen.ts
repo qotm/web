@@ -387,6 +387,10 @@ export const zQuoteEntity = z.object({
         ]),
         at: z.string().datetime()
     })),
+    corrections: z.array(z.object({
+        before: z.string(),
+        at: z.string().datetime()
+    })),
     releases: z.array(z.string())
 });
 
@@ -753,6 +757,10 @@ export const zAdminQuoteEntity = z.object({
         ]),
         at: z.string().datetime()
     })),
+    corrections: z.array(z.object({
+        before: z.string(),
+        at: z.string().datetime()
+    })),
     releases: z.array(z.string()),
     history: z.array(z.object({
         status: z.enum([
@@ -789,6 +797,10 @@ export const zCorrectQuote = z.object({
 });
 
 export const zCurationDecision = z.unknown();
+
+export const zNomination = z.object({
+    note: z.string().min(3).max(1000).optional()
+});
 
 export const zAdminReportPageEntity = z.object({
     total: z.number(),

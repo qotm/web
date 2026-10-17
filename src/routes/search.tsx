@@ -15,6 +15,7 @@ import {
 	TextLink
 } from '@/shared/ui';
 import { paths } from '@/lib/paths';
+import { count } from '@/lib/count';
 import { useSearchQuery } from '@/features/quotes/api';
 import { useQuoteActions } from '@/features/quotes/use-quote-actions';
 
@@ -28,7 +29,7 @@ function TopicCard({ slug, name, quotes, curated }: { slug: string; name: string
 		<Card label="Topic">
 			<TextLink to={paths.topic(slug)}>{name}</TextLink>
 			<p className="mt-1.5 mb-0 text-[15px] text-muted-foreground">
-				{n(quotes)} quotes, {n(curated)} curated
+				{count(quotes, 'quote')}, {n(curated)} curated
 			</p>
 		</Card>
 	);
@@ -116,7 +117,7 @@ export function SearchRoute() {
 								<TextLink to={paths.author(a.slug)}>{a.name}</TextLink>
 								<p className="mt-1.5 mb-0 text-[15px] text-muted-foreground">
 									{a.line && a.line !== '—' ? `${a.line} · ` : ''}
-									{n(a.quotes)} quotes
+									{count(a.quotes, 'quote')}
 								</p>
 							</Card>
 						))}

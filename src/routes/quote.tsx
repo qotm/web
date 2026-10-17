@@ -25,6 +25,7 @@ import {
 	type QuoteAction
 } from '@/shared/ui';
 import { paths } from '@/lib/paths';
+import { count } from '@/lib/count';
 import { NOT_INDEXED } from '@/shared/ui/meta/indexing';
 import { useAuthorQuery, useQuoteQuery, useRelatedQuotesQuery } from '@/features/quotes/api';
 import { ReportDialog } from '@/features/quotes/components/report-dialog';
@@ -69,9 +70,37 @@ function MoreFromAuthor({ slug, name }: { slug: string; name: string }) {
 		<Card tone="wash" label={`More from ${surname(name)}`}>
 			{/* clay-700: clay-600 on the wash is 4.41:1, short of 4.5. */}
 			<TextLink to={paths.author(slug)} className="text-clay-700">
-				{data ? `${data.tabs.all} quotes, ${data.tabs.curated} curated` : 'All their quotes'} {glyph('→')}
+				{data ? `${count(data.tabs.all, 'quote')}, ${data.tabs.curated} curated` : 'All their quotes'} {glyph('→')}
 			</TextLink>
 		</Card>
+	);
+}
+
+/**
+ * The wording corrections, oldest first: when, and the words before (the
+ * terms promise both are public). The staff note stays in the audit log.
+ */
+function Corrections({ corrections }: { corrections: QuoteEntity['corrections'] }) {
+	if (!corrections.length) return null;
+	return (
+		<ul aria-label="Corrections" className="m-0 mt-4 flex list-none flex-col gap-3 border-t border-border p-0 pt-4">
+			{corrections.map((c) => (
+				<li key={c.at} className="flex flex-col gap-1 text-[14px]/[1.5]">
+					<span className="font-mono text-[12px] text-muted-foreground">
+						Corrected {/* As the steps above date themselves ("Jul 01"), with the year. */}
+						{new Date(c.at).toLocaleDateString('en-US', {
+							month: 'short',
+							day: '2-digit',
+							year: 'numeric',
+							timeZone: 'UTC'
+						})}
+					</span>
+					<span className="text-muted-foreground">
+						Earlier wording: <q className="text-foreground">{c.before}</q>
+					</span>
+				</li>
+			))}
+		</ul>
 	);
 }
 
@@ -216,13 +245,20 @@ export function QuoteRoute() {
 						<ProvenancePanel quote={q} />
 					</div>
 				) : (
-					<ProvenancePanel quote={q} />
+					<div className="flex flex-col gap-grid">
+						<ProvenancePanel quote={q} />
+						<Card as="section" aria-label="History" label="History">
+							<LifecycleSteps {...lifecycleOf(q)} orientation="vertical" />
+							<Corrections corrections={q.corrections} />
+						</Card>
+					</div>
 				)}
 				<div className="flex flex-col gap-grid">
 					{original ? (
 						<>
 							<Card label="Road to the CLI">
 								<LifecycleSteps {...lifecycleOf(q)} orientation="vertical" />
+								<Corrections corrections={q.corrections} />
 							</Card>
 							{q.viewer?.recommended ? (
 								<Notice tone="wash" title="You recommended this.">

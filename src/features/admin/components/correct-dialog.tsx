@@ -5,13 +5,9 @@ import { useDebouncedValue } from '@/shared/hooks/use-debounced-value';
 import type { AdminQuoteEntity } from '@/shared/types';
 import { Button, Dialog, Field, FormField, FormTextarea, Input, Notice, notify } from '@/shared/ui';
 import { correctionBody, correctionValues, type CorrectionValues } from '../lib/queues';
+import { refusal } from '../lib/refusal';
 
 /** The API's own words for a refusal it explains ("Link the author before verifying…"). */
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
-};
-
 const validateCorrection = (v: CorrectionValues) => {
 	const errors: Partial<Record<keyof CorrectionValues, string>> = {};
 	if (v.note.trim().length < 3) errors.note = 'Say what you checked, for the audit log';

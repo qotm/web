@@ -25,6 +25,7 @@ const quote = (q: Partial<QuoteEntity> = {}): QuoteEntity => ({
 	verifier: null,
 	verifiedAt: null,
 	lifecycle: [],
+	corrections: [],
 	releases: [],
 	...q
 });

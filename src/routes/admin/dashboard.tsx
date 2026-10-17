@@ -128,7 +128,15 @@ export function AdminDashboardRoute() {
 						</section>
 						<DraftRelease />
 					</div>
-					<h2 className={`${h2} mt-2`}>Corpus quality · last 30 days</h2>
+					<div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+						<h2 className={h2}>Corpus quality · last 30 days</h2>
+						{/* Rolled up hourly, so a decision shows here within the hour. */}
+						<span className="font-mono text-[12px] text-muted-foreground">
+							as of{' '}
+							{new Date(data.period.rolledUpAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })} ·
+							updated hourly
+						</span>
+					</div>
 					<div className={grid4}>
 						<StatCard
 							label="Verification acceptance"

@@ -8,13 +8,9 @@ import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import type { AdminReportEntity } from '@/shared/types';
 import { Button, Notice, QuoteBlock, ReviewDecision, StatusBadge, TextLink, notify } from '@/shared/ui';
 import { paths } from '@/lib/paths';
+import { refusal } from '@/features/admin/lib/refusal';
 
 const PAGE_SIZE = 10;
-
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
-};
 
 const reporter = (r: Pick<AdminReportEntity, 'reporter'>) => (r.reporter ? `@${r.reporter}` : 'a former member');
 

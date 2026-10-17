@@ -4,6 +4,23 @@ const actions = (page: import('@playwright/test').Page) => page.getByRole('group
 
 /** QOT-73: the quote page and its share and report dialogs. */
 test.describe('quote page', () => {
+	test('canonical: its history, with the earlier wording of a correction (never the staff note)', async ({ page }) => {
+		sql(
+			"INSERT INTO corrections (id, quote_id, old_text, new_text, note, created_at) SELECT 'e2e_correction', id, 'Simplicity is prerequisit for reliability.', text, 'Typo in prerequisite', '2026-09-20' FROM quotes WHERE public_id = 'q_8f2k1c'"
+		);
+		try {
+			await page.goto('/q/8f2k1c');
+			const history = page.getByRole('region', { name: 'History' });
+			await expect(history.getByRole('list', { name: 'Lifecycle' })).toBeVisible();
+			const corrections = history.getByRole('list', { name: 'Corrections' });
+			await expect(corrections).toContainText('Corrected Sep 20, 2026');
+			await expect(corrections).toContainText('Earlier wording: Simplicity is prerequisit for reliability.');
+			await expect(page.getByText('Typo in prerequisite')).toHaveCount(0);
+		} finally {
+			sql("DELETE FROM corrections WHERE id = 'e2e_correction'");
+		}
+	});
+
 	test('canonical: badges, the quote, provenance, the terminal command, share card, more from the author, related', async ({
 		page
 	}) => {

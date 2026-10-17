@@ -1,4 +1,4 @@
-import { E2E, apiAs, expect, signIn, test } from './fixtures';
+import { E2E, apiAs, expect, signIn, sql, test } from './fixtures';
 
 const rows = (page: import('@playwright/test').Page) => page.getByRole('table', { name: 'Quotes' }).locator('tbody tr');
 
@@ -113,6 +113,26 @@ test.describe('admin quotes', () => {
 
 		await page.getByRole('link', { name: a.id, exact: true }).click();
 		await expect(page).toHaveURL(new RegExp(`/q/${a.id.replace(/^q_/, '')}$`));
+	});
+
+	test('a curator nominates a published original from the drawer; it then opens in curation', async ({ page }) => {
+		sql(
+			"INSERT INTO quotes (id, public_id, text, type, status, published_at, updated_at) VALUES ('e2e_nominate', 'q_e2enom', 'Ship the smallest thing that teaches you something.', 'ORIGINAL', 'PUBLISHED', now(), now())"
+		);
+		try {
+			await signIn(page, 'admin');
+			await page.goto('/admin/quotes?peek=q_e2enom');
+			const drawer = page.getByRole('dialog', { name: 'Quote q_e2enom' });
+			await drawer.getByRole('button', { name: 'Nominate for curation' }).click();
+			await expect(page.getByText('q_e2enom is a curation candidate.')).toBeVisible();
+			await expect(drawer.getByRole('link', { name: /Open in curation queue/ })).toHaveAttribute(
+				'href',
+				'/admin/curation?id=q_e2enom'
+			);
+		} finally {
+			sql("DELETE FROM audit_logs WHERE target_id = 'q_e2enom'");
+			sql("DELETE FROM quotes WHERE id = 'e2e_nominate'");
+		}
 	});
 
 	test('the drawer’s main action opens the queue the quote waits in, or its open report', async ({ page }) => {

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Link } from 'react-router';
-import { useAdminQuoteQuery, useAdminReportsQuery } from '@/features/admin/api';
+import { useAdminQuoteQuery, useAdminReportsQuery, useNominateQuoteMutation } from '@/features/admin/api';
 import { PageSkeleton, StateScreen } from '@/shared/layouts';
 import { Button, IconButton, Notice, ProvenancePanel, QuoteBlock, StatusBadge, TextLink, notify } from '@/shared/ui';
 import { adminPaths, paths } from '@/lib/paths';
 import { isTyping, waitsIn } from '../lib/queues';
+import { refusal } from '../lib/refusal';
 import { CorrectDialog } from './correct-dialog';
 import { Signals } from './signals';
 
@@ -66,6 +67,10 @@ export function QuotePeek({ id, position, prev, next, onGo, onClose }: QuotePeek
 			? { to: `${adminPaths[queue]}?id=${id}`, label: QUEUE_ACTION[queue] }
 			: null;
 	const history = quote ? quote.history.toReversed().slice(0, 3) : [];
+	// A published original not yet in curation: a curator may put it forward.
+	const nominable =
+		!action && quote?.type === 'original' && ['PUBLISHED', 'COMMUNITY_DISCOVERY'].includes(quote.status);
+	const [nominate, { isLoading: nominating }] = useNominateQuoteMutation();
 
 	return (
 		<aside
@@ -177,6 +182,19 @@ export function QuotePeek({ id, position, prev, next, onGo, onClose }: QuotePeek
 				{action ? (
 					<Button asChild size="sm" className="ml-auto">
 						<Link to={action.to}>{action.label} →</Link>
+					</Button>
+				) : nominable ? (
+					<Button
+						size="sm"
+						className="ml-auto"
+						disabled={nominating}
+						onClick={async () => {
+							const res = await nominate({ id, body: {} });
+							if ('error' in res) return notify(refusal(res.error, 'That was not saved. Try again.'));
+							notify(`${id} is a curation candidate.`);
+						}}
+					>
+						Nominate for curation
 					</Button>
 				) : null}
 			</div>

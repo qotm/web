@@ -3,6 +3,7 @@ import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import type { TopicEntity } from '@/shared/types';
 import { Button, Card, CommandBlock, Eyebrow, PageMeta, Skeleton, Tabs, TopicTag } from '@/shared/ui';
 import { paths } from '@/lib/paths';
+import { count } from '@/lib/count';
 import { useTopicQuery, useTopicsQuery } from '@/features/quotes/api';
 import { QuoteList } from '@/features/quotes/components/quote-list';
 
@@ -69,7 +70,7 @@ function TopicIndex() {
 							</h2>
 							{t.description ? <p className="m-0 mb-2 text-[15px] text-muted-foreground">{t.description}</p> : null}
 							<p className="m-0 font-mono text-[13px] text-muted-foreground">
-								{n(t.counts.quotes)} quotes · {n(t.counts.curated)} curated
+								{count(t.counts.quotes, 'quote')} · {n(t.counts.curated)} curated
 							</p>
 						</Card>
 					))}
@@ -132,7 +133,7 @@ export function TopicRoute() {
 						<h1 className="m-0 mb-2.5 text-h1">{title(topic.name)}.</h1>
 						<p className="m-0 text-muted-foreground">
 							{topic.description ? `${topic.description} ` : ''}
-							{n(topic.counts.quotes)} quotes, {n(topic.counts.curated)} curated.
+							{count(topic.counts.quotes, 'quote')}, {n(topic.counts.curated)} curated.
 						</p>
 					</div>
 					<CommandBlock command={`qotm --topic ${topic.slug}`} />

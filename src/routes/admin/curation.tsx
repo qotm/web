@@ -18,13 +18,9 @@ import {
 	StatusBadge,
 	notify
 } from '@/shared/ui';
+import { refusal } from '@/features/admin/lib/refusal';
 
 const PAGE_SIZE = 10;
-
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
-};
 
 const card = (q: QueueItemEntity): QueueCard => ({
 	id: q.id,

@@ -16,6 +16,7 @@ import {
 	StatusBadge,
 	notify
 } from '@/shared/ui';
+import { refusal } from '@/features/admin/lib/refusal';
 
 type Role = AdminUsersIdRoleData['body']['role'];
 
@@ -44,11 +45,6 @@ const roleOf = (u: Pick<AdminUserEntity, 'role'>): Role => {
 	const roles = (u.role ?? 'member').split(',');
 	if (roles.includes('superuser') || roles.includes('admin')) return 'admin';
 	return (['moderator', 'verifier'] as const).find((r) => roles.includes(r)) ?? 'member';
-};
-
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
 };
 
 /** Change a user's role, after saying what the new one may do. */

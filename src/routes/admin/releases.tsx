@@ -18,17 +18,13 @@ import {
 	releaseVersion,
 	shortSha
 } from '@/shared/ui';
+import { refusal } from '@/features/admin/lib/refusal';
 
 const PAGE_SIZE = 10;
 /** While a build or a publish runs, ask again this often. */
 const BUILDING_POLL_MS = 3_000;
 
 const n = (v: number) => v.toLocaleString('en-US');
-
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
-};
 
 /** The publish confirmation (artboard AdminPublish): what ships, and the reviewed-preview tick. */
 function PublishDialog({

@@ -9,15 +9,11 @@ import { notesOf, submitter, verification } from '@/features/admin/lib/queues';
 import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import type { QueueItemEntity } from '@/shared/types';
 import { Button, Notice, ProvenancePanel, QuoteBlock, ReviewDecision, StatusBadge, notify } from '@/shared/ui';
+import { refusal } from '@/features/admin/lib/refusal';
 
 const PAGE_SIZE = 10;
 
 /** The API's own words for a refusal it explains ("Link the author before verifying…"). */
-const refusal = (error: unknown, fallback: string) => {
-	const message = (error as { data?: { message?: unknown } }).data?.message;
-	return typeof message === 'string' && !message.startsWith('Validation') ? message : fallback;
-};
-
 const card = (q: QueueItemEntity): QueueCard => ({
 	id: q.id,
 	who: submitter(q),

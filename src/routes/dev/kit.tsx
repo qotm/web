@@ -134,6 +134,7 @@ const detail = (q: QuoteCardEntity, extra: Partial<QuoteEntity> = {}): QuoteEnti
 	verifier: null,
 	verifiedAt: null,
 	lifecycle: [],
+	corrections: [],
 	releases: [],
 	...extra
 });
