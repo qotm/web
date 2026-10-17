@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useAdminQuotesQuery, useExportQuotesMutation, useExportStatusQuery } from '@/features/admin/api';
 import { QuotePeek } from '@/features/admin/components/quote-peek';
+import { BulkBar, type BulkOutcome } from '@/features/admin/components/bulk-bar';
 import { stepFrom } from '@/features/admin/lib/queues';
 import { Empty, PageSkeleton, StateScreen } from '@/shared/layouts';
 import { useDebouncedValue } from '@/shared/hooks/use-debounced-value';
@@ -22,7 +23,7 @@ import {
 	statusInfo
 } from '@/shared/ui';
 import { API_URL } from '@/lib/env';
-import { paths } from '@/lib/paths';
+import { adminPaths, paths } from '@/lib/paths';
 
 type Filters = NonNullable<AdminQuotesData['query']>;
 
@@ -139,7 +140,12 @@ export function AdminQuotesRoute() {
 		...(state ? { state } : {})
 	};
 	const { data, isLoading, isFetching, isError, refetch } = useAdminQuotesQuery({ ...filters, page, limit: PAGE_SIZE });
-	const [selected, setSelected] = useState<string[]>([]);
+	// A selection belongs to the page it was made on: another page or filter starts empty.
+	const scope = JSON.stringify([page, q, type, state]);
+	const [selection, setSelection] = useState<{ scope: string; ids: string[] }>({ scope, ids: [] });
+	const selected = selection.scope === scope ? selection.ids : [];
+	const setSelected = (ids: string[]) => setSelection({ scope, ids });
+	const [outcome, setOutcome] = useState<BulkOutcome | null>(null);
 	const [exporting, setExporting] = useState<string | null>(null);
 	const [startExport, { isLoading: queuing }] = useExportQuotesMutation();
 	const peek = params.get('peek');
@@ -193,6 +199,41 @@ export function AdminQuotesRoute() {
 				</Button>
 			</header>
 			{exporting ? <ExportProgress id={exporting} onDone={() => setExporting(null)} /> : null}
+			{outcome ? (
+				<Notice
+					tone={outcome.detail ? 'info' : 'wash'}
+					title={outcome.title}
+					action={
+						<div className="flex items-center gap-3">
+							{outcome.undo ? (
+								<Button
+									size="sm"
+									variant="quiet"
+									onClick={() =>
+										void outcome.undo!().then(() => {
+											setOutcome(null);
+											notify('Put back as it was.');
+										})
+									}
+								>
+									undo
+								</Button>
+							) : (
+								<TextLink to={adminPaths.audit} mono>
+									audit log →
+								</TextLink>
+							)}
+							<Button size="sm" variant="quiet" aria-label="Dismiss" onClick={() => setOutcome(null)}>
+								✕
+							</Button>
+						</div>
+					}
+				>
+					{outcome.detail
+						? `${outcome.detail} ${outcome.keep.length === 1 ? 'It stays' : 'They stay'} selected, so you can look.`
+						: null}
+				</Notice>
+			) : null}
 			<div className="flex flex-wrap items-end gap-3" role="search" aria-label="Filter quotes">
 				<SearchField
 					size="sm"
@@ -234,25 +275,6 @@ export function AdminQuotesRoute() {
 				<Empty title="No quotes match." description="Try other words, or clear the type and state." />
 			) : (
 				<>
-					{selected.length ? (
-						<div className="flex flex-wrap items-center gap-3 font-mono text-[13px] text-muted-foreground">
-							{selected.length} selected
-							<Button
-								size="sm"
-								variant="outline"
-								onClick={() =>
-									void navigator.clipboard
-										.writeText(selected.join('\n'))
-										.then(() => notify(`Copied ${selected.length} ids.`))
-								}
-							>
-								Copy ids
-							</Button>
-							<Button size="sm" variant="quiet" onClick={() => setSelected([])}>
-								Clear
-							</Button>
-						</div>
-					) : null}
 					<DataTable<AdminQuoteRowEntity>
 						label="Quotes"
 						className={isFetching ? 'opacity-70' : undefined}
@@ -302,6 +324,23 @@ export function AdminQuotesRoute() {
 					/>
 				</>
 			)}
+			{selected.length && data ? (
+				<BulkBar
+					selected={data.list.filter((r) => selected.includes(r.id))}
+					onClear={() => setSelected([])}
+					exporting={queuing || Boolean(exporting)}
+					onExport={(ids) =>
+						void startExport({ ids })
+							.unwrap()
+							.then((job) => setExporting(job.id))
+							.catch(() => notify('The export was not queued. Try again.'))
+					}
+					onDone={(o) => {
+						setOutcome(o);
+						setSelected(o.keep);
+					}}
+				/>
+			) : null}
 			{peek ? (
 				<QuotePeek
 					key="peek"

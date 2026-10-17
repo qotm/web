@@ -29,6 +29,10 @@ import type {
 	AdminQuotesData,
 	AdminQuotesExportData,
 	AdminQuotesExportResponse,
+	AdminQuotesBulkTopicData,
+	AdminQuotesBulkTopicResponse,
+	AdminQuotesBulkWithdrawData,
+	AdminQuotesBulkWithdrawResponse,
 	AdminQuotesResponse,
 	AdminReportsData,
 	AdminReportsIdDecisionData,
@@ -234,6 +238,16 @@ export const adminApi = baseApi.injectEndpoints({
 		exportQuotes: build.mutation<AdminQuotesExportResponse, AdminQuotesExportData['body']>({
 			query: (body) => ({ url: '/v1/admin/quotes/export', method: 'POST', body })
 		}),
+		/** Withdraws the selected quotes, each with the note; skipped ones say why. */
+		bulkWithdraw: build.mutation<AdminQuotesBulkWithdrawResponse, AdminQuotesBulkWithdrawData['body']>({
+			query: (body) => ({ url: '/v1/admin/quotes/bulk/withdraw', method: 'POST', body }),
+			invalidatesTags: [...DECIDED]
+		}),
+		/** Adds a topic to the selected quotes, or takes it off them. */
+		bulkTopic: build.mutation<AdminQuotesBulkTopicResponse, AdminQuotesBulkTopicData['body']>({
+			query: (body) => ({ url: '/v1/admin/quotes/bulk/topic', method: 'POST', body }),
+			invalidatesTags: ['AdminQueue']
+		}),
 		/** An export's progress: waiting, running, ready (rows, bytes) or failed. */
 		exportStatus: build.query<AdminExportsIdResponse, string>({
 			query: (id) => `/v1/admin/exports/${id}`
@@ -267,6 +281,8 @@ export const {
 	usePublishReleaseMutation,
 	useAdminQuotesQuery,
 	useExportQuotesMutation,
+	useBulkWithdrawMutation,
+	useBulkTopicMutation,
 	useExportStatusQuery,
 	useCreateAuthorMutation,
 	useUpdateAuthorMutation,

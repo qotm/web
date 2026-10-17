@@ -891,11 +891,32 @@ export type AdminQuoteRowEntity = {
     type: 'canonical' | 'original';
     status: 'PRIVATE' | 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
     lastRelease: string | null;
+    topics: Array<string>;
     createdAt: string;
 };
 
 export type ExportJobEntity = {
     id: string;
+};
+
+export type BulkWithdraw = {
+    ids: Array<string>;
+    note: string;
+};
+
+export type BulkResultEntity = {
+    done: Array<string>;
+    unchanged: Array<string>;
+    skipped: Array<{
+        id: string;
+        reason: string;
+    }>;
+};
+
+export type BulkTopic = {
+    ids: Array<string>;
+    topic: string;
+    action: 'add' | 'remove';
 };
 
 export type ExportStatusEntity = {
@@ -2410,7 +2431,7 @@ export type AdminAuditData = {
          * Actor handle, action, target or note: `@kofi`, `withdrew`, `q_5d3a8w`
          */
         q?: string;
-        action?: 'quote.verified' | 'quote.evidence_requested' | 'quote.rejected' | 'quote.published' | 'quote.nominated' | 'quote.curated' | 'quote.kept_out' | 'quote.disputed' | 'quote.restored' | 'quote.withdrawn' | 'quote.corrected' | 'report.resolved' | 'release.preview_built' | 'release.published' | 'user.role_changed' | 'author.created' | 'author.updated' | 'source.created' | 'source.updated' | 'topic.created' | 'topic.updated';
+        action?: 'quote.verified' | 'quote.evidence_requested' | 'quote.rejected' | 'quote.published' | 'quote.nominated' | 'quote.curated' | 'quote.kept_out' | 'quote.disputed' | 'quote.restored' | 'quote.withdrawn' | 'quote.corrected' | 'quote.topic_added' | 'quote.topic_removed' | 'report.resolved' | 'release.preview_built' | 'release.published' | 'user.role_changed' | 'author.created' | 'author.updated' | 'source.created' | 'source.updated' | 'topic.created' | 'topic.updated';
         page?: number;
         limit?: number;
     };
@@ -2567,6 +2588,7 @@ export type AdminQuotesData = {
         q?: string;
         type?: 'canonical' | 'original';
         state?: 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        ids?: Array<string>;
         page?: number;
         limit?: number;
     };
@@ -2587,6 +2609,7 @@ export type AdminQuotesExportData = {
         q?: string;
         type?: 'canonical' | 'original';
         state?: 'SUBMITTED' | 'CURATION_REVIEW' | 'CURATED' | 'DATASET_RELEASE' | 'UNDER_REVIEW' | 'VERIFIED' | 'ORIGINALITY_CHECK' | 'PUBLISHED' | 'COMMUNITY_DISCOVERY' | 'CURATION_CANDIDATE' | 'NEEDS_EVIDENCE' | 'DISPUTED' | 'REJECTED' | 'WITHDRAWN';
+        ids?: Array<string>;
     };
     path?: never;
     query?: never;
@@ -2598,6 +2621,32 @@ export type AdminQuotesExportResponses = {
 };
 
 export type AdminQuotesExportResponse = AdminQuotesExportResponses[keyof AdminQuotesExportResponses];
+
+export type AdminQuotesBulkWithdrawData = {
+    body: BulkWithdraw;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/quotes/bulk/withdraw';
+};
+
+export type AdminQuotesBulkWithdrawResponses = {
+    200: BulkResultEntity;
+};
+
+export type AdminQuotesBulkWithdrawResponse = AdminQuotesBulkWithdrawResponses[keyof AdminQuotesBulkWithdrawResponses];
+
+export type AdminQuotesBulkTopicData = {
+    body: BulkTopic;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/quotes/bulk/topic';
+};
+
+export type AdminQuotesBulkTopicResponses = {
+    200: BulkResultEntity;
+};
+
+export type AdminQuotesBulkTopicResponse = AdminQuotesBulkTopicResponses[keyof AdminQuotesBulkTopicResponses];
 
 export type AdminExportsIdData = {
     body?: never;

@@ -1335,6 +1335,7 @@ export const zAdminQuoteListEntity = z.object({
             'WITHDRAWN'
         ]),
         lastRelease: z.unknown(),
+        topics: z.array(z.string()),
         createdAt: z.string().datetime()
     }))
 });
@@ -1365,11 +1366,35 @@ export const zAdminQuoteRowEntity = z.object({
         'WITHDRAWN'
     ]),
     lastRelease: z.unknown(),
+    topics: z.array(z.string()),
     createdAt: z.string().datetime()
 });
 
 export const zExportJobEntity = z.object({
     id: z.string()
+});
+
+export const zBulkWithdraw = z.object({
+    ids: z.array(z.string()).min(1).max(100),
+    note: z.string().min(1).max(1000)
+});
+
+export const zBulkResultEntity = z.object({
+    done: z.array(z.string()),
+    unchanged: z.array(z.string()),
+    skipped: z.array(z.object({
+        id: z.string(),
+        reason: z.string()
+    }))
+});
+
+export const zBulkTopic = z.object({
+    ids: z.array(z.string()).min(1).max(100),
+    topic: z.string(),
+    action: z.enum([
+        'add',
+        'remove'
+    ])
 });
 
 export const zExportStatusEntity = z.object({

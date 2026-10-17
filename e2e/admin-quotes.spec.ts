@@ -49,8 +49,99 @@ test.describe('admin quotes', () => {
 		await page.getByRole('button', { name: 'Copy ids' }).click();
 		await expect(page.getByText('Copied 2 ids.')).toBeVisible();
 		expect((await page.evaluate(() => navigator.clipboard.readText())).split('\n')).toHaveLength(2);
-		await page.getByRole('button', { name: 'Clear' }).click();
+		await page.getByRole('button', { name: 'Clear the selection' }).click();
 		await expect(page.getByText('2 selected')).toHaveCount(0);
+	});
+
+	/** Two fresh quotes only these tests touch, found by a word nothing else has (public ids are 8 characters). */
+	const bulkQuotes = (word: string) => {
+		sql(
+			`INSERT INTO quotes (id, public_id, text, type, status, published_at, updated_at) VALUES ('e2e_${word}_1', 'q_${word}1', 'A ${word} quote, the first.', 'CANONICAL', 'VERIFIED', now(), now()), ('e2e_${word}_2', 'q_${word}2', 'A ${word} quote, the second.', 'CANONICAL', 'VERIFIED', now(), now())`
+		);
+		sql(
+			`INSERT INTO quote_topics (quote_id, topic_id) SELECT q.id, t.id FROM quotes q, topics t WHERE q.public_id LIKE 'q_${word}%' AND t.slug = 'programming'`
+		);
+		return () => {
+			sql(`DELETE FROM audit_logs WHERE target_id LIKE 'q_${word}%'`);
+			sql(`DELETE FROM quotes WHERE public_id LIKE 'q_${word}%'`);
+		};
+	};
+
+	test('withdraws the selection with a note, and says what it did', async ({ page }) => {
+		const cleanup = bulkQuotes('bkwd');
+		try {
+			await signIn(page, 'admin');
+			await page.goto('/admin/quotes?q=bkwd');
+			await page.getByRole('checkbox', { name: 'Select all' }).check();
+			const bar = page.getByRole('toolbar', { name: 'Selected quotes' });
+			await expect(bar).toContainText('2 selected');
+			await bar.getByRole('button', { name: 'Withdraw…' }).click();
+			const dialog = page.getByRole('alertdialog', { name: 'Withdraw 2 quotes?' });
+			for (const id of ['q_bkwd1', 'q_bkwd2']) await expect(dialog).toContainText(id);
+			await dialog.getByRole('button', { name: 'Withdraw 2 quotes' }).click();
+			await expect(dialog.getByText('Say why, for the audit log')).toBeVisible();
+			await dialog.getByLabel('Note').fill('Test duplicates');
+			await dialog.getByRole('button', { name: 'Withdraw 2 quotes' }).click();
+			await expect(page.getByText('2 quotes withdrawn.')).toBeVisible();
+			await expect(bar).toHaveCount(0);
+			await expect(rows(page).locator('[data-status="WITHDRAWN"]')).toHaveCount(2);
+		} finally {
+			cleanup();
+		}
+	});
+
+	test('adds a topic to the selection, counting who has it, and undoes it', async ({ page }) => {
+		const cleanup = bulkQuotes('bktp');
+		try {
+			await signIn(page, 'admin');
+			await page.goto('/admin/quotes?q=bktp');
+			await page.getByRole('checkbox', { name: 'Select all' }).check();
+			const bar = page.getByRole('toolbar', { name: 'Selected quotes' });
+			await bar.getByRole('button', { name: /Add topic/ }).click();
+			const picker = page.getByRole('dialog', { name: 'Add a topic' });
+			await expect(picker.getByRole('button', { name: /programming/ })).toContainText('all have it');
+			await picker.getByLabel('Find a topic').fill('debug');
+			await picker.getByRole('button', { name: /debugging/ }).click();
+			await expect(page.getByText('debugging added to 2 quotes.')).toBeVisible();
+			expect(
+				sql(
+					"SELECT count(*) FROM quote_topics qt JOIN topics t ON t.id = qt.topic_id JOIN quotes q ON q.id = qt.quote_id WHERE t.slug = 'debugging' AND q.public_id LIKE 'q_bktp%'"
+				)
+			).toBe('2');
+			await page.getByRole('button', { name: 'undo' }).click();
+			await expect(page.getByText('Put back as it was.')).toBeVisible();
+			expect(
+				sql(
+					"SELECT count(*) FROM quote_topics qt JOIN topics t ON t.id = qt.topic_id JOIN quotes q ON q.id = qt.quote_id WHERE t.slug = 'debugging' AND q.public_id LIKE 'q_bktp%'"
+				)
+			).toBe('0');
+		} finally {
+			cleanup();
+		}
+	});
+
+	test('a selection belongs to its page; a phone gets the actions as a sheet', async ({ page }) => {
+		await signIn(page, 'admin');
+		await page.goto('/admin/quotes');
+		await rows(page).nth(0).getByRole('checkbox').check();
+		await expect(page.getByText('1 selected')).toBeVisible();
+		await page.getByRole('navigation', { name: 'Pagination' }).getByRole('button', { name: /next/ }).click();
+		await expect(page.getByText('1 selected')).toHaveCount(0);
+
+		await page.setViewportSize({ width: 390, height: 844 });
+		// Rows are cards on a phone.
+		await page
+			.getByRole('checkbox', { name: /^Select q_/ })
+			.first()
+			.check();
+		const bar = page.getByRole('toolbar', { name: 'Selected quotes' });
+		await expect(bar.getByRole('button', { name: 'Withdraw…' })).toBeHidden();
+		await bar.getByRole('button', { name: /Actions/ }).click();
+		const sheet = page.getByRole('dialog', { name: '1 selected' });
+		for (const name of ['Add a topic…', 'Remove a topic…', 'Export CSV', 'Copy ids', 'Withdraw…', 'Clear selection'])
+			await expect(sheet.getByRole('button', { name })).toBeVisible();
+		await sheet.getByRole('button', { name: 'Clear selection' }).click();
+		await expect(bar).toHaveCount(0);
 	});
 
 	test('exports the filtered list, and offers the CSV when it is ready', async ({ page }) => {
